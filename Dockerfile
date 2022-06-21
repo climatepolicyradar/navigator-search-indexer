@@ -11,10 +11,7 @@ RUN curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-
 ENV PATH = "${PATH}:/root/.poetry/bin"
 
 # Copy files to image
-COPY ./search-index .
-# Copy common package to image
-RUN mkdir /common
-COPY /common ../common
+COPY . .
 
 # Install python dependencies using poetry
 RUN poetry config virtualenvs.create false

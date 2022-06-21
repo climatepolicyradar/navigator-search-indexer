@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "search-index"
+name = "navigator-search-indexer"
 version = "0.1.0"
 description = ""
 authors = ["CPR Tech <tech@climatepolicyradar.org>"]
@@ -12,7 +12,6 @@ pandas = "^1.4.1"
 cloudpathlib = {version = "^0.7.0", extras = ["s3"]}
 sentence-transformers = "^2.2.0"
 click = "^8.0.4"
-navigator = {path = "../common", develop = true}
 psycopg2-binary = "^2.9.3"
 pytest = "^7.1.1"
 
