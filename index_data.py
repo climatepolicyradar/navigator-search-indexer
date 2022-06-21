@@ -9,10 +9,10 @@ import pandas as pd
 import numpy as np
 import click
 
-from navigator.core.log import get_logger
 from app.db import PostgresConnector
 from app.index import OpenSearchIndex
 from app.load_data import get_data_from_navigator_tables
+from app.utils import get_logger
 
 logger = get_logger(__name__)
 

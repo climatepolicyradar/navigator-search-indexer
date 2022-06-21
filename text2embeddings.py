@@ -11,14 +11,12 @@ from typing import List, Optional, Dict, Union
 import click
 import numpy as np
 from cloudpathlib import CloudPath
-from navigator.core.log import get_logger
-from navigator.core.utils import get_timestamp
 from tqdm.auto import tqdm
 
 from app.db import PostgresConnector
 from app.load_data import get_data_from_navigator_tables
 from app.ml import SBERTEncoder, SentenceEncoder
-from app.utils import paginate_list
+from app.utils import paginate_list, get_logger, get_timestamp
 
 logger = get_logger(__name__)
 
