@@ -4,7 +4,7 @@ from opensearchpy import OpenSearch, helpers
 from tqdm.auto import tqdm
 import requests
 
-from navigator.core.log import get_logger
+from app.utils import get_logger
 
 logger = get_logger(__name__)
 
