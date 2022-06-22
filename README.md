@@ -19,7 +19,7 @@ Use the following command to run the pdf2text cli using model `msmarco-distilber
 > This has been raised as a [bug issue](https://github.com/climatepolicyradar/navigator/issues/438).
 
 ```
-docker run -v /path/to/pdf2text/outputs:/dir-in -v /path/to/output/directory:/dir-out navigator-search-indexer python /app/text2embeddings.py -i /dir-in -o /dir-out -m "msmarco-distilbert-dot-v5"
+docker run --net=host --env-file .env -v /path/to/pdf2text/outputs:/dir-in -v /path/to/output/directory:/dir-out navigator-search-indexer python /app/text2embeddings.py -i /dir-in -o /dir-out -m "msmarco-distilbert-dot-v5"
 ```
 
 ### 3. Loading data into Opensearch (in docker-compose)
@@ -27,7 +27,7 @@ docker run -v /path/to/pdf2text/outputs:/dir-in -v /path/to/output/directory:/di
 Note: this command will wipe and repopulate the index specified in `.env` if it's already populated.
 
 ```
-docker run -v /path/to/text-ids-file:/text-ids-path -v /path/to/embeddings-file:/embeddings-path navigator-search-indexer python /app/index_data.py --text-ids-path /text-ids-path --embeddings-path /embeddings-path -d 768
+docker run --net=host --env-file .env -v /path/to/text-ids-file:/text-ids-path -v /path/to/embeddings-file:/embeddings-path navigator-search-indexer python /app/index_data.py --text-ids-path /text-ids-path --embeddings-path /embeddings-path -d 768
 ```
 ## Opensearch index structure
 
