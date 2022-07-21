@@ -204,7 +204,7 @@ class OpenSearchIndex:
         successes = 0
 
         for ok, _ in helpers.streaming_bulk(
-            client=self.opns, index=self.index_name, actions=actions
+            client=self.opns, index=self.index_name, actions=actions, timeout="30s"
         ):
             successes += ok
 
