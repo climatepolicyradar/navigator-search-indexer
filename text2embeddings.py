@@ -324,6 +324,10 @@ def run_cli(
     logger.info(f"There are {len(text_and_hashes)} text blocks.")
     if limit:
         text_and_hashes = text_and_hashes[:limit]
+        md5_sums = list(set([i["document_md5_hash"] for i in text_and_hashes]))
+        navigator_dataset = navigator_dataset[
+            navigator_dataset["md5_sum"].isin(md5_sums)
+        ]
 
     logger.info(f"Loading sentence-transformer model {model_name}")
     encoder = SBERTEncoder(model_name)
