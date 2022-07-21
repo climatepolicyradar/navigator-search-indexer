@@ -21,7 +21,7 @@ from app.utils import paginate_list, get_logger, get_timestamp
 logger = get_logger(__name__)
 
 
-def get_text_from_list(text_block: dict, prev_processed_text_block: dict) -> str:
+def get_text_from_list(text_block: dict, prev_processed_text: Optional[str]) -> str:
     """Get text from list type and apply some decoding and minimal formatting.
 
     Format a list text block and prepend it to the previous text block, assuming it is the context of the list.
@@ -29,7 +29,7 @@ def get_text_from_list(text_block: dict, prev_processed_text_block: dict) -> str
 
     Args:
         text_block (dict): text block dict.
-        prev_processed_text_block (dict): previous text block dict.
+        prev_processed_text (Optional[str]): text of previous text block processed.
 
     Returns:
         str: Formatted list text block that is useful for indexing semantics.
@@ -56,8 +56,8 @@ def get_text_from_list(text_block: dict, prev_processed_text_block: dict) -> str
     #  when, for example, there are random elements between pages that the postprocessors haven't been able to catch.
     #  But I've ignored this for now because it seems that the postprocessing in postprocessor.py has dealt with the
     #  vast majority of edge cases (as indicated by the rarity of certain debugging metadata).
-    if prev_processed_text_block:
-        text = prev_processed_text_block + "\n" + text
+    if prev_processed_text:
+        text = prev_processed_text + "\n" + text
         return text
     else:
         return text
@@ -185,7 +185,7 @@ def get_text_from_document_dict(
 
 def get_text_from_json_files(
     filepaths: List[Union[Path, CloudPath]], md5_sums: List[str]
-) -> List[Dict[str, str]]:
+) -> List[Dict[str, Union[str, int, List[List[float]]]]]:
     """Extract text, text block IDs and document IDs from JSON files created by the PDF parsing pipeline.
 
     Args:
@@ -193,7 +193,7 @@ def get_text_from_json_files(
         md5_sums (List[str]): list of md5 sums to include in returned object
 
     Returns:
-        List[Dict[str, str]]: dicts are {"text": "", "text_block_id": "", "document_md5_hash": ""}.
+        List[Dict[str, Union[str, int, List[List[float]]]]]: dicts are {"text": "", "text_block_id": "", "document_md5_hash": "", "coords": []}.
     """
     text_by_document = []
 
@@ -274,8 +274,8 @@ def encode_text_to_memmap(
     help="Optionally limit the number of text samples to process. Useful for debugging.",
 )
 def run_cli(
-    input_dir: Path,
-    output_dir: Path,
+    input_dir: str,
+    output_dir: str,
     s3: Optional[str],
     model_name: str,
     batch_size: int,
@@ -284,8 +284,8 @@ def run_cli(
     """Run CLI to produce embeddings from pdf2text JSON outputs. Encoding will automatically run on the GPU if one is available.
 
     Args:
-        input_dir (Path): Directory containing JSON files
-        output_dir (Path): Directory to save embeddings and IDs to
+        input_dir (str): Directory containing JSON files
+        output_dir (str): Directory to save embeddings and IDs to
         s3 (Optional[str]): Whether we are reading from and writing to S3.
         model_name (str): Name of the sentence-BERT model to use. See https://www.sbert.net/docs/pretrained_models.html.
         batch_size (int): Batch size for encoding.
@@ -318,7 +318,7 @@ def run_cli(
     # that represent documents which are in the app database.
     json_filepaths = list(input_dir.glob("*.json"))
 
-    md5_sums = navigator_dataset["md5_sum"].unique()
+    md5_sums = navigator_dataset["md5_sum"].unique().tolist()
     text_and_hashes = get_text_from_json_files(json_filepaths, md5_sums)
 
     logger.info(f"There are {len(text_and_hashes)} text blocks.")
@@ -339,7 +339,7 @@ def run_cli(
     if s3:
         embs_output_path = Path(tempfile.mkdtemp()) / embs_output_path.name
 
-    encode_text_to_memmap(text_by_document, encoder, batch_size, embs_output_path)
+    encode_text_to_memmap(text_by_document, encoder, batch_size, embs_output_path)  # type: ignore
 
     # Save text, text block IDs and document IDs to JSON file
     with (output_dir / f"ids_{model_name}_{curr_time}.json").open("w") as f:
@@ -374,12 +374,12 @@ def run_cli(
 
     if s3:
         logger.info(f"Writing embeddings to S3 bucket {output_dir}")
-        output_dir.upload_from(embs_output_path)
+        output_dir.upload_from(embs_output_path)  # type: ignore
         logger.info(f"Writing description embeddings to S3 bucket {output_dir}")
-        output_dir.upload_from(description_embs_output_path)
-        output_dir.upload_from(description_ids_output_path)
+        output_dir.upload_from(description_embs_output_path)  # type: ignore
+        output_dir.upload_from(description_ids_output_path)  # type: ignore
         logger.info(f"Deleting temporary folder {embs_output_path}")
-        output_dir.upload_from(logger_fname)
+        output_dir.upload_from(logger_fname)  # type: ignore
 
 
 if __name__ == "__main__":
