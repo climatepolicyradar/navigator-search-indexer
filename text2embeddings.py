@@ -56,11 +56,8 @@ def get_text_from_list(text_block: dict, prev_processed_text: Optional[str]) -> 
     #  when, for example, there are random elements between pages that the postprocessors haven't been able to catch.
     #  But I've ignored this for now because it seems that the postprocessing in postprocessor.py has dealt with the
     #  vast majority of edge cases (as indicated by the rarity of certain debugging metadata).
-    if prev_processed_text:
-        text = prev_processed_text + "\n" + text
-        return text
-    else:
-        return text
+
+    return text if not prev_processed_text else prev_processed_text + "\n" + text
 
 
 def delete_string_indices(data: str, indices: List[int]) -> str:
