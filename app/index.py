@@ -5,6 +5,7 @@ from tqdm.auto import tqdm
 import requests
 
 from app.utils import get_logger
+from app import config
 
 logger = get_logger(__name__)
 
@@ -204,7 +205,10 @@ class OpenSearchIndex:
         successes = 0
 
         for ok, _ in helpers.streaming_bulk(
-            client=self.opns, index=self.index_name, actions=actions, timeout="30s"
+            client=self.opns,
+            index=self.index_name,
+            actions=actions,
+            timeout=f"{config.BULK_INDEX_TIMEOUT}s",
         ):
             successes += ok
 
