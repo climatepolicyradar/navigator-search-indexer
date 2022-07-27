@@ -1,0 +1,23 @@
+name: run-tests
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+  pull_request:
+    branches:
+      - main
+      - dev
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: copy environment
+        run: cp .env.example .env
+      - name: build
+        run: make build
+      - name: test
+        run: make test
