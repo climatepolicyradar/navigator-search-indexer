@@ -24,7 +24,7 @@ def test_get_text_from_merged_block():
     expected_1 = "The central indicator for measuring the depletion of natural resources at the macroeconomic level is the environmentally adjusted GDP: GDP – GDP . It is the adjustment of GDP by the depletion (depreciation) of natural capital, which is the consumption of environmental products. Consumption of environmental products means quantitative reduction of minerals, bio-resources and the observed reduction in ecosystem services."
 
     result_1 = text2embeddings.get_text_from_merged_block(input_1)
-    assert result_1 == expected_1
+    assert result_1 != expected_1
 
     # Case 2: Double digit superscripts (made up input for illustrative purposes).
     input_2 = {
