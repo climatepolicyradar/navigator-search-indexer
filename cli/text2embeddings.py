@@ -68,7 +68,7 @@ def encode_indexer_input(
     default=None,
     help="Optionally limit the number of text samples to process. Useful for debugging.",
 )
-def run_cli(
+def main(
     input_dir: str,
     output_dir: str,
     s3: bool,
@@ -160,4 +160,4 @@ def run_cli(
 
 
 if __name__ == "__main__":
-    run_cli()
+    main()
