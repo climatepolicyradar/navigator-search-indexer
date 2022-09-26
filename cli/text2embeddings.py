@@ -56,6 +56,13 @@ def encode_indexer_input(
     help="Whether or not we are reading from and writing to S3.",
 )
 @click.option(
+    "--redo",
+    "-r",
+    help="Redo encoding for files that have already been parsed. By default, files with IDs that already exist in the output directory are skipped.",
+    is_flag=True,
+    default=False,
+)
+@click.option(
     "--limit",
     type=int,
     default=None,
@@ -65,15 +72,17 @@ def run_cli(
     input_dir: str,
     output_dir: str,
     s3: bool,
+    redo: bool,
     limit: Optional[int],
 ):
     """
-    Run CLI to produce embeddings from pdf2text JSON outputs. Encoding will automatically run on the GPU if one is available.
+    Run CLI to produce embeddings from document parser JSON outputs. Each embeddings file is called {id}.json where {id} is the document ID of the input. Its first line is the description embedding and all other lines are embeddings of each of the text blocks in the document in order. Encoding will automatically run on the GPU if one is available.
 
     Args:
         input_dir: Directory containing JSON files
-        output_dir: Directory to save embeddings and IDs to
+        output_dir: Directory to save embeddings to
         s3: Whether we are reading from and writing to S3.
+        redo: Redo encoding for files that have already been parsed. By default, files with IDs that already exist in the output directory are skipped.
         limit (Optional[int]): Optionally limit the number of text samples to process. Useful for debugging.
     """
 
@@ -84,10 +93,30 @@ def run_cli(
         input_dir_as_path = Path(input_dir)
         output_dir_as_path = Path(output_dir)
 
+    document_ids_previously_parsed = set(
+        [path.stem for path in output_dir_as_path.glob("*.npy")]
+    )
     files_to_parse = list(input_dir_as_path.glob("*.json"))
     tasks = [IndexerInput.parse_raw(path.read_text()) for path in files_to_parse]
 
+    if not redo and document_ids_previously_parsed.intersection(
+        {task.id for task in tasks}
+    ):
+        logger.warning(
+            f"Found {len(document_ids_previously_parsed.intersection({task.id for task in tasks}))} documents that have already been encoded. Skipping."
+        )
+        tasks = [
+            task for task in tasks if task.id not in document_ids_previously_parsed
+        ]
+
+        if not tasks:
+            logger.warning("No more documents to encode. Exiting.")
+            return
+
     if limit:
+        logger.info(
+            f"Limiting to {limit} documents as the --limit flag has been passed."
+        )
         tasks = tasks[:limit]
 
     logger.info(f"Loading sentence-transformer model {config.SBERT_MODEL}")
@@ -101,18 +130,12 @@ def run_cli(
             encoder, task, config.ENCODING_BATCH_SIZE
         )
 
-        description_embedding_output_path = (
-            output_dir_as_path / f"{task.id}_description_embedding.npy"
-        )
-        text_embedding_output_path = (
-            output_dir_as_path / f"{task.id}_text_embedding.npy"
-        )
+        output_path = output_dir_as_path / f"{task.id}.npy"
 
-        with description_embedding_output_path.open("wb") as f:
-            np.save(f, description_embedding, allow_pickle=False)
+        combined_embeddings = np.vstack([description_embedding, text_embeddings])
 
-        with text_embedding_output_path.open("wb") as f:
-            np.save(f, text_embeddings, allow_pickle=False)
+        with output_path.open("wb") as f:
+            np.save(f, combined_embeddings, allow_pickle=False)
 
 
 if __name__ == "__main__":
