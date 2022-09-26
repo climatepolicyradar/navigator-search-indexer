@@ -1,4 +1,4 @@
-import text2embeddings
+from cli import text2embeddings
 
 
 def test_get_text_from_merged_block():

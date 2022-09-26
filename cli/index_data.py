@@ -13,10 +13,9 @@ from src.db import PostgresConnector
 from src.index import OpenSearchIndex
 from src.load_data import get_data_from_navigator_tables
 from src.utils import get_logger
+from src.config import CDN_URL
 
 logger = get_logger(__name__)
-
-CDN_URL: str = os.getenv("CDN_URL", "https://cdn.climatepolicyradar.org")
 
 
 def s3_to_cdn_url(s3_url: str) -> str:
