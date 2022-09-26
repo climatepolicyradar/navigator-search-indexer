@@ -12,6 +12,7 @@ def _convert_to_bool(x: str) -> bool:
     raise ValueError(f"Cannot convert {x} to bool. Input must be 'True' or 'False'.")
 
 
+SBERT_MODEL: str = os.getenv("SBERT_MODEL", "msmarco-distilbert-dot-v5")
 CDN_URL: str = os.getenv("CDN_URL", "https://cdn.climatepolicyradar.org")
 KNN_PARAM_EF_SEARCH: int = int(
     os.getenv("KNN_PARAM_EF_SEARCH", "100")

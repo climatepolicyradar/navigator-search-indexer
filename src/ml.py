@@ -34,8 +34,8 @@ class SBERTEncoder(SentenceEncoder):
     """
 
     def __init__(self, model_name: str):
-        super(SBERTEncoder).__init__()
-        # logger.debug("Downloading sentence-transformers model")
+        super().__init__()
+
         self.encoder = SentenceTransformer(model_name)
 
     def encode(self, text: str) -> np.ndarray:
