@@ -1,6 +1,7 @@
 """In-app config. Set by environment variables."""
 
 import os
+from typing import Set
 
 
 def _convert_to_bool(x: str) -> bool:
@@ -39,3 +40,7 @@ OPENSEARCH_VERIFY_CERTS: bool = _convert_to_bool(
 OPENSEARCH_SSL_SHOW_WARN: bool = _convert_to_bool(
     os.getenv("OPENSEARCH_SSL_SHOW_WARN", "True")
 )
+TARGET_LANGUAGES: Set[str] = set(
+    os.getenv("TARGET_LANGUAGES", "en").lower().split(",")
+)  # comma-separated 2-letter ISO codes
+ENCODER_SUPPORTED_LANGUAGES: Set[str] = {"en"}

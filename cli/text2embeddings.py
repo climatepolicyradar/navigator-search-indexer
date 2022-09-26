@@ -113,6 +113,27 @@ def run_cli(
             logger.warning("No more documents to encode. Exiting.")
             return
 
+    # Filter only to tasks that have one language and where the language is supported. These could either be translated or in the original language.
+    if (
+        unsupported_languages := config.TARGET_LANGUAGES
+        - config.ENCODER_SUPPORTED_LANGUAGES
+    ):
+        logger.warning(
+            f"The following languages have been requested for encoding but are not supported by the encoder: {unsupported_languages}. Only the following languages will be encoded: {config.ENCODER_SUPPORTED_LANGUAGES}."
+        )
+
+    tasks = [
+        task
+        for task in tasks
+        if (len(task.languages) == 1)
+        and (
+            task.languages[0]
+            in config.ENCODER_SUPPORTED_LANGUAGES.union(config.TARGET_LANGUAGES)
+        )
+    ]
+
+    # TODO: check we have all the files we need here i.e. (no ids * no languages)? Or do in the indexing step?
+
     if limit:
         logger.info(
             f"Limiting to {limit} documents as the --limit flag has been passed."

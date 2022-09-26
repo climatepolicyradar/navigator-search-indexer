@@ -82,7 +82,7 @@ class IndexerInput(BaseModel):
     document_name: str
     document_description: str
     url: AnyHttpUrl
-    languages: Optional[Sequence[str]]
+    languages: Sequence[str] = []
     translated: bool
     document_slug: str  # for better links to the frontend hopefully soon
     content_type: ContentType
