@@ -13,10 +13,10 @@ import numpy as np
 from cloudpathlib import CloudPath
 from tqdm.auto import tqdm
 
-from app.db import PostgresConnector
-from app.load_data import get_data_from_navigator_tables
-from app.ml import SBERTEncoder, SentenceEncoder
-from app.utils import paginate_list, get_logger, get_timestamp
+from src.db import PostgresConnector
+from src.load_data import get_data_from_navigator_tables
+from src.ml import SBERTEncoder, SentenceEncoder
+from src.utils import paginate_list, get_logger, get_timestamp
 
 logger = get_logger(__name__)
 

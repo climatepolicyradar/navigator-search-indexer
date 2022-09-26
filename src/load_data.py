@@ -3,7 +3,7 @@
 
 import pandas as pd
 
-from app.db import PostgresConnector
+from src.db import PostgresConnector
 
 
 def get_data_from_navigator_tables(

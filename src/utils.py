@@ -23,6 +23,7 @@ def paginate_list(_list: list, page_size: int) -> List[list]:
     """
     return [_list[i : i + page_size] for i in range(0, len(_list), page_size)]
 
+
 def get_logger(name):
     logger = logging.getLogger(name)
     logger.setLevel(logging.DEBUG)
