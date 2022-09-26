@@ -13,6 +13,7 @@ def _convert_to_bool(x: str) -> bool:
 
 
 SBERT_MODEL: str = os.getenv("SBERT_MODEL", "msmarco-distilbert-dot-v5")
+ENCODING_BATCH_SIZE: int = int(os.getenv("ENCODING_BATCH_SIZE", "32"))
 CDN_URL: str = os.getenv("CDN_URL", "https://cdn.climatepolicyradar.org")
 KNN_PARAM_EF_SEARCH: int = int(
     os.getenv("KNN_PARAM_EF_SEARCH", "100")

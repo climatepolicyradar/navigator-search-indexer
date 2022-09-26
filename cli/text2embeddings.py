@@ -55,7 +55,6 @@ def encode_indexer_input(
     required=False,
     help="Whether or not we are reading from and writing to S3.",
 )
-@click.option("--batch-size", type=int, default=32, help="Batch size for encoding.")
 @click.option(
     "--limit",
     type=int,
@@ -66,7 +65,6 @@ def run_cli(
     input_dir: str,
     output_dir: str,
     s3: bool,
-    batch_size: int,
     limit: Optional[int],
 ):
     """
@@ -76,7 +74,6 @@ def run_cli(
         input_dir: Directory containing JSON files
         output_dir: Directory to save embeddings and IDs to
         s3: Whether we are reading from and writing to S3.
-        batch_size: Batch size for encoding.
         limit (Optional[int]): Optionally limit the number of text samples to process. Useful for debugging.
     """
 
@@ -97,11 +94,11 @@ def run_cli(
     encoder = SBERTEncoder(config.SBERT_MODEL)
 
     logger.info(
-        f"Encoding text from {len(files_to_parse)} documents in batches of {batch_size}"
+        f"Encoding text from {len(files_to_parse)} documents in batches of {config.ENCODING_BATCH_SIZE}"
     )
     for task in tqdm(tasks, unit="docs"):
         description_embedding, text_embeddings = encode_indexer_input(
-            encoder, task, batch_size
+            encoder, task, config.ENCODING_BATCH_SIZE
         )
 
         description_embedding_output_path = (
