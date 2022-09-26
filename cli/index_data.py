@@ -13,7 +13,7 @@ from src.db import PostgresConnector
 from src.index import OpenSearchIndex
 from src.load_data import get_data_from_navigator_tables
 from src.utils import get_logger
-from src.config import CDN_URL
+from src import config
 
 logger = get_logger(__name__)
 
@@ -28,7 +28,7 @@ def s3_to_cdn_url(s3_url: str) -> str:
         str: URL to a PDF in our CDN bucket.
     """
 
-    return re.sub(r"https:\/\/.*\.s3\..*\.amazonaws.com", CDN_URL, s3_url)
+    return re.sub(r"https:\/\/.*\.s3\..*\.amazonaws.com", config.CDN_URL, s3_url)
 
 
 def get_document_generator(
@@ -236,14 +236,12 @@ def load_description_embeddings_and_metadata(
 @click.option("--desc-ids-path", type=click.Path(exists=True), required=True)
 @click.option("--desc-embeddings-path", type=click.Path(exists=True), required=True)
 @click.option("--embedding-dim", "-d", type=int, required=True)
-@click.option("--index-no-replicas", "-r", type=int, default=2)
 def run_cli(
     text_ids_path: Path,
     embeddings_path: Path,
     desc_ids_path: Path,
     desc_embeddings_path: Path,
     embedding_dim: int,
-    index_no_replicas: int,
 ) -> None:
     """Index text and embeddings stores at `text-ids-path` and `embeddings-path` into Opensearch.
 
@@ -253,8 +251,6 @@ def run_cli(
         desc_ids_path (Path): path to CSV file containing a document ID for each description.
         desc_embeddings_path (Path): path to memmap file containing description embeddings.
         embedding_dim (int): embedding dimension.
-        index_no_replicas (int): number of replicas to create when indexing. Defaults to 2, which is a sensible number for a
-        production three-node cluster: each primary shard has a replica on both other nodes.
     """
     postgres_connector = PostgresConnector(os.environ["BACKEND_DATABASE_URL"])
     main_dataset = get_data_from_navigator_tables(postgres_connector)
@@ -268,26 +264,19 @@ def run_cli(
         main_dataset, ids_table, embs, description_embs_dict
     )
 
-    def _convert_to_bool(x):
-        if x.lower() == "true":
-            return True
-        elif x.lower() == "false":
-            return False
-
     opensearch = OpenSearchIndex(
         url=os.environ["OPENSEARCH_URL"],
         username=os.environ["OPENSEARCH_USER"],
         password=os.environ["OPENSEARCH_PASSWORD"],
         index_name=os.environ["OPENSEARCH_INDEX"],
-        # TODO: convert to env variables?
         opensearch_connector_kwargs={
-            "use_ssl": _convert_to_bool(os.environ["OPENSEARCH_USE_SSL"]),
-            "verify_certs": _convert_to_bool(os.environ["OPENSEARCH_VERIFY_CERTS"]),
-            "ssl_show_warn": _convert_to_bool(os.environ["OPENSEARCH_SSL_WARNINGS"]),
+            "use_ssl": config.OPENSEARCH_USE_SSL,
+            "verify_certs": config.OPENSEARCH_VERIFY_CERTS,
+            "ssl_show_warn": config.OPENSEARCH_SSL_SHOW_WARN,
         },
-        embedding_dim=int(os.environ["OPENSEARCH_INDEX_EMBEDDING_DIM"]),
+        embedding_dim=config.OPENSEARCH_INDEX_EMBEDDING_DIM,
     )
-    opensearch.delete_and_create_index(n_replicas=index_no_replicas)
+    opensearch.delete_and_create_index(n_replicas=config.OPENSEARCH_INDEX_NUM_REPLICAS)
     # We disable index refreshes during indexing to speed up the indexing process,
     # and to ensure only 1 segment is created per shard. This also speeds up KNN
     # queries and aggregations according to the Opensearch and Elasticsearch docs.

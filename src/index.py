@@ -5,6 +5,7 @@ from tqdm.auto import tqdm
 import requests
 
 from src.utils import get_logger
+from src import config
 
 logger = get_logger(__name__)
 
@@ -59,8 +60,8 @@ class OpenSearchIndex:
             "settings": {
                 "index": {
                     "knn": True,
-                    "knn.algo_param.ef_search": 100,  # TODO: tune me. see https://opensearch.org/docs/latest/search-plugins/knn/knn-index#index-settings
-                    "number_of_shards": 1,
+                    "knn.algo_param.ef_search": config.KNN_PARAM_EF_SEARCH,
+                    "number_of_shards": config.OPENSEARCH_INDEX_NUM_SHARDS,
                     "number_of_replicas": n_replicas,
                 },
                 "analysis": {
@@ -140,10 +141,10 @@ class OpenSearchIndex:
                         "method": {
                             "name": "hnsw",
                             "space_type": "innerproduct",
-                            "engine": "nmslib",  # TODO: decide between faiss and nmslib and tune params
+                            "engine": "nmslib",
                             "parameters": {
-                                "ef_construction": 512,  # TODO: tune me. 512 is Opensearch default
-                                "m": 16,  # TODO: tune me. 16 is Opensearch default
+                                "ef_construction": config.NMSLIB_EF_CONSTRUCTION,
+                                "m": config.NMSLIB_M,
                             },
                         },
                     },
@@ -157,10 +158,10 @@ class OpenSearchIndex:
                         "method": {
                             "name": "hnsw",
                             "space_type": "innerproduct",
-                            "engine": "nmslib",  # TODO: decide between faiss and nmslib and tune params
+                            "engine": "nmslib",
                             "parameters": {
-                                "ef_construction": 512,  # TODO: tune me. 512 is Opensearch default
-                                "m": 16,  # TODO: tune me. 16 is Opensearch default
+                                "ef_construction": config.NMSLIB_EF_CONSTRUCTION,
+                                "m": config.NMSLIB_M,
                             },
                         },
                     },
