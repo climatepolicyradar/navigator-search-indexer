@@ -28,6 +28,9 @@ def test_run_encoder_local(test_input_dir: Path):
         assert (Path(output_dir) / "test_pdf.npy").exists()
         assert (Path(output_dir) / "test_pdf.json").exists()
 
+        # test_html has the `has_valid_text` flag set to false, so the numpy file should only contain a description embedding
+        assert np.load(Path(output_dir) / "test_html.npy").shape == (1, 768)
+
 
 def test_run_encoder_s3(test_input_dir: Path):
     """Test that the encoder runs with S3 input and output paths and outputs the correct files."""

@@ -100,4 +100,7 @@ class IndexerInput(BaseModel):
         if self.document_content_type == ContentType.PDF:
             return self.pdf_data.text_blocks  # type: ignore
         elif self.document_content_type == ContentType.HTML:
-            return self.html_data.text_blocks  # type: ignore
+            if self.html_data.has_valid_text:  # type: ignore
+                return self.html_data.text_blocks  # type: ignore
+            else:
+                return []
