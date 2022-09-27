@@ -7,13 +7,10 @@ authors = ["CPR Tech <tech@climatepolicyradar.org>"]
 [tool.poetry.dependencies]
 python = "^3.8"
 opensearch-py = "^1.1.0"
-SQLAlchemy = "^1.4.32"
-pandas = "^1.4.1"
 cloudpathlib = {version = "^0.7.0", extras = ["s3"]}
 sentence-transformers = "2.2.0"
 huggingface_hub = "0.4.0"
 click = "^8.0.4"
-psycopg2-binary = "^2.9.3"
 pytest = "^7.1.1"
 pydantic = "^1.10.2"
 
