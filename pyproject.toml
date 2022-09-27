@@ -13,6 +13,7 @@ huggingface_hub = "0.4.0"
 click = "^8.0.4"
 pytest = "^7.1.1"
 pydantic = "^1.10.2"
+python-json-logger = "^2.0.4"
 
 [tool.poetry.dev-dependencies]
 black = "^22.1.0"

@@ -481,6 +481,14 @@ python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,>=2.7"
 six = ">=1.5"
 
 [[package]]
+name = "python-json-logger"
+version = "2.0.4"
+description = "A python library adding a json log formatter"
+category = "main"
+optional = false
+python-versions = ">=3.5"
+
+[[package]]
 name = "pyyaml"
 version = "6.0"
 description = "YAML parser and emitter for Python"
@@ -798,7 +806,7 @@ testing = ["coverage (>=4)", "coverage-enable-subprocess (>=1)", "flaky (>=3)", 
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "dc2ba81e4f06a225b572f8c2bb13a9fab8ef4bec4298c935012ac18871f7f345"
+content-hash = "ea3d530411084d76e50706d8fc56ae7a84e465007250b38ba8a469a1f539bc43"
 
 [metadata.files]
 atomicwrites = []
@@ -841,6 +849,7 @@ pyflakes = []
 pyparsing = []
 pytest = []
 python-dateutil = []
+python-json-logger = []
 pyyaml = []
 regex = []
 requests = []
