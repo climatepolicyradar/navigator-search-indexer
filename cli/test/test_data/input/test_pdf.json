@@ -6,6 +6,9 @@
     "languages": [
         "en"
     ],
+    "document_metadata": {
+        "document_source_url": "http://climate-laws.org"
+    },
     "translated": false,
     "document_slug": "XYX",
     "content_type": "application/pdf",

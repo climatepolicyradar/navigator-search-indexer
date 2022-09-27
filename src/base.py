@@ -12,6 +12,13 @@ class ContentType(str, Enum):
     PDF = "application/pdf"
 
 
+class DocumentMetadata(BaseModel):
+    """Metadata about a document."""
+
+    document_source_url: AnyHttpUrl
+    # TODO: add other metadata fields from loader
+
+
 class TextBlock(BaseModel):
     """
     Base class for a text block.
@@ -76,9 +83,7 @@ class IndexerInput(BaseModel):
     """Input to the indexer. Serialised output of the document parser."""
 
     id: str
-    document_metadata: dict = (
-        {}
-    )  # TODO: add a proper model for this once we know what it looks like
+    document_metadata: DocumentMetadata
     document_name: str
     document_description: str
     url: AnyHttpUrl
@@ -88,3 +93,11 @@ class IndexerInput(BaseModel):
     content_type: ContentType
     html_data: Optional[HTMLData] = None
     pdf_data: Optional[PDFData] = None
+
+    def get_text_blocks(self) -> Sequence[TextBlock]:  # type: ignore
+        """Returns the text blocks contained in the document."""
+
+        if self.content_type == ContentType.PDF:
+            return self.pdf_data.text_blocks  # type: ignore
+        elif self.content_type == ContentType.HTML:
+            return self.html_data.text_blocks  # type: ignore

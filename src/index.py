@@ -1,13 +1,13 @@
 from typing import Optional, Iterable
+import logging
 
 from opensearchpy import OpenSearch, helpers
 from tqdm.auto import tqdm
 import requests
 
-from src.utils import get_logger
 from src import config
 
-logger = get_logger(__name__)
+logger = logging.getLogger(__name__)
 
 
 class OpenSearchIndex:

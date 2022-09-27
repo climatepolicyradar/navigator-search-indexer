@@ -28,12 +28,7 @@ def encode_indexer_input(
 
     description_embedding = encoder.encode(input.document_description)
 
-    if input.content_type == "text/html":
-        text_blocks = input.html_data.text_blocks  # type: ignore
-    elif input.content_type == "application/pdf":
-        text_blocks = input.pdf_data.text_blocks  # type: ignore
-    else:
-        raise ValueError(f"Unknown content type {input.content_type}")
+    text_blocks = input.get_text_blocks()
 
     text_embeddings = encoder.encode_batch(
         [block.to_string() for block in text_blocks], batch_size=batch_size

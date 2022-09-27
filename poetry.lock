@@ -818,6 +818,25 @@ torchhub = ["filelock", "huggingface-hub (>=0.1.0,<1.0)", "importlib-metadata", 
 vision = ["pillow"]
 
 [[package]]
+name = "types-requests"
+version = "2.28.11"
+description = "Typing stubs for requests"
+category = "dev"
+optional = false
+python-versions = "*"
+
+[package.dependencies]
+types-urllib3 = "<1.27"
+
+[[package]]
+name = "types-urllib3"
+version = "1.26.25"
+description = "Typing stubs for urllib3"
+category = "dev"
+optional = false
+python-versions = "*"
+
+[[package]]
 name = "typing-extensions"
 version = "4.2.0"
 description = "Backported and Experimental Type Hints for Python 3.7+"
@@ -859,7 +878,7 @@ testing = ["coverage (>=4)", "coverage-enable-subprocess (>=1)", "flaky (>=3)", 
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "c7baadaf3d2545a26d5e653421468ad8f3d22a1e47d41cfea62546511ecb5432"
+content-hash = "4a61bb2a55619357b0bbe503c1b0ba0f1b2fb1d1790b9a8c8d95379dd1f6fc51"
 
 [metadata.files]
 atomicwrites = []
@@ -924,6 +943,8 @@ torch = []
 torchvision = []
 tqdm = []
 transformers = []
+types-requests = []
+types-urllib3 = []
 typing-extensions = []
 urllib3 = []
 virtualenv = []
