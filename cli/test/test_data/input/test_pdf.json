@@ -1,8 +1,8 @@
 {
-    "id": "test_pdf",
+    "document_id": "test_pdf",
     "document_name": "test_pdf",
     "document_description": "test_pdf_description",
-    "url": "https://cdn.climatepolicyradar.org/EUR/2013/EUR-2013-01-01-Overview+of+CAP+Reform+2014-2020_6237180d8c443d72c06c9167019ca177.pdf",
+    "document_url": "https://cdn.climatepolicyradar.org/EUR/2013/EUR-2013-01-01-Overview+of+CAP+Reform+2014-2020_6237180d8c443d72c06c9167019ca177.pdf",
     "languages": [
         "en"
     ],
@@ -11,7 +11,7 @@
     },
     "translated": false,
     "document_slug": "XYX",
-    "content_type": "application/pdf",
+    "document_content_type": "application/pdf",
     "html_data": null,
     "pdf_data": {
         "page_metadata": [

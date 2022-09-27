@@ -95,13 +95,15 @@ def main(
     tasks = [IndexerInput.parse_raw(path.read_text()) for path in files_to_parse]
 
     if not redo and document_ids_previously_parsed.intersection(
-        {task.id for task in tasks}
+        {task.document_id for task in tasks}
     ):
         logger.warning(
-            f"Found {len(document_ids_previously_parsed.intersection({task.id for task in tasks}))} documents that have already been encoded. Skipping."
+            f"Found {len(document_ids_previously_parsed.intersection({task.document_id for task in tasks}))} documents that have already been encoded. Skipping."
         )
         tasks = [
-            task for task in tasks if task.id not in document_ids_previously_parsed
+            task
+            for task in tasks
+            if task.document_id not in document_ids_previously_parsed
         ]
 
         if not tasks:
@@ -146,14 +148,14 @@ def main(
             encoder, task, config.ENCODING_BATCH_SIZE
         )
 
-        embeddings_output_path = output_dir_as_path / f"{task.id}.npy"
+        embeddings_output_path = output_dir_as_path / f"{task.document_id}.npy"
 
         combined_embeddings = np.vstack([description_embedding, text_embeddings])
 
-        task_output_path = output_dir_as_path / f"{task.id}.json"
+        task_output_path = output_dir_as_path / f"{task.document_id}.json"
         task_output_path.write_text(task.json())
 
-        embeddings_output_path = output_dir_as_path / f"{task.id}.npy"
+        embeddings_output_path = output_dir_as_path / f"{task.document_id}.npy"
         with embeddings_output_path.open("wb") as f:
             np.save(f, combined_embeddings, allow_pickle=False)
 

@@ -82,22 +82,22 @@ class HTMLData(BaseModel):
 class IndexerInput(BaseModel):
     """Input to the indexer. Serialised output of the document parser."""
 
-    id: str
+    document_id: str
     document_metadata: DocumentMetadata
     document_name: str
     document_description: str
-    url: AnyHttpUrl
+    document_url: AnyHttpUrl
     languages: Sequence[str] = []
     translated: bool
     document_slug: str  # for better links to the frontend hopefully soon
-    content_type: ContentType
+    document_content_type: ContentType
     html_data: Optional[HTMLData] = None
     pdf_data: Optional[PDFData] = None
 
     def get_text_blocks(self) -> Sequence[TextBlock]:  # type: ignore
         """Returns the text blocks contained in the document."""
 
-        if self.content_type == ContentType.PDF:
+        if self.document_content_type == ContentType.PDF:
             return self.pdf_data.text_blocks  # type: ignore
-        elif self.content_type == ContentType.HTML:
+        elif self.document_content_type == ContentType.HTML:
             return self.html_data.text_blocks  # type: ignore

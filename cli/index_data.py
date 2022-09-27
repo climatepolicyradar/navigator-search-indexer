@@ -30,13 +30,13 @@ def get_document_generator(
     # TODO: move to config?
     # TODO: build index mapping based on this?
     CORE_METADATA_FIELDS = {
-        "id",
+        "document_id",
         "document_name",
         "document_description",
-        "url",
+        "document_url",
         "translated",
         "document_slug",
-        "content_type",
+        "document_content_type",
     }
 
     for task in tasks:
@@ -47,7 +47,7 @@ def get_document_generator(
         all_metadata = {**core_metadata, **database_metadata}
         # TODO: do we still need md5sum in the index?
 
-        embeddings = np.load(str(embedding_dir_as_path / f"{task.id}.npy"))
+        embeddings = np.load(str(embedding_dir_as_path / f"{task.document_id}.npy"))
 
         # Generate document name doc
         yield {

@@ -1,8 +1,8 @@
 {
-    "id": "test_html",
+    "document_id": "test_html",
     "document_name": "test_html",
     "document_description": "test_html_description",
-    "url": "https://www.industry.gov.au/funding-and-incentives/emissions-reduction-fund",
+    "document_url": "https://www.industry.gov.au/funding-and-incentives/emissions-reduction-fund",
     "languages": [
         "en"
     ],
@@ -11,7 +11,7 @@
     },
     "translated": false,
     "document_slug": "YYY",
-    "content_type": "text/html",
+    "document_content_type": "text/html",
     "html_data": {
         "detected_title": "Machinery of Government (MoG) changes to our department from 1 July 2022",
         "detected_date": "2020-10-22",

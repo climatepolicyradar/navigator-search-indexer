@@ -121,6 +121,8 @@ class OpenSearchIndex:
                     "document_sector_name": {"type": "keyword"},
                     "document_keyword": {"type": "keyword"},
                     "document_language": {"type": "keyword"},
+                    "document_slug": {"type": "keyword"},
+                    "document_content_type": {"type": "keyword"},
                     # Searchable
                     "for_search_document_name": {
                         "type": "text",
