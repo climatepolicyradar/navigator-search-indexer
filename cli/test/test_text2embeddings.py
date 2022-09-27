@@ -12,7 +12,7 @@ from cli.text2embeddings import main as cli_main
 
 @pytest.fixture()
 def test_input_dir() -> Path:
-    return (Path(__file__).parent / "test_data" / "input").resolve()
+    return (Path(__file__).parent / "test_data" / "text2embeddings_input").resolve()
 
 
 def test_run_encoder_local(test_input_dir: Path):

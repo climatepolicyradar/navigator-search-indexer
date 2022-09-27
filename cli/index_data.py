@@ -86,7 +86,7 @@ def get_document_generator(
     required=False,
     help="Whether or not we are reading from and writing to S3.",
 )
-def run_cli(
+def main(
     text2embedding_output_dir: str,
     s3: bool,
 ) -> None:
@@ -138,4 +138,4 @@ def run_cli(
 
 
 if __name__ == "__main__":
-    run_cli()
+    main()
