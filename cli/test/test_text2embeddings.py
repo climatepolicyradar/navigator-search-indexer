@@ -24,7 +24,9 @@ def test_run_encoder_local(test_input_dir: Path):
         assert result.exit_code == 0
 
         assert (Path(output_dir) / "test_html.npy").exists()
+        assert (Path(output_dir) / "test_html.json").exists()
         assert (Path(output_dir) / "test_pdf.npy").exists()
+        assert (Path(output_dir) / "test_pdf.json").exists()
 
 
 def test_run_encoder_s3(test_input_dir: Path):
@@ -43,6 +45,7 @@ def test_run_encoder_s3(test_input_dir: Path):
 
         assert result.exit_code == 0
         assert (LocalS3Path(output_dir) / "test_html.npy").exists()
+        assert (LocalS3Path(output_dir) / "test_html.json").exists()
 
 
 def test_run_parser_skip_already_done(caplog, test_input_dir) -> None:

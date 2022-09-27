@@ -146,11 +146,15 @@ def main(
             encoder, task, config.ENCODING_BATCH_SIZE
         )
 
-        output_path = output_dir_as_path / f"{task.id}.npy"
+        embeddings_output_path = output_dir_as_path / f"{task.id}.npy"
 
         combined_embeddings = np.vstack([description_embedding, text_embeddings])
 
-        with output_path.open("wb") as f:
+        task_output_path = output_dir_as_path / f"{task.id}.json"
+        task_output_path.write_text(task.json())
+
+        embeddings_output_path = output_dir_as_path / f"{task.id}.npy"
+        with embeddings_output_path.open("wb") as f:
             np.save(f, combined_embeddings, allow_pickle=False)
 
 

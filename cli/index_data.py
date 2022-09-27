@@ -79,8 +79,7 @@ def get_document_generator(
 
 
 @click.command()
-@click.argument("pdf-parser-output-dir")
-@click.argument("embedding-dir")
+@click.argument("text2embedding-output-dir")
 @click.option(
     "--s3",
     is_flag=True,
@@ -88,8 +87,7 @@ def get_document_generator(
     help="Whether or not we are reading from and writing to S3.",
 )
 def run_cli(
-    pdf_parser_output_dir: str,
-    embedding_dir: str,
+    text2embedding_output_dir: str,
     s3: bool,
 ) -> None:
     """
@@ -99,15 +97,13 @@ def run_cli(
     :param embedding_dir: directory or S3 folder containing embeddings from the text2embeddings CLI.
     """
     if s3:
-        pdf_parser_output_dir_as_path = S3Path(pdf_parser_output_dir)
-        embedding_dir_as_path = S3Path(embedding_dir)
+        embedding_dir_as_path = S3Path(text2embedding_output_dir)
     else:
-        pdf_parser_output_dir_as_path = Path(pdf_parser_output_dir)
-        embedding_dir_as_path = Path(embedding_dir)
+        embedding_dir_as_path = Path(text2embedding_output_dir)
 
     tasks = [
         IndexerInput.parse_raw(path.read_text())
-        for path in list(pdf_parser_output_dir_as_path.glob("*.json"))
+        for path in list(embedding_dir_as_path.glob("*.json"))
     ]
 
     doc_generator = get_document_generator(tasks, embedding_dir_as_path)
