@@ -8,11 +8,17 @@ import pytest
 import numpy as np
 
 from cli.text2embeddings import main as cli_main
+from src.base import IndexerInput
 
 
 @pytest.fixture()
 def test_input_dir() -> Path:
     return (Path(__file__).parent / "test_data" / "text2embeddings_input").resolve()
+
+
+@pytest.fixture()
+def test_input_dir_bad_data() -> Path:
+    return (Path(__file__).parent / "test_data" / "text2embeddings_input_bad").resolve()
 
 
 def test_run_encoder_local(test_input_dir: Path):
@@ -23,10 +29,29 @@ def test_run_encoder_local(test_input_dir: Path):
         result = runner.invoke(cli_main, [str(test_input_dir), output_dir])
         assert result.exit_code == 0
 
-        assert (Path(output_dir) / "test_html.npy").exists()
-        assert (Path(output_dir) / "test_html.json").exists()
-        assert (Path(output_dir) / "test_pdf.npy").exists()
-        assert (Path(output_dir) / "test_pdf.json").exists()
+        assert set(Path(output_dir).glob("*.json")) == {
+            Path(output_dir) / "test_html.json",
+            Path(output_dir) / "test_pdf.json",
+        }
+        assert set(Path(output_dir).glob("*.npy")) == {
+            Path(output_dir) / "test_html.npy",
+            Path(output_dir) / "test_pdf.npy",
+        }
+
+        for path in Path(output_dir).glob("*.json"):
+            assert IndexerInput.parse_raw(path.read_text())
+
+        for path in Path(output_dir).glob("*.npy"):
+            assert np.load(path).shape[1] == 768
+
+
+def test_run_encoder_local_fail_bad_input(test_input_dir_bad_data: Path):
+    """Test that the encoder fails with bad input data."""
+
+    with tempfile.TemporaryDirectory() as output_dir:
+        runner = CliRunner()
+        result = runner.invoke(cli_main, [str(test_input_dir_bad_data), output_dir])
+        assert result.exit_code == 1
 
 
 def test_run_encoder_s3(test_input_dir: Path):
@@ -44,8 +69,11 @@ def test_run_encoder_s3(test_input_dir: Path):
         result = runner.invoke(cli_main, [input_dir, output_dir, "--s3"])
 
         assert result.exit_code == 0
-        assert (LocalS3Path(output_dir) / "test_html.npy").exists()
-        assert (LocalS3Path(output_dir) / "test_html.json").exists()
+
+        assert set(LocalS3Path(output_dir).iterdir()) == {
+            LocalS3Path(f"{output_dir}/test_html.json"),
+            LocalS3Path(f"{output_dir}/test_html.npy"),
+        }
 
 
 def test_run_parser_skip_already_done(caplog, test_input_dir) -> None:
