@@ -2,7 +2,7 @@ from typing import Optional, Sequence, Tuple, List
 from enum import Enum
 from datetime import date
 
-from pydantic import BaseModel, AnyHttpUrl, Field
+from pydantic import BaseModel, AnyHttpUrl, Field, root_validator
 
 
 class ContentType(str, Enum):
@@ -15,7 +15,7 @@ class ContentType(str, Enum):
 class DocumentMetadata(BaseModel):
     """Metadata about a document."""
 
-    document_source_url: AnyHttpUrl
+    document_source_url: Optional[AnyHttpUrl]
     # TODO: add other metadata fields from loader
 
 
@@ -86,21 +86,67 @@ class IndexerInput(BaseModel):
     document_metadata: DocumentMetadata
     document_name: str
     document_description: str
-    document_url: AnyHttpUrl
+    document_url: Optional[AnyHttpUrl]
     languages: Optional[Sequence[str]]
     translated: bool
     document_slug: str  # for better links to the frontend hopefully soon
-    document_content_type: ContentType
+    document_content_type: Optional[ContentType]
     html_data: Optional[HTMLData] = None
     pdf_data: Optional[PDFData] = None
 
     def get_text_blocks(self) -> Sequence[TextBlock]:  # type: ignore
         """Returns the text blocks contained in the document."""
 
-        if self.document_content_type == ContentType.PDF:
+        if self.document_content_type is None:
+            return []
+        elif self.document_content_type == ContentType.PDF:
             return self.pdf_data.text_blocks  # type: ignore
         elif self.document_content_type == ContentType.HTML:
             if self.html_data.has_valid_text:  # type: ignore
                 return self.html_data.text_blocks  # type: ignore
             else:
                 return []
+
+    @root_validator
+    def check_html_pdf_metadata(cls, values):
+        """
+        Check that html_data is set if content_type is HTML, or pdf_data is set if content_type is PDF.
+
+        TODO: this is copied from `ParserOutput` in the document parser. Do we want to move it to a common place so both repos can use it?
+        """
+        if (
+            values["document_content_type"] == ContentType.HTML
+            and values["html_data"] is None
+        ):
+            raise ValueError("html_metadata must be set for HTML documents")
+
+        if (
+            values["document_content_type"] == ContentType.PDF
+            and values["pdf_data"] is None
+        ):
+            raise ValueError("pdf_metadata must be null for HTML documents")
+
+        if values["document_content_type"] is None and (
+            values["html_data"] is not None or values["pdf_data"] is not None
+        ):
+            raise ValueError(
+                "html_metadata and pdf_metadata must be null for documents with no content type."
+            )
+
+        return values
+
+    @root_validator
+    def check_content_type_and_url(cls, values) -> None:
+        """Either both or neither of content type and url should be null."""
+        if (
+            values["document_content_type"] is None
+            and values["document_url"] is not None
+        ) or (
+            values["document_content_type"] is not None
+            and values["document_url"] is None
+        ):
+            raise ValueError(
+                "Both document_content_type and document_url must be null or not null."
+            )
+
+        return values
