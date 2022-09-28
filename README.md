@@ -1,17 +1,20 @@
 # Opensearch Indexer
 
 The code in this folder contains multiple CLIs used to index data into the Navigator search index:
+
 * `text2embeddings.py`: loads JSON data produced by the `pdf2text` pipeline and converts it to embeddings (.memmap) and text and IDs (.json) files.
 * `index_data.py`: loads document metadata from the Navigator database and the prototype *processed_policies.csv** file and indexes this data alongside the text and embeddings created using `text2embeddings` into the search index.
 
 There is also an `opensearch-query-example.ipynb` notebook that demonstrates running a query on the index. This is to be developed further and integrated into the Navigator APIs.
 
 ## Running
+
 ### 1. Building
 
 `make build`
 
 ### 2. Creating embeddings
+
 Use the following command to run the pdf2text cli using model `msmarco-distilbert-dot-v5` with the default batch size and no limit. Run `docker run navigator-search-indexer python /app/text2embeddings.py --help` for a full set of options.
 
 > WARNING: this command currently fails with a memory error in docker-compose, but works fine when run on Python directly on the host machine. To get this running you can `poetry install` this folder and pass the database URL directly to python.
@@ -29,6 +32,7 @@ Note: this command will wipe and repopulate the index specified in `.env` if it'
 ```
 docker run --net=host --env-file .env -v /path/to/text-ids-file:/text-ids-path -v /path/to/embeddings-file:/embeddings-path navigator-search-indexer python /app/index_data.py --text-ids-path /text-ids-path --embeddings-path /embeddings-path -d 768
 ```
+
 ## Opensearch index structure
 
 The following snippets are examples of the structure of different documents in the Opensearch index. Each document in the Opensearch index either describes a title, a description, or a text block of a document. **TODO: This will be revised once we remove the concept of actions from our database.**
@@ -37,7 +41,6 @@ The following snippets are examples of the structure of different documents in t
 
 ``` json
 {
-    "md5_sum" : "1c11e58a696ca5741fdc3454b4369564",
     "document_url" : "https://cdn.climatepolicyradar.org/PHL/2020/PHL-2020-03-19-Sustainable Finance Policy Framework of 2020-319_1c11e58a696ca5741fdc3454b4369564.pdf",
     "document_id" : 167,
     "document_name" : "Sustainable Finance Policy Framework of 2020",
@@ -99,7 +102,6 @@ Note the `for_search_document_name` field which is used for title search; the `d
 
 ``` json
 {
-  "md5_sum" : "1c11e58a696ca5741fdc3454b4369564",
   "document_url" : "https://cdn.climatepolicyradar.org/PHL/2020/PHL-2020-03-19-Sustainable Finance Policy Framework of 2020-319_1c11e58a696ca5741fdc3454b4369564.pdf",
   "document_id" : 167,
   "document_name" : "Sustainable Finance Policy Framework of 2020",
@@ -140,7 +142,6 @@ Note the `for_search_document_description` field and the `document_description` 
 
 ``` json
 {
-  "md5_sum" : "1c11e58a696ca5741fdc3454b4369564",
   "document_url" : "https://cdn.climatepolicyradar.org/PHL/2020/PHL-2020-03-19-Sustainable Finance Policy Framework of 2020-319_1c11e58a696ca5741fdc3454b4369564.pdf",
   "document_id" : 167,
   "document_name" : "Sustainable Finance Policy Framework of 2020",

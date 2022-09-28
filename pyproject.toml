@@ -7,20 +7,20 @@ authors = ["CPR Tech <tech@climatepolicyradar.org>"]
 [tool.poetry.dependencies]
 python = "^3.8"
 opensearch-py = "^1.1.0"
-SQLAlchemy = "^1.4.32"
-pandas = "^1.4.1"
 cloudpathlib = {version = "^0.7.0", extras = ["s3"]}
 sentence-transformers = "2.2.0"
 huggingface_hub = "0.4.0"
 click = "^8.0.4"
-psycopg2-binary = "^2.9.3"
 pytest = "^7.1.1"
+pydantic = "^1.10.2"
+python-json-logger = "^2.0.4"
 
 [tool.poetry.dev-dependencies]
 black = "^22.1.0"
 flake8 = "^4.0.1"
 mypy = "^0.941"
 pre-commit = "^2.17.0"
+types-requests = "^2.28.11"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
@@ -33,6 +33,7 @@ build-backend = "poetry.core.masonry.api"
 # D107 - Missing docstring in __init__
 # D202 - No blank lines allowed after function docstring
 # D203 - 1 blank line required before class docstring
+# D212 - Multi-line docstring summary should start at the first line
 # D213 - Multi-line docstring summary should start at the second line
 # D400 - First line should end with a period
 # D401 - First line should be in imperative mood (Google styleguide denotes 'descriptive' style.)
@@ -42,7 +43,7 @@ build-backend = "poetry.core.masonry.api"
 # D415 - First line should end with a period, question mark, or exclamation point
 ignore = """
 D100,D103,D104,D107,
-D202,D203,D213,
+D202,D203,D212,D213,
 D400,D401,D406,D407,D413,D415
 """
 
