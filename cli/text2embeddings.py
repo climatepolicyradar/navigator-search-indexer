@@ -40,21 +40,24 @@ logging.config.dictConfig(DEFAULT_LOGGING)
 
 def encode_indexer_input(
     encoder: SentenceEncoder, input: IndexerInput, batch_size: int
-) -> Tuple[np.ndarray, np.ndarray]:
+) -> Tuple[np.ndarray, Optional[np.ndarray]]:
     """
     Produce a numpy array of description embedding and a numpy array of text embeddings for an indexer input.
 
     :param input: serialised indexer input (output from document parser)
-    :return: description embedding, text embeddings
+    :return: description embedding, text embeddings. Text embeddings are None if there were no text blocks to encode.
     """
 
     description_embedding = encoder.encode(input.document_description)
 
     text_blocks = input.get_text_blocks()
 
-    text_embeddings = encoder.encode_batch(
-        [block.to_string() for block in text_blocks], batch_size=batch_size
-    )
+    if text_blocks:
+        text_embeddings = encoder.encode_batch(
+            [block.to_string() for block in text_blocks], batch_size=batch_size
+        )
+    else:
+        text_embeddings = None
 
     return description_embedding, text_embeddings
 
@@ -173,7 +176,11 @@ def main(
 
         embeddings_output_path = output_dir_as_path / f"{task.document_id}.npy"
 
-        combined_embeddings = np.vstack([description_embedding, text_embeddings])
+        combined_embeddings = (
+            np.vstack([description_embedding, text_embeddings])
+            if text_embeddings is not None
+            else description_embedding.reshape(1, -1)
+        )
 
         task_output_path = output_dir_as_path / f"{task.document_id}.json"
         task_output_path.write_text(task.json())
