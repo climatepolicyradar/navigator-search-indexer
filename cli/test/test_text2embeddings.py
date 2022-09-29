@@ -44,6 +44,9 @@ def test_run_encoder_local(test_input_dir: Path):
         for path in Path(output_dir).glob("*.npy"):
             assert np.load(path).shape[1] == 768
 
+        # test_html has the `has_valid_text` flag set to false, so the numpy file should only contain a description embedding
+        assert np.load(Path(output_dir) / "test_html.npy").shape == (1, 768)
+
 
 def test_run_encoder_local_fail_bad_input(test_input_dir_bad_data: Path):
     """Test that the encoder fails with bad input data."""
@@ -52,9 +55,6 @@ def test_run_encoder_local_fail_bad_input(test_input_dir_bad_data: Path):
         runner = CliRunner()
         result = runner.invoke(cli_main, [str(test_input_dir_bad_data), output_dir])
         assert result.exit_code == 1
-
-        # test_html has the `has_valid_text` flag set to false, so the numpy file should only contain a description embedding
-        assert np.load(Path(output_dir) / "test_html.npy").shape == (1, 768)
 
 
 def test_run_encoder_s3(test_input_dir: Path):
