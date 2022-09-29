@@ -1,5 +1,6 @@
-from typing import Optional, Iterable
+from typing import Optional, Iterable, List
 import logging
+from pathlib import Path
 
 from opensearchpy import OpenSearch, helpers
 from tqdm.auto import tqdm
@@ -105,6 +106,20 @@ class OpenSearchIndex:
 
         return mapping
 
+    def _get_synonyms(self) -> List[str]:
+        """
+        Get list of synonyms from text file.
+
+        :return List[str]: list of synonyms
+        """
+        synonyms = []
+
+        with open(Path(__file__).parent / "synonyms.txt", "r") as f:
+            for line in f:
+                synonyms.append(line.strip())
+
+        return synonyms
+
     def _index_body(self, n_replicas: int) -> dict:
         """Define policy index fields and types"""
 
@@ -121,7 +136,12 @@ class OpenSearchIndex:
                         "ascii_folding_preserve_original": {
                             "type": "asciifolding",
                             "preserve_original": True,
-                        }
+                        },
+                        "graph_synonyms": {
+                            "type": "synonym_graph",
+                            "lenient": True,
+                            "synonyms": self._get_synonyms(),
+                        },
                     },
                     # This analyser folds non-ASCII characters into ASCII equivalents, but preserves the original.
                     # E.g. a search for "é" will return results for "e" and "é".
@@ -129,7 +149,11 @@ class OpenSearchIndex:
                         "folding": {
                             "tokenizer": "standard",
                             "filter": ["lowercase", "ascii_folding_preserve_original"],
-                        }
+                        },
+                        "search_synonyms": {
+                            "tokenizer": "whitespace",
+                            "filter": ["graph_synonyms"],
+                        },
                     },
                     # This normalizer does the same as the folding analyser, but is used for keyword fields.
                     "normalizer": {

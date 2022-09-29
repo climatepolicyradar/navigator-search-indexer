@@ -1,0 +1,9 @@
+co2, carbon dioxide
+ch4, methane
+ghg, greenhouse gas, greenhouse gases
+ccs, carbon capture and sequestation, carbon capture and storage
+carbon leakage, emissions displacement
+ets, emissions trading scheme
+electric vehicle, ev
+feed-in tarrifs, fiTs
+UNFCCC, United Nations Framework Convention on Climate Change, UN Framework Convention on Climate Change
