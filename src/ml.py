@@ -6,6 +6,8 @@ from typing import List
 from sentence_transformers import SentenceTransformer
 import numpy as np
 
+from src import config
+
 
 class SentenceEncoder(ABC):
     """Base class for a sentence encoder"""
@@ -36,7 +38,9 @@ class SBERTEncoder(SentenceEncoder):
     def __init__(self, model_name: str):
         super().__init__()
 
-        self.encoder = SentenceTransformer(model_name)
+        self.encoder = SentenceTransformer(
+            model_name, cache_folder=config.INDEX_ENCODER_CACHE_FOLDER
+        )
 
     def encode(self, text: str) -> np.ndarray:
         """Encode a string, return a numpy array.
