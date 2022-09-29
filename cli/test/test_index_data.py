@@ -9,7 +9,7 @@ from cli.index_data import get_document_generator
 
 @pytest.fixture()
 def test_input_dir() -> Path:
-    return (Path(__file__).parent / "test_data" / "load_data_input").resolve()
+    return (Path(__file__).parent / "test_data" / "index_data_input").resolve()
 
 
 def test_get_document_generator(test_input_dir: Path):
@@ -19,6 +19,8 @@ def test_get_document_generator(test_input_dir: Path):
         IndexerInput.parse_raw(path.read_text())
         for path in list(test_input_dir.glob("*.json"))
     ]
+
+    assert len(tasks) > 0  # otherwise test is pointless
 
     doc_generator = get_document_generator(tasks, test_input_dir)
 
@@ -105,6 +107,8 @@ def test_document_generator_mapping_alignment(test_input_dir: Path):
         IndexerInput.parse_raw(path.read_text())
         for path in list(test_input_dir.glob("*.json"))
     ]
+
+    assert len(tasks) > 0  # otherwise test is pointless
 
     doc_generator = get_document_generator(tasks, test_input_dir)
 

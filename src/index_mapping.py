@@ -29,4 +29,7 @@ OPTIONAL_FIELDS: Dict[str, List[str]] = {
 }
 
 # All fields - used to generate the index mapping
-ALL_FIELDS: Dict[str, List[str]] = {**COMMON_FIELDS, **OPTIONAL_FIELDS}
+ALL_FIELDS = {
+    x: COMMON_FIELDS.get(x, []) + OPTIONAL_FIELDS.get(x, [])
+    for x in set(COMMON_FIELDS).union(OPTIONAL_FIELDS)
+}
