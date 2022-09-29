@@ -7,7 +7,12 @@ COMMON_FIELDS: Dict[str, List[str]] = {
     "sortable": ["document_name", "document_description"],
     "date": [],  # ["document_date"], # TODO: uncomment when we have a date field passed from the loader
     "boolean": ["translated"],
-    "categorical": ["document_slug", "document_url", "document_content_type"],
+    "categorical": [
+        "document_slug",
+        "document_url",
+        "document_content_type",
+        "document_source_url",
+    ],
 }
 
 # Fields that appear only in some Opensearch documents
@@ -19,7 +24,7 @@ OPTIONAL_FIELDS: Dict[str, List[str]] = {
         "text",
     ],
     "embedding": ["text_embedding", "document_description_embedding"],
-    "boolean": ["translated"],
+    "boolean": [],
     "categorical": ["text_block_coords", "text_block_id"],
 }
 
