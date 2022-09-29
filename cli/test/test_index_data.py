@@ -8,7 +8,7 @@ from cli.index_data import get_document_generator
 
 @pytest.fixture()
 def test_input_dir() -> Path:
-    return (Path(__file__).parent / "test_data" / "load_data_input").resolve()
+    return (Path(__file__).parent / "test_data" / "index_data_input").resolve()
 
 
 def test_get_document_generator(test_input_dir: Path):
@@ -18,6 +18,9 @@ def test_get_document_generator(test_input_dir: Path):
         IndexerInput.parse_raw(path.read_text())
         for path in list(test_input_dir.glob("*.json"))
     ]
+
+    # checking that we've picked up some tasks, otherwise the test is pointless as the document generator will be empty
+    assert len(tasks) > 0
 
     doc_generator = get_document_generator(tasks, test_input_dir)
 

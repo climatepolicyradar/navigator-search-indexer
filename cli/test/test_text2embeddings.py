@@ -32,10 +32,12 @@ def test_run_encoder_local(test_input_dir: Path):
         assert set(Path(output_dir).glob("*.json")) == {
             Path(output_dir) / "test_html.json",
             Path(output_dir) / "test_pdf.json",
+            Path(output_dir) / "test_no_content_type.json",
         }
         assert set(Path(output_dir).glob("*.npy")) == {
             Path(output_dir) / "test_html.npy",
             Path(output_dir) / "test_pdf.npy",
+            Path(output_dir) / "test_no_content_type.npy",
         }
 
         for path in Path(output_dir).glob("*.json"):
@@ -43,6 +45,12 @@ def test_run_encoder_local(test_input_dir: Path):
 
         for path in Path(output_dir).glob("*.npy"):
             assert np.load(path).shape[1] == 768
+
+        # test_html has the `has_valid_text` flag set to false, so the numpy file should only contain a description embedding
+        assert np.load(Path(output_dir) / "test_html.npy").shape == (1, 768)
+
+        # this file has no text, so the numpy file should only contain a description embedding
+        assert np.load(Path(output_dir) / "test_no_content_type.npy").shape == (1, 768)
 
 
 def test_run_encoder_local_fail_bad_input(test_input_dir_bad_data: Path):
@@ -52,9 +60,6 @@ def test_run_encoder_local_fail_bad_input(test_input_dir_bad_data: Path):
         runner = CliRunner()
         result = runner.invoke(cli_main, [str(test_input_dir_bad_data), output_dir])
         assert result.exit_code == 1
-
-        # test_html has the `has_valid_text` flag set to false, so the numpy file should only contain a description embedding
-        assert np.load(Path(output_dir) / "test_html.npy").shape == (1, 768)
 
 
 def test_run_encoder_s3(test_input_dir: Path):
@@ -83,7 +88,7 @@ def test_run_parser_skip_already_done(caplog, test_input_dir) -> None:
     """Test that files which have already been parsed are skipped by default."""
 
     with tempfile.TemporaryDirectory() as output_dir:
-        for fname_to_skip in ("test_pdf", "test_html"):
+        for fname_to_skip in ("test_pdf", "test_html", "test_no_content_type"):
             with open(Path(output_dir) / f"{fname_to_skip}.npy", "wb") as f:
                 f.write(np.random.rand(768).astype(np.float32).tobytes())
 
@@ -99,7 +104,7 @@ def test_run_parser_skip_already_done(caplog, test_input_dir) -> None:
         assert result.exit_code == 0
 
         assert (
-            "Found 2 documents that have already been encoded. Skipping."
+            "Found 3 documents that have already been encoded. Skipping."
             in caplog.messages
         )
 
