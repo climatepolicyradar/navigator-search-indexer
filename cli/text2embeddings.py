@@ -147,7 +147,8 @@ def main(
     tasks = [
         task
         for task in tasks
-        if (len(task.languages) == 1)
+        if task.languages
+        and (len(task.languages) == 1)
         and (
             task.languages[0]
             in config.ENCODER_SUPPORTED_LANGUAGES.union(config.TARGET_LANGUAGES)
