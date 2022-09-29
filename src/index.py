@@ -5,7 +5,8 @@ from opensearchpy import OpenSearch, helpers
 from tqdm.auto import tqdm
 import requests
 
-from src import config, index_mapping
+from src import config
+from src.index_mapping import ALL_FIELDS
 
 logger = logging.getLogger(__name__)
 
@@ -56,32 +57,32 @@ class OpenSearchIndex:
     def _generate_mapping_properties(self) -> dict:
         mapping = dict()
 
-        mapping[index_mapping.DOCUMENT_ID_FIELD] = {
+        mapping[ALL_FIELDS["id"][0]] = {
             "type": "keyword",
             "normalizer": "folding",
             # Load ordinals on indexing for this field for faster aggregations.
             "eager_global_ordinals": True,
         }
 
-        for field in index_mapping.SORTABLE_TEXT_FIELDS:
+        for field in ALL_FIELDS["sortable"]:
             mapping[field] = {
                 "type": "keyword",
                 "normalizer": "folding",
             }
 
-        for field in index_mapping.DATE_FIELDS:
+        for field in ALL_FIELDS["date"]:
             mapping[field] = {"type": "date", "format": "dd/MM/yyyy"}
 
-        for field in index_mapping.INTEGER_FIELDS:
+        for field in ALL_FIELDS["integer"]:
             mapping[field] = {"type": "integer"}
 
-        for field in index_mapping.SEARCHABLE_TEXT_FIELDS:
+        for field in ALL_FIELDS["searchable"]:
             mapping[field] = {
                 "type": "text",
                 "analyzer": "folding",
             }
 
-        for field in index_mapping.EMBEDDING_FIELDS:
+        for field in ALL_FIELDS["embedding"]:
             mapping[field] = {
                 "type": "knn_vector",
                 "dimension": config.OPENSEARCH_INDEX_EMBEDDING_DIM,
@@ -96,10 +97,10 @@ class OpenSearchIndex:
                 },
             }
 
-        for field in index_mapping.BOOLEAN_FIELDS:
+        for field in ALL_FIELDS["boolean"]:
             mapping[field] = {"type": "boolean"}
 
-        for field in index_mapping.CATEGORICAL_FIELDS:
+        for field in ALL_FIELDS["categorical"]:
             mapping[field] = {"type": "keyword"}
 
         return mapping
