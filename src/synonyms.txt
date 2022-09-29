@@ -14,7 +14,6 @@ hfc, hydrofluorocarbon
 n2, nitrogen
 cfc, chlorofluorocarbon
 o3, ozone
-vos, volatile organic compounds
-paH, polycyclic aromatic hydrocarbons
 co, carbon monoxide
 LULUCF, land use land-use change and forestry
+Forestry and other land use, FOLU
