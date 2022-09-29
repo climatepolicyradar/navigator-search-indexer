@@ -8,3 +8,13 @@ electric vehicle, ev
 feed-in tarrifs, fiTs
 UNFCCC, United Nations Framework Convention on Climate Change, UN Framework Convention on Climate Change
 pv, photovoltaic
+n2o, nitrous oxide
+so2, sulfur dioxide
+hfc, hydrofluorocarbon
+n2, nitrogen
+cfc, chlorofluorocarbon
+o3, ozone
+vos, volatile organic compounds
+paH, polycyclic aromatic hydrocarbons
+co, carbon monoxide
+LULUCF, land use land-use change and forestry
