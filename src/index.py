@@ -5,7 +5,7 @@ from opensearchpy import OpenSearch, helpers
 from tqdm.auto import tqdm
 import requests
 
-from src import config
+from src import config, index_mapping
 
 logger = logging.getLogger(__name__)
 
@@ -53,6 +53,57 @@ class OpenSearchIndex:
         """Check if we are connected to the OpenSearch instance."""
         return self.opns.ping()
 
+    def _generate_mapping_properties(self) -> dict:
+        mapping = dict()
+
+        mapping[index_mapping.DOCUMENT_ID_FIELD] = {
+            "type": "keyword",
+            "normalizer": "folding",
+            # Load ordinals on indexing for this field for faster aggregations.
+            "eager_global_ordinals": True,
+        }
+
+        for field in index_mapping.SORTABLE_TEXT_FIELDS:
+            mapping[field] = {
+                "type": "keyword",
+                "normalizer": "folding",
+            }
+
+        for field in index_mapping.DATE_FIELDS:
+            mapping[field] = {"type": "date", "format": "dd/MM/yyyy"}
+
+        for field in index_mapping.INTEGER_FIELDS:
+            mapping[field] = {"type": "integer"}
+
+        for field in index_mapping.SEARCHABLE_TEXT_FIELDS:
+            mapping[field] = {
+                "type": "text",
+                "analyzer": "folding",
+            }
+
+        for field in index_mapping.EMBEDDING_FIELDS:
+            mapping[field] = {
+                "type": "knn_vector",
+                "dimension": config.OPENSEARCH_INDEX_EMBEDDING_DIM,
+                "method": {
+                    "name": "hnsw",
+                    "space_type": "innerproduct",
+                    "engine": "nmslib",
+                    "parameters": {
+                        "ef_construction": config.NMSLIB_EF_CONSTRUCTION,
+                        "m": config.NMSLIB_M,
+                    },
+                },
+            }
+
+        for field in index_mapping.BOOLEAN_FIELDS:
+            mapping[field] = {"type": "boolean"}
+
+        for field in index_mapping.CATEGORICAL_FIELDS:
+            mapping[field] = {"type": "keyword"}
+
+        return mapping
+
     def _index_body(self, n_replicas: int) -> dict:
         """Define policy index fields and types"""
 
@@ -89,86 +140,7 @@ class OpenSearchIndex:
                     },
                 },
             },
-            "mappings": {
-                "properties": {
-                    "document_id": {"type": "keyword"},
-                    "document_name": {"type": "keyword", "normalizer": "folding"},
-                    "document_description": {
-                        "type": "keyword",
-                        "normalizer": "folding",
-                    },
-                    "document_name_and_id": {
-                        "type": "keyword",
-                        "normalizer": "folding",
-                        # Load ordinals on indexing for this field for faster aggregations.
-                        "eager_global_ordinals": True,
-                    },
-                    "md5_sum": {"type": "keyword"},
-                    "document_url": {"type": "keyword"},
-                    "document_source_url": {"type": "keyword"},
-                    "document_date": {"type": "date", "format": "dd/MM/yyyy"},
-                    "document_country_code": {"type": "keyword"},
-                    "document_country_english_shortname": {"type": "keyword"},
-                    "document_region_code": {"type": "keyword"},
-                    "document_region_english_shortname": {"type": "keyword"},
-                    "document_source_name": {"type": "keyword"},
-                    "document_type": {"type": "keyword"},
-                    "document_category": {"type": "keyword"},
-                    "document_framework_name": {"type": "keyword"},
-                    "document_hazard_name": {"type": "keyword"},
-                    "document_instrument_name": {"type": "keyword"},
-                    "document_response_name": {"type": "keyword"},
-                    "document_sector_name": {"type": "keyword"},
-                    "document_keyword": {"type": "keyword"},
-                    "document_language": {"type": "keyword"},
-                    "document_slug": {"type": "keyword"},
-                    "document_content_type": {"type": "keyword"},
-                    # Searchable
-                    "for_search_document_name": {
-                        "type": "text",
-                        "analyzer": "folding",
-                    },
-                    "for_search_document_description": {
-                        "type": "text",
-                        "analyzer": "folding",
-                    },
-                    "text_block_id": {"type": "keyword"},
-                    "text": {
-                        "type": "text",
-                        "analyzer": "folding",
-                    },
-                    "text_embedding": {
-                        "type": "knn_vector",
-                        "dimension": self.embedding_dim,
-                        "method": {
-                            "name": "hnsw",
-                            "space_type": "innerproduct",
-                            "engine": "nmslib",
-                            "parameters": {
-                                "ef_construction": config.NMSLIB_EF_CONSTRUCTION,
-                                "m": config.NMSLIB_M,
-                            },
-                        },
-                    },
-                    "text_block_coords": {"type": "keyword"},
-                    "text_block_page": {
-                        "type": "integer",
-                    },
-                    "document_description_embedding": {
-                        "type": "knn_vector",
-                        "dimension": self.embedding_dim,
-                        "method": {
-                            "name": "hnsw",
-                            "space_type": "innerproduct",
-                            "engine": "nmslib",
-                            "parameters": {
-                                "ef_construction": config.NMSLIB_EF_CONSTRUCTION,
-                                "m": config.NMSLIB_M,
-                            },
-                        },
-                    },
-                }
-            },
+            "mappings": {"properties": self._generate_mapping_properties()},
         }
 
     def delete_and_create_index(self, n_replicas: int):
