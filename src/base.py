@@ -15,7 +15,8 @@ class ContentType(str, Enum):
 class DocumentMetadata(BaseModel):
     """Metadata about a document."""
 
-    document_source_url: Optional[AnyHttpUrl]
+    ...
+    # document_source_url: Optional[AnyHttpUrl]
     # TODO: add other metadata fields from loader
 
 

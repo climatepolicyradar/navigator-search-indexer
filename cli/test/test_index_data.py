@@ -39,7 +39,6 @@ def test_get_document_generator(test_input_dir: Path):
                     "translated",
                     "document_slug",
                     "document_content_type",
-                    "document_source_url",
                 }
             ]
         )
