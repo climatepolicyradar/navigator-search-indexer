@@ -25,13 +25,3 @@ RUN python -c "from sentence_transformers import SentenceTransformer; SentenceTr
 COPY ./src ./src
 COPY ./cli ./cli
 COPY ./data ./data
-
-# Add Environment Variables to Run Locally 
-ARG AWS_ACCESS_KEY_ID=
-ENV AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
-
-ARG AWS_SECRET_ACCESS_KEY=
-ENV AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
-
-# Run the indexer on the input s3 directory
-CMD [ "sh", "./cli/run.sh" ]
