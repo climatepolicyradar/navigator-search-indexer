@@ -5,6 +5,7 @@ import logging.config
 import os
 from pathlib import Path
 from typing import Optional, Tuple
+import psutil
 
 import click
 import numpy as np
@@ -170,6 +171,8 @@ def main(
         f"Encoding text from {len(files_to_parse)} documents in batches of {config.ENCODING_BATCH_SIZE}"
     )
     for task in tqdm(tasks, unit="docs"):
+        logging.info(f"Beginning encoding for: {task.document_id}")
+        logging.info(psutil.virtual_memory())
         description_embedding, text_embeddings = encode_indexer_input(
             encoder, task, config.ENCODING_BATCH_SIZE
         )
