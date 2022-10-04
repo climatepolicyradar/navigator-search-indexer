@@ -84,7 +84,7 @@ class IndexerInput(BaseModel):
     """Input to the indexer. Serialised output of the document parser."""
 
     document_id: str
-    # document_metadata: DocumentMetadata
+    document_metadata: DocumentMetadata
     document_name: str
     document_description: str
     document_url: Optional[AnyHttpUrl]
