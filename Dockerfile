@@ -21,6 +21,8 @@ RUN poetry install
 RUN mkdir /models
 RUN python -c "from sentence_transformers import SentenceTransformer; SentenceTransformer('sentence-transformers/msmarco-distilbert-dot-v5', cache_folder='/models')"
 
+RUN pip install py-spy
+
 # Copy files to image
 COPY ./src ./src
 COPY ./cli ./cli

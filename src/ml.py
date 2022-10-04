@@ -51,7 +51,7 @@ class SBERTEncoder(SentenceEncoder):
         Returns:
             np.ndarray
         """
-        return self.encoder.encode(text)
+        return self.encoder.encode(text, show_progress_bar=False)
 
     def encode_batch(self, text_batch: List[str], batch_size: int = 32) -> np.ndarray:
         """Encode a batch of strings, return a numpy array.
