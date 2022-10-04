@@ -1,7 +1,7 @@
 """Text encoders."""
 
 from abc import ABC, abstractmethod
-from typing import List
+from typing import List, Optional
 
 from sentence_transformers import SentenceTransformer
 import numpy as np
@@ -13,12 +13,14 @@ class SentenceEncoder(ABC):
     """Base class for a sentence encoder"""
 
     @abstractmethod
-    def encode(self, text: str) -> np.ndarray:
+    def encode(self, text: str, device: Optional[str] = None) -> np.ndarray:
         """Encode a string, return a numpy array."""
         raise NotImplementedError
 
     @abstractmethod
-    def encode_batch(self, text_batch: List[str], batch_size: int) -> np.ndarray:
+    def encode_batch(
+        self, text_batch: List[str], batch_size: int, device: Optional[str] = None
+    ) -> np.ndarray:
         """Encode a batch of strings, return a numpy array."""
         raise NotImplementedError
 
@@ -42,29 +44,33 @@ class SBERTEncoder(SentenceEncoder):
             model_name, cache_folder=config.INDEX_ENCODER_CACHE_FOLDER
         )
 
-    def encode(self, text: str) -> np.ndarray:
+    def encode(self, text: str, device: Optional[str] = None) -> np.ndarray:
         """Encode a string, return a numpy array.
 
         Args:
             text (str): string to encode.
+            device (str): torch.device to use for encoding.
 
         Returns:
             np.ndarray
         """
-        return self.encoder.encode(text)
+        return self.encoder.encode(text, device=device)
 
-    def encode_batch(self, text_batch: List[str], batch_size: int = 32) -> np.ndarray:
+    def encode_batch(
+        self, text_batch: List[str], batch_size: int = 32, device: Optional[str] = None
+    ) -> np.ndarray:
         """Encode a batch of strings, return a numpy array.
 
         Args:
             text_batch (List[str]): list of strings to encode.
+            device (str): torch.device to use for encoding.
             batch_size (int, optional): batch size to encode strings in. Defaults to 32.
 
         Returns:
             np.ndarray
         """
         return self.encoder.encode(
-            text_batch, batch_size=batch_size, show_progress_bar=False
+            text_batch, batch_size=batch_size, show_progress_bar=False, device=device
         )
 
     @property

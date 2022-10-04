@@ -39,7 +39,10 @@ logging.config.dictConfig(DEFAULT_LOGGING)
 
 
 def encode_indexer_input(
-    encoder: SentenceEncoder, input: IndexerInput, batch_size: int
+    encoder: SentenceEncoder,
+    input: IndexerInput,
+    batch_size: int,
+    device: Optional[str] = None,
 ) -> Tuple[np.ndarray, Optional[np.ndarray]]:
     """
     Produce a numpy array of description embedding and a numpy array of text embeddings for an indexer input.
@@ -48,13 +51,15 @@ def encode_indexer_input(
     :return: description embedding, text embeddings. Text embeddings are None if there were no text blocks to encode.
     """
 
-    description_embedding = encoder.encode(input.document_description)
+    description_embedding = encoder.encode(input.document_description, device=device)
 
     text_blocks = input.get_text_blocks()
 
     if text_blocks:
         text_embeddings = encoder.encode_batch(
-            [block.to_string() for block in text_blocks], batch_size=batch_size
+            [block.to_string() for block in text_blocks],
+            batch_size=batch_size,
+            device=device,
         )
     else:
         text_embeddings = None
@@ -88,12 +93,20 @@ def encode_indexer_input(
     default=None,
     help="Optionally limit the number of text samples to process. Useful for debugging.",
 )
+@click.option(
+    "--device",
+    type=click.Choice(["cuda", "cpu"]),
+    help="Device to use for embeddings generation",
+    required=True,
+    default="cpu",
+)
 def main(
     input_dir: str,
     output_dir: str,
     s3: bool,
     redo: bool,
     limit: Optional[int],
+    device: str,
 ):
     """
     Run CLI to produce embeddings from document parser JSON outputs. Each embeddings file is called {id}.json where {id} is the document ID of the input. Its first line is the description embedding and all other lines are embeddings of each of the text blocks in the document in order. Encoding will automatically run on the GPU if one is available.
@@ -104,6 +117,7 @@ def main(
         s3: Whether we are reading from and writing to S3.
         redo: Redo encoding for files that have already been parsed. By default, files with IDs that already exist in the output directory are skipped.
         limit (Optional[int]): Optionally limit the number of text samples to process. Useful for debugging.
+        device (str): Device to use for embeddings generation. Must be either "cuda" or "cpu".
     """
 
     if s3:
@@ -171,7 +185,7 @@ def main(
     )
     for task in tqdm(tasks, unit="docs"):
         description_embedding, text_embeddings = encode_indexer_input(
-            encoder, task, config.ENCODING_BATCH_SIZE
+            encoder, task, config.ENCODING_BATCH_SIZE, device=device
         )
 
         embeddings_output_path = output_dir_as_path / f"{task.document_id}.npy"
