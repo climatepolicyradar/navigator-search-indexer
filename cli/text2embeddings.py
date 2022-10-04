@@ -181,7 +181,7 @@ def main(
     encoder = SBERTEncoder(config.SBERT_MODEL)
 
     logger.info(
-        f"Encoding text from {len(files_to_parse)} documents in batches of {config.ENCODING_BATCH_SIZE}"
+        f"Encoding text from {len(files_to_parse)} documents in batches of {config.ENCODING_BATCH_SIZE} text blocks."
     )
     for task in tqdm(tasks, unit="docs"):
         description_embedding, text_embeddings = encode_indexer_input(
