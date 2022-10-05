@@ -1,1 +1,1 @@
-python -m cli.text2embeddings --s3 $parser_output_s3 $indexer_output_s3
+python -m cli.text2embeddings --s3 $parser_output_s3 $indexer_output_s3 --device=cuda

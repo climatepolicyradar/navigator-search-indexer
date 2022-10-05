@@ -16,10 +16,15 @@ test:
 dev_install:
 	poetry install && poetry run pre-commit install
 
-build_aws:
+test_against_aws:
 	cp Dockerfile.aws.example Dockerfile
 	docker build -t navigator-search-indexer-aws .
-	docker run -it navigator-search-indexer-aws
+	docker run -it navigator-search-indexer-aws python -m pytest
+
+run_local_against_aws:
+	cp Dockerfile.aws.example Dockerfile
+	docker build -t navigator-search-indexer-aws .
+	docker run -e parser_output_s3=s3://data-pipeline-a64047a/unit_tests/runs/parser_output/ -e indexer_output_s3=s3://data-pipeline-a64047a/unit_tests/runs/indexer_output/ -it navigator-search-indexer-aws
 
 build_and_push_ecr:
 	aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 281621126254.dkr.ecr.us-east-1.amazonaws.com
