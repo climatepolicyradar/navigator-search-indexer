@@ -147,3 +147,9 @@ dmypy.json
 
 # Mac OS files
 .DS_Store
+
+# Pycharm
+.idea/
+
+# Dockerfile
+Dockerfile
