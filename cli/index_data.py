@@ -12,6 +12,7 @@ from cloudpathlib import S3Path
 
 from src.index import OpenSearchIndex
 from src.base import IndexerInput
+from src.index_mapping import COMMON_FIELDS
 from src import config
 
 LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO").upper()
@@ -37,37 +38,33 @@ logger = logging.getLogger(__name__)
 logging.config.dictConfig(DEFAULT_LOGGING)
 
 
+def get_metadata_dict(task: IndexerInput) -> dict:
+    """
+    Get key-value pairs for metadata fields: fields which are not required for search.
+
+    :param task: task from the document parser
+    :return dict: key-value pairs for metadata fields
+    """
+
+    task_dict = {**task.dict(), **task.document_metadata.dict()}
+    required_fields = [field for fields in COMMON_FIELDS.values() for field in fields]
+
+    return {k: v for k, v in task_dict.items() if k in required_fields}
+
+
 def get_document_generator(
     tasks: Sequence[IndexerInput], embedding_dir_as_path: Union[Path, S3Path]
 ) -> Generator[dict, None, None]:
     """
     Generator for documents to index. For each input document, an Opensearch document is created for each of its text blocks as well as its title and description.
 
-    :param tasks: list of tasks from the PDF parser
+    :param tasks: list of tasks from the document parser
     :param embedding_dir_as_path: directory containing embeddings .npy files. These are named with IDs corresponding to the IDs in the tasks.
     :yield Generator[dict, None, None]: generator of Opensearch documents
     """
 
-    # TODO: move to config?
-    # TODO: build index mapping based on this?
-    CORE_METADATA_FIELDS = {
-        "document_id",
-        "document_name",
-        "document_description",
-        "document_url",
-        "translated",
-        "document_slug",
-        "document_content_type",
-    }
-
     for task in tasks:
-        database_metadata = task.document_metadata.dict()
-        core_metadata = {
-            k: v for k, v in task.dict().items() if k in CORE_METADATA_FIELDS
-        }
-        all_metadata = {**core_metadata, **database_metadata}
-        # TODO: do we still need md5sum in the index?
-
+        all_metadata = get_metadata_dict(task)
         embeddings = np.load(str(embedding_dir_as_path / f"{task.document_id}.npy"))
 
         # Generate document name doc
