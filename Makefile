@@ -24,11 +24,11 @@ test_against_aws:
 run_local_against_aws:
 	cp Dockerfile.aws.example Dockerfile
 	docker build -t navigator-search-indexer-aws .
-	docker run -e parser_output_s3=s3://data-pipeline-a64047a/unit_tests/runs/parser_output/ -e indexer_output_s3=s3://data-pipeline-a64047a/unit_tests/runs/indexer_output/ -it navigator-search-indexer-aws
+	docker run -e parser_output_s3=s3://data-staging-pipeline-c591d79/runs/10-16-2022_19:30___28723eca-14cf-44e2-abab-32afefe97c96/parser_output/ -e indexer_output_s3=s3://data-staging-pipeline-c591d79/runs/10-16-2022_19:30___28723eca-14cf-44e2-abab-32afefe97c96/indexer_output/ -it navigator-search-indexer-aws
 
 build_and_push_ecr:
-	aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 281621126254.dkr.ecr.us-east-1.amazonaws.com
+	aws ecr get-login-password --region eu-west-2 --profile dev | docker login --username AWS --password-stdin 073457443605.dkr.ecr.eu-west-2.amazonaws.com
 	cp Dockerfile.aws.example Dockerfile
-	docker build -t indexer-4d7db1c .
-	docker tag indexer-4d7db1c:latest 281621126254.dkr.ecr.us-east-1.amazonaws.com/indexer-4d7db1c:latest
-	docker push 281621126254.dkr.ecr.us-east-1.amazonaws.com/indexer-4d7db1c:latest
+	docker build -t navigator-search-indexer-staging .
+	docker tag navigator-search-indexer-staging:latest 073457443605.dkr.ecr.eu-west-2.amazonaws.com/navigator-search-indexer-staging:latest
+	docker push 073457443605.dkr.ecr.eu-west-2.amazonaws.com/navigator-search-indexer-staging:latest
