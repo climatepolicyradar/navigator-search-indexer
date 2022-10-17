@@ -3,6 +3,7 @@
 build:
 	cp Dockerfile.local.example Dockerfile
 	docker build -t navigator-search-indexer .
+	docker tag navigator-search-indexer:latest navigator-search-indexer-staging:latest
 
 run_encoding_docker:
 	docker run -v ${PWD}/data:/app/data navigator-search-indexer python -m cli.text2embeddings ./data/raw ./data/processed
