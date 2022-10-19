@@ -29,6 +29,6 @@ run_local_against_aws:
 build_and_push_ecr:
 	aws ecr get-login-password --region eu-west-2 --profile dev | docker login --username AWS --password-stdin 073457443605.dkr.ecr.eu-west-2.amazonaws.com
 	cp Dockerfile.aws.example Dockerfile
-	docker build -t indexer-4d7db1c .
-	docker tag indexer-4d7db1c:latest 281621126254.dkr.ecr.us-east-1.amazonaws.com/indexer-4d7db1c:latest
-	docker push 281621126254.dkr.ecr.us-east-1.amazonaws.com/indexer-4d7db1c:latest
+	docker build -t navigator-search-indexer-staging .
+	docker tag navigator-search-indexer-staging:latest 073457443605.dkr.ecr.eu-west-2.amazonaws.com/navigator-search-indexer-staging:latest
+	docker push 073457443605.dkr.ecr.eu-west-2.amazonaws.com/navigator-search-indexer-staging:latest

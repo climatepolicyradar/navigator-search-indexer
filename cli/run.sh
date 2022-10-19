@@ -1,1 +1,1 @@
-python -m cli.text2embeddings --s3 $parser_output_s3 $indexer_output_s3 --device=cpu
+python -m cli.text2embeddings --s3 $EMBEDDINGS_INPUT_PREFIX $INDEXER_INPUT_PREFIX --device=cpu
