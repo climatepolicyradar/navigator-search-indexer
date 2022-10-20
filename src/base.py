@@ -87,7 +87,9 @@ class IndexerInput(BaseModel):
     document_metadata: DocumentMetadata
     document_name: str
     document_description: str
-    document_url: Optional[AnyHttpUrl]
+    document_source_url: Optional[AnyHttpUrl]
+    document_cdn_object: Optional[str]
+    document_md5_sum: Optional[str]
     languages: Optional[Sequence[str]]
     translated: bool
     document_slug: str  # for better links to the frontend hopefully soon
@@ -127,27 +129,13 @@ class IndexerInput(BaseModel):
         ):
             raise ValueError("pdf_metadata must be null for HTML documents")
 
-        if values["document_content_type"] is None and (
-            values["html_data"] is not None or values["pdf_data"] is not None
-        ):
-            raise ValueError(
-                "html_metadata and pdf_metadata must be null for documents with no content type."
-            )
-
-        return values
-
-    @root_validator
-    def check_content_type_and_url(cls, values) -> None:
-        """Either both or neither of content type and url should be null."""
         if (
-            values["document_content_type"] is None
-            and values["document_url"] is not None
-        ) or (
-            values["document_content_type"] is not None
-            and values["document_url"] is None
+            values["document_content_type"] not in {ContentType.HTML, ContentType.PDF}
+            and (values["html_data"] is not None or values["pdf_data"] is not None)
         ):
             raise ValueError(
-                "Both document_content_type and document_url must be null or not null."
+                "html_metadata and pdf_metadata must be null for documents an "
+                "unsupported content type."
             )
 
         return values

@@ -9,8 +9,9 @@ COMMON_FIELDS: Dict[str, List[str]] = {
     "boolean": ["translated"],
     "categorical": [
         "document_slug",
-        "document_url",
+        "document_cdn_object",
         "document_content_type",
+        "document_md5_sum",
         "document_source_url",
     ],
 }

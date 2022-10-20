@@ -2,7 +2,9 @@
     "document_id": "test_no_content_type",
     "document_name": "test_no_content_type",
     "document_description": "test_description",
-    "document_url": null,
+    "document_source_url": null,
+    "document_cdn_object": null,
+    "document_md5_sum": null,
     "document_metadata": {
         "document_source_url": null
     },

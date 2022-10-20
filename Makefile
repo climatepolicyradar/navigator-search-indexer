@@ -12,7 +12,7 @@ run_indexing_docker:
 	docker run --network=host --env-file=.env -v ${PWD}/data:/app/data navigator-search-indexer python -m cli.index_data ./data/processed
 
 test:
-	docker run navigator-search-indexer python -m pytest
+	docker run navigator-search-indexer python -m pytest -vvv
 
 dev_install:
 	poetry install && poetry run pre-commit install
