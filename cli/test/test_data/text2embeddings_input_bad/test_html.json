@@ -2,7 +2,9 @@
     "document_id": "test_html",
     "document_name": "test_html",
     "document_description": "test_html_description",
-    "document_url": "//www.industry.gov.au/funding-and-incentives/emissions-reduction-fund",
+    "document_source_url": "//www.industry.gov.au/funding-and-incentives/emissions-reduction-fund",
+    "document_cdn_object": null,
+    "document_md5_sum": null,
     "languages": [
         "en"
     ],
