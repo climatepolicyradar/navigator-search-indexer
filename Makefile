@@ -29,10 +29,3 @@ run_local_against_aws:
 	cp Dockerfile.aws.example Dockerfile
 	docker build -t navigator-search-indexer-aws .
 	docker run -e EMBEDDINGS_INPUT_PREFIX=${EMBEDDINGS_INPUT_PREFIX} -e INDEXER_INPUT_PREFIX=${INDEXER_INPUT_PREFIX} -it navigator-search-indexer-aws
-
-build_and_push_ecr:
-	aws ecr get-login-password --region eu-west-2 --profile dev | docker login --username AWS --password-stdin ${ECR_REPO}
-	cp Dockerfile.aws.example Dockerfile
-	docker build -t navigator-search-indexer-staging .
-	docker tag navigator-search-indexer-staging:latest ${ECR_REPO}/navigator-search-indexer-staging:latest
-	docker push ${ECR_REPO}/navigator-search-indexer-staging:latest
