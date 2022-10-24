@@ -5,7 +5,6 @@ setup:
 	cp .env.example .env
 
 build:
-	cp Dockerfile.local.example Dockerfile
 	docker build -t navigator-search-indexer .
 
 run_encoding_docker:
