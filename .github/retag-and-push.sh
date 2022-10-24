@@ -45,6 +45,9 @@ echo "Repo Tag ${name}"
 timestamp=$(date --utc +%Y%m%d.%H%M.%S%N)
 short_sha=${GITHUB_SHA:0:8}
 
+# Always re-run build to make sure we have appropriate tags for extra repos
+docker build -t "${project}" .
+
 if [[ "${GITHUB_REF}" == "refs/heads"* ]]; then
     # push `branch-sha` tagged image
     branch="${GITHUB_REF/refs\/heads\//}"

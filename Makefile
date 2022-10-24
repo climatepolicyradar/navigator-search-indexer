@@ -6,7 +6,6 @@ setup:
 
 build:
 	docker build -t navigator-search-indexer .
-	docker tag navigator-search-indexer navigator-search-indexer-staging
 
 run_encoding_docker:
 	docker run -v ${PWD}/data:/app/data navigator-search-indexer python -m cli.text2embeddings ./data/raw ./data/processed
