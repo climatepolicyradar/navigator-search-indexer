@@ -25,3 +25,6 @@ RUN python -c "from sentence_transformers import SentenceTransformer; SentenceTr
 COPY ./src ./src
 COPY ./cli ./cli
 COPY ./data ./data
+
+# Run the indexer on the input s3 directory
+ENTRYPOINT [ "sh", "./cli/run.sh" ]
