@@ -16,7 +16,7 @@ class DocumentMetadata(BaseModel):
     """Metadata about a document."""
 
     publication_ts: Optional[datetime.datetime]
-    date: Optional[datetime.date] = None  # Set on import by a validator
+    date: Optional[str] = None  # Set on import by a validator
     geography: str
     category: str
     source: str
@@ -24,9 +24,9 @@ class DocumentMetadata(BaseModel):
 
     @root_validator
     def convert_publication_ts_to_date(cls, values):
-        """Convert publication_ts to a datetime object. This is necessary as OpenSearch expects a date object."""
+        """Convert publication_ts to a datetime string. This is necessary as OpenSearch expects a date object."""
 
-        values["date"] = values["publication_ts"].date()
+        values["date"] = values["publication_ts"].strftime("%d/%m/%Y")
 
         return values
 

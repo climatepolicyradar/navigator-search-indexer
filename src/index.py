@@ -71,7 +71,7 @@ class OpenSearchIndex:
             }
 
         for field in ALL_FIELDS["date"]:
-            mapping[field] = {"type": "date", "format": "yyyy-MM-dd"}
+            mapping[field] = {"type": "date", "format": "dd/MM/yyyy"}
 
         for field in ALL_FIELDS["integer"]:
             mapping[field] = {"type": "integer"}
