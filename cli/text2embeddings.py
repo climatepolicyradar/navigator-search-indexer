@@ -134,7 +134,7 @@ def main(
 
     if config.FILES_TO_PARSE is not None:
         files_to_parse_subset = config.FILES_TO_PARSE.split("$")[1:]
-        files_to_parse = (input_dir_as_path / f for f in files_to_parse_subset)
+        files_to_parse = [input_dir_as_path / f for f in files_to_parse_subset]
     else:
         files_to_parse = list(input_dir_as_path.glob("*.json"))
 
