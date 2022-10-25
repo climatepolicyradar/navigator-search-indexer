@@ -30,33 +30,17 @@ def test_get_document_generator(test_input_dir: Path):
 
     for doc in doc_generator:
         for field in [
-                    "document_id",
-                    "document_name",
-                    "document_description",
-                    "document_source_url",
-                    "document_cdn_object",
-                    "document_md5_sum",
-                    "translated",
-                    "document_slug",
-                    "document_content_type",
-                ]:
+            "document_id",
+            "document_name",
+            "document_description",
+            "document_source_url",
+            "document_cdn_object",
+            "document_md5_sum",
+            "translated",
+            "document_slug",
+            "document_content_type",
+        ]:
             assert field in doc, f"{field} not found in {doc}"
-        # assert all(
-        #     [
-        #         field in doc
-        #         for field in [
-        #             "document_id",
-        #             "document_name",
-        #             "document_description",
-        #             "document_source_url",
-        #             "document_cdn_object",
-        #             "document_md5_sum",
-        #             "translated",
-        #             "document_slug",
-        #             "document_content_type",
-        #         ]
-        #     ]
-        # )
 
         if "for_search_document_name" in doc:
             for_search_name_count += 1
