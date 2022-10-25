@@ -71,7 +71,7 @@ class OpenSearchIndex:
             }
 
         for field in ALL_FIELDS["date"]:
-            mapping[field] = {"type": "date", "format": "dd/MM/yyyy"}
+            mapping[field] = {"type": "date", "format": "yyyy-MM-dd"}
 
         for field in ALL_FIELDS["integer"]:
             mapping[field] = {"type": "integer"}
@@ -197,7 +197,7 @@ class OpenSearchIndex:
 
         response = requests.get(
             url,
-            auth=self._login,
+            auth=self._login,  # type: ignore
         )
 
         if response.status_code == 200:
