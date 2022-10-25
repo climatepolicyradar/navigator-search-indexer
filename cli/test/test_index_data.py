@@ -39,11 +39,11 @@ def test_get_document_generator(test_input_dir: Path):
             "translated",
             "document_slug",
             "document_content_type",
-            "geography",
-            "category",
-            "source",
-            "type",
-            "publication_ts",
+            "document_geography",
+            "document_category",
+            "document_source",
+            "document_type",
+            "document_date",
         ]:
             assert field in doc, f"{field} not found in {doc}"
 

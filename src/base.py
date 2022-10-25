@@ -2,7 +2,7 @@ from typing import Optional, Sequence, Tuple, List
 from enum import Enum
 import datetime
 
-from pydantic import BaseModel, AnyHttpUrl, Field, root_validator, validator
+from pydantic import BaseModel, AnyHttpUrl, Field, root_validator
 
 
 class ContentType(str, Enum):
@@ -15,19 +15,20 @@ class ContentType(str, Enum):
 class DocumentMetadata(BaseModel):
     """Metadata about a document."""
 
-    publication_ts: Optional[datetime.date]
+    publication_ts: Optional[datetime.datetime]
+    date: Optional[datetime.date] = None  # Set on import by a validator
     geography: str
     category: str
     source: str
     type: str
 
-    @validator("publication_ts", pre=True)
-    def convert_publication_ts_to_date(cls, value):
+    @root_validator
+    def convert_publication_ts_to_date(cls, values):
         """Convert publication_ts to a datetime object. This is necessary as OpenSearch expects a date object."""
 
-        if isinstance(value, str):
-            return datetime.datetime.fromisoformat(value).date()
-        return value
+        values["date"] = values["publication_ts"].date()
+
+        return values
 
 
 class TextBlock(BaseModel):
