@@ -74,6 +74,10 @@ def encode_indexer_input(
 @click.argument(
     "output-dir",
 )
+@click.argument(
+    "files_to_parse",
+    required=False,
+)
 @click.option(
     "--s3",
     is_flag=True,
@@ -103,6 +107,7 @@ def encode_indexer_input(
 def main(
     input_dir: str,
     output_dir: str,
+    files_to_process: Optional[str],
     s3: bool,
     redo: bool,
     limit: Optional[int],
@@ -130,8 +135,11 @@ def main(
     document_ids_previously_parsed = set(
         [path.stem for path in output_dir_as_path.glob("*.npy")]
     )
-    files_to_parse = list(input_dir_as_path.glob("*.json"))
-    tasks = [IndexerInput.parse_raw(path.read_text()) for path in files_to_parse]
+    if files_to_process is not None:
+        input_files = [p for p in files_to_process.split("$") if p]
+    else:
+        input_files = list(input_dir_as_path.glob("*.json"))
+    tasks = [IndexerInput.parse_raw(path.read_text()) for path in input_files]
 
     if not redo and document_ids_previously_parsed.intersection(
         {task.document_id for task in tasks}
@@ -181,7 +189,7 @@ def main(
     encoder = SBERTEncoder(config.SBERT_MODEL)
 
     logger.info(
-        f"Encoding text from {len(files_to_parse)} documents in batches of {config.ENCODING_BATCH_SIZE} text blocks."
+        f"Encoding text from {len(input_files)} documents in batches of {config.ENCODING_BATCH_SIZE} text blocks."
     )
     for task in tqdm(tasks, unit="docs"):
         description_embedding, text_embeddings = encode_indexer_input(
