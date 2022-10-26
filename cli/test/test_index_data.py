@@ -126,11 +126,6 @@ def test_get_text_document_generator(
             "translated",
             "document_slug",
             "document_content_type",
-            "document_geography",
-            "document_category",
-            "document_source",
-            "document_type",
-            "document_date",
         ]:
             assert field in doc, f"{field} not found in {doc}"
 
