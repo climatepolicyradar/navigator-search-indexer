@@ -13,6 +13,7 @@ def _convert_to_bool(x: str) -> bool:
     raise ValueError(f"Cannot convert {x} to bool. Input must be 'True' or 'False'.")
 
 
+OPENSEARCH_INDEX_PREFIX: str = os.getenv("OPENSEARCH_INDEX_PREFIX", "navigator")
 SBERT_MODEL: str = os.getenv("SBERT_MODEL", "msmarco-distilbert-dot-v5")
 INDEX_ENCODER_CACHE_FOLDER: str = os.getenv("INDEX_ENCODER_CACHE_FOLDER", "/models")
 ENCODING_BATCH_SIZE: int = int(os.getenv("ENCODING_BATCH_SIZE", "32"))
