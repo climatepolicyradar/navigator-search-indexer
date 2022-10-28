@@ -8,6 +8,7 @@ from typing import Optional, Tuple
 
 import click
 import numpy as np
+from cloudpathlib.exceptions import OverwriteNewerCloudError
 from cloudpathlib import S3Path
 from tqdm.auto import tqdm
 
@@ -130,7 +131,13 @@ def main(
     document_ids_previously_parsed = set(
         [path.stem for path in output_dir_as_path.glob("*.npy")]
     )
-    files_to_parse = list(input_dir_as_path.glob("*.json"))
+
+    if config.FILES_TO_PARSE is not None:
+        files_to_parse_subset = config.FILES_TO_PARSE.split("$")[1:]
+        files_to_parse = (input_dir_as_path / f for f in files_to_parse_subset)
+    else:
+        files_to_parse = list(input_dir_as_path.glob("*.json"))
+
     tasks = [IndexerInput.parse_raw(path.read_text()) for path in files_to_parse]
 
     if not redo and document_ids_previously_parsed.intersection(
@@ -197,7 +204,12 @@ def main(
         )
 
         task_output_path = output_dir_as_path / f"{task.document_id}.json"
-        task_output_path.write_text(task.json())
+
+        try:
+            task_output_path.write_text(task.json())
+        except OverwriteNewerCloudError:
+            logger.info(f"Tried to write to {task_output_path}, received OverwriteNewerCloudError and therefore "
+                        f"skipping.")
 
         embeddings_output_path = output_dir_as_path / f"{task.document_id}.npy"
         with embeddings_output_path.open("wb") as f:
