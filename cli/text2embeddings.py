@@ -130,7 +130,13 @@ def main(
     document_ids_previously_parsed = set(
         [path.stem for path in output_dir_as_path.glob("*.npy")]
     )
-    files_to_parse = list(input_dir_as_path.glob("*.json"))
+
+    if config.FILES_TO_PARSE is not None:
+        files_to_parse_subset = config.FILES_TO_PARSE.split("$")[1:]
+        files_to_parse = (input_dir_as_path / f for f in files_to_parse_subset)
+    else:
+        files_to_parse = list(input_dir_as_path.glob("*.json"))
+
     tasks = [IndexerInput.parse_raw(path.read_text()) for path in files_to_parse]
 
     if not redo and document_ids_previously_parsed.intersection(
