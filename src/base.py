@@ -1,6 +1,6 @@
 from typing import Optional, Sequence, Tuple, List
 from enum import Enum
-from datetime import date
+import datetime
 
 from pydantic import BaseModel, AnyHttpUrl, Field, root_validator
 
@@ -15,9 +15,20 @@ class ContentType(str, Enum):
 class DocumentMetadata(BaseModel):
     """Metadata about a document."""
 
-    ...
-    # document_source_url: Optional[AnyHttpUrl]
-    # TODO: add other metadata fields from loader
+    publication_ts: Optional[datetime.datetime]
+    date: Optional[str] = None  # Set on import by a validator
+    geography: str
+    category: str
+    source: str
+    type: str
+
+    @root_validator
+    def convert_publication_ts_to_date(cls, values):
+        """Convert publication_ts to a datetime string. This is necessary as OpenSearch expects a date object."""
+
+        values["date"] = values["publication_ts"].strftime("%d/%m/%Y")
+
+        return values
 
 
 class TextBlock(BaseModel):
@@ -75,7 +86,7 @@ class HTMLData(BaseModel):
     """Set of metadata specific to HTML documents."""
 
     detected_title: Optional[str]
-    detected_date: Optional[date]
+    detected_date: Optional[datetime.date]
     has_valid_text: bool
     text_blocks: Sequence[TextBlock]
 
@@ -129,10 +140,10 @@ class IndexerInput(BaseModel):
         ):
             raise ValueError("pdf_metadata must be null for HTML documents")
 
-        if (
-            values["document_content_type"] not in {ContentType.HTML, ContentType.PDF}
-            and (values["html_data"] is not None or values["pdf_data"] is not None)
-        ):
+        if values["document_content_type"] not in {
+            ContentType.HTML,
+            ContentType.PDF,
+        } and (values["html_data"] is not None or values["pdf_data"] is not None):
             raise ValueError(
                 "html_metadata and pdf_metadata must be null for documents an "
                 "unsupported content type."

@@ -6,8 +6,12 @@
     "document_cdn_object": null,
     "document_md5_sum": null,
     "document_metadata": {
-        "document_source_url": null
-    },
+        "publication_ts": "2022-10-25 12:45:00.869045",
+        "geography": "test_geo",
+        "category": "test_category",
+        "source": "test_source",
+        "type": "test_type"
+},
     "languages": [
         "en"
     ],
