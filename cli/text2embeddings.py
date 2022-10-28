@@ -8,6 +8,7 @@ from typing import Optional, Tuple
 
 import click
 import numpy as np
+from cloudpathlib.exceptions import OverwriteNewerCloudError
 from cloudpathlib import S3Path
 from tqdm.auto import tqdm
 
@@ -203,7 +204,12 @@ def main(
         )
 
         task_output_path = output_dir_as_path / f"{task.document_id}.json"
-        task_output_path.write_text(task.json())
+
+        try:
+            task_output_path.write_text(task.json())
+        except OverwriteNewerCloudError:
+            logger.info(f"Tried to write to {task_output_path}, received OverwriteNewerCloudError and therefore "
+                        f"skipping.")
 
         embeddings_output_path = output_dir_as_path / f"{task.document_id}.npy"
         with embeddings_output_path.open("wb") as f:
