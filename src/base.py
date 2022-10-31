@@ -4,12 +4,8 @@ import datetime
 
 from pydantic import BaseModel, AnyHttpUrl, Field, root_validator
 
-
-class ContentType(str, Enum):
-    """List of document content types that can be handled by the parser."""
-
-    HTML = "text/html"
-    PDF = "application/pdf"
+HTML_CONTENT_TYPE = "text/html"
+PDF_CONTENT_TYPE = "application/pdf"
 
 
 class DocumentMetadata(BaseModel):
@@ -104,7 +100,7 @@ class IndexerInput(BaseModel):
     languages: Optional[Sequence[str]]
     translated: bool
     document_slug: str  # for better links to the frontend hopefully soon
-    document_content_type: Optional[ContentType]
+    document_content_type: Optional[str]
     html_data: Optional[HTMLData] = None
     pdf_data: Optional[PDFData] = None
 
@@ -113,9 +109,9 @@ class IndexerInput(BaseModel):
 
         if self.document_content_type is None:
             return []
-        elif self.document_content_type == ContentType.PDF:
+        elif self.document_content_type == PDF_CONTENT_TYPE:
             return self.pdf_data.text_blocks  # type: ignore
-        elif self.document_content_type == ContentType.HTML:
+        elif self.document_content_type == HTML_CONTENT_TYPE:
             if self.html_data.has_valid_text:  # type: ignore
                 return self.html_data.text_blocks  # type: ignore
             else:
@@ -129,21 +125,21 @@ class IndexerInput(BaseModel):
         TODO: this is copied from `ParserOutput` in the document parser. Do we want to move it to a common place so both repos can use it?
         """
         if (
-            values["document_content_type"] == ContentType.HTML
+            values["document_content_type"] == HTML_CONTENT_TYPE
             and values["html_data"] is None
         ):
             raise ValueError("html_metadata must be set for HTML documents")
 
         if (
-            values["document_content_type"] == ContentType.PDF
+            values["document_content_type"] == PDF_CONTENT_TYPE
             and values["pdf_data"] is None
         ):
             raise ValueError("pdf_metadata must be null for HTML documents")
 
-        if values["document_content_type"] not in {
-            ContentType.HTML,
-            ContentType.PDF,
-        } and (values["html_data"] is not None or values["pdf_data"] is not None):
+        if (
+            values["document_content_type"] not in {HTML_CONTENT_TYPE, PDF_CONTENT_TYPE}
+            and (values["html_data"] is not None or values["pdf_data"] is not None)
+        ):
             raise ValueError(
                 "html_metadata and pdf_metadata must be null for documents an "
                 "unsupported content type."
