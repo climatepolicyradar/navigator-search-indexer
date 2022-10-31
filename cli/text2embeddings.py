@@ -132,13 +132,13 @@ def main(
         [path.stem for path in output_dir_as_path.glob("*.npy")]
     )
 
-    if config.FILES_TO_PARSE is not None:
-        files_to_parse_subset = config.FILES_TO_PARSE.split("$")[1:]
-        files_to_parse = (input_dir_as_path / f for f in files_to_parse_subset)
+    if config.FILES_TO_PROCESS is not None:
+        files_to_process_subset = config.FILES_TO_PROCESS.split("$")[1:]
+        files_to_process = [input_dir_as_path / f for f in files_to_process_subset]
     else:
-        files_to_parse = list(input_dir_as_path.glob("*.json"))
+        files_to_process = list(input_dir_as_path.glob("*.json"))
 
-    tasks = [IndexerInput.parse_raw(path.read_text()) for path in files_to_parse]
+    tasks = [IndexerInput.parse_raw(path.read_text()) for path in files_to_process]
 
     if not redo and document_ids_previously_parsed.intersection(
         {task.document_id for task in tasks}
@@ -188,30 +188,38 @@ def main(
     encoder = SBERTEncoder(config.SBERT_MODEL)
 
     logger.info(
-        f"Encoding text from {len(files_to_parse)} documents in batches of {config.ENCODING_BATCH_SIZE} text blocks."
+        f"Encoding text from {len(files_to_process)} documents in batches "
+        f"of {config.ENCODING_BATCH_SIZE} text blocks."
     )
     for task in tqdm(tasks, unit="docs"):
-        description_embedding, text_embeddings = encode_indexer_input(
-            encoder, task, config.ENCODING_BATCH_SIZE, device=device
-        )
-
-        embeddings_output_path = output_dir_as_path / f"{task.document_id}.npy"
-
-        combined_embeddings = (
-            np.vstack([description_embedding, text_embeddings])
-            if text_embeddings is not None
-            else description_embedding.reshape(1, -1)
-        )
-
         task_output_path = output_dir_as_path / f"{task.document_id}.json"
 
         try:
             task_output_path.write_text(task.json())
         except OverwriteNewerCloudError:
-            logger.info(f"Tried to write to {task_output_path}, received OverwriteNewerCloudError and therefore "
-                        f"skipping.")
+            # TODO: investigate why this happens, and why we're copying the input
+            logger.info(
+                f"Tried to write to {task_output_path}, received "
+                "OverwriteNewerCloudError, assuming a newer task definition "
+                "is the one we want, continuing to process."
+            )
 
         embeddings_output_path = output_dir_as_path / f"{task.document_id}.npy"
+        if embeddings_output_path.exists():
+            logger.info(
+                f"Embeddings output file '{embeddings_output_path}' already exists, "
+                "skipping processing."
+            )
+            continue
+
+        description_embedding, text_embeddings = encode_indexer_input(
+            encoder, task, config.ENCODING_BATCH_SIZE, device=device
+        )
+        combined_embeddings = (
+            np.vstack([description_embedding, text_embeddings])
+            if text_embeddings is not None
+            else description_embedding.reshape(1, -1)
+        )
         with embeddings_output_path.open("wb") as f:
             np.save(f, combined_embeddings, allow_pickle=False)
 
