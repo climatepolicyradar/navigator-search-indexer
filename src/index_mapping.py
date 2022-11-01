@@ -5,7 +5,9 @@ from typing import List, Dict
 COMMON_FIELDS: Dict[str, List[str]] = {
     "id": ["document_id"],
     "sortable": ["document_name", "document_description"],
-    "date": [],  # ["document_date"], # TODO: uncomment when we have a date field passed from the loader
+    "date": [
+        "document_date",
+    ],
     "boolean": ["translated"],
     "categorical": [
         "document_slug",
@@ -13,6 +15,10 @@ COMMON_FIELDS: Dict[str, List[str]] = {
         "document_content_type",
         "document_md5_sum",
         "document_source_url",
+        "document_geography",
+        "document_category",
+        "document_source",
+        "document_type",
     ],
 }
 

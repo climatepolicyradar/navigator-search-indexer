@@ -8,7 +8,7 @@ build:
 	docker build -t navigator-search-indexer .
 
 run_encoding_docker:
-	docker run  --entrypoint python -v ${PWD}/data:/app/data navigator-search-indexer -m cli.text2embeddings ./data/raw ./data/processed
+	docker run --entrypoint python -v ${PWD}/data:/app/data navigator-search-indexer -m cli.text2embeddings ./data/raw ./data/processed
 
 run_indexing_docker:
 	docker run --entrypoint python --network=host --env-file=.env -v ${PWD}/data:/app/data navigator-search-indexer -m cli.index_data ./data/processed

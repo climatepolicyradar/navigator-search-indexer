@@ -1,23 +1,30 @@
 from typing import Optional, Sequence, Tuple, List
 from enum import Enum
-from datetime import date
+import datetime
 
 from pydantic import BaseModel, AnyHttpUrl, Field, root_validator
 
-
-class ContentType(str, Enum):
-    """List of document content types that can be handled by the parser."""
-
-    HTML = "text/html"
-    PDF = "application/pdf"
+CONTENT_TYPE_HTML = "text/html"
+CONTENT_TYPE_PDF = "application/pdf"
 
 
 class DocumentMetadata(BaseModel):
     """Metadata about a document."""
 
-    ...
-    # document_source_url: Optional[AnyHttpUrl]
-    # TODO: add other metadata fields from loader
+    publication_ts: Optional[datetime.datetime]
+    date: Optional[str] = None  # Set on import by a validator
+    geography: str
+    category: str
+    source: str
+    type: str
+
+    @root_validator
+    def convert_publication_ts_to_date(cls, values):
+        """Convert publication_ts to a datetime string. This is necessary as OpenSearch expects a date object."""
+
+        values["date"] = values["publication_ts"].strftime("%d/%m/%Y")
+
+        return values
 
 
 class TextBlock(BaseModel):
@@ -75,7 +82,7 @@ class HTMLData(BaseModel):
     """Set of metadata specific to HTML documents."""
 
     detected_title: Optional[str]
-    detected_date: Optional[date]
+    detected_date: Optional[datetime.date]
     has_valid_text: bool
     text_blocks: Sequence[TextBlock]
 
@@ -93,7 +100,7 @@ class IndexerInput(BaseModel):
     languages: Optional[Sequence[str]]
     translated: bool
     document_slug: str  # for better links to the frontend hopefully soon
-    document_content_type: Optional[ContentType]
+    document_content_type: Optional[str]
     html_data: Optional[HTMLData] = None
     pdf_data: Optional[PDFData] = None
 
@@ -102,9 +109,9 @@ class IndexerInput(BaseModel):
 
         if self.document_content_type is None:
             return []
-        elif self.document_content_type == ContentType.PDF:
+        elif self.document_content_type == CONTENT_TYPE_PDF:
             return self.pdf_data.text_blocks  # type: ignore
-        elif self.document_content_type == ContentType.HTML:
+        elif self.document_content_type == CONTENT_TYPE_HTML:
             if self.html_data.has_valid_text:  # type: ignore
                 return self.html_data.text_blocks  # type: ignore
             else:
@@ -118,19 +125,19 @@ class IndexerInput(BaseModel):
         TODO: this is copied from `ParserOutput` in the document parser. Do we want to move it to a common place so both repos can use it?
         """
         if (
-            values["document_content_type"] == ContentType.HTML
+            values["document_content_type"] == CONTENT_TYPE_HTML
             and values["html_data"] is None
         ):
             raise ValueError("html_metadata must be set for HTML documents")
 
         if (
-            values["document_content_type"] == ContentType.PDF
+            values["document_content_type"] == CONTENT_TYPE_PDF
             and values["pdf_data"] is None
         ):
             raise ValueError("pdf_metadata must be null for HTML documents")
 
         if (
-            values["document_content_type"] not in {ContentType.HTML, ContentType.PDF}
+            values["document_content_type"] not in {CONTENT_TYPE_HTML, CONTENT_TYPE_PDF}
             and (values["html_data"] is not None or values["pdf_data"] is not None)
         ):
             raise ValueError(

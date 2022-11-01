@@ -197,7 +197,7 @@ class OpenSearchIndex:
 
         response = requests.get(
             url,
-            auth=self._login,
+            auth=self._login,  # type: ignore
         )
 
         if response.status_code == 200:

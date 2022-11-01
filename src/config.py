@@ -46,3 +46,4 @@ TARGET_LANGUAGES: Set[str] = set(
     os.getenv("TARGET_LANGUAGES", "en").lower().split(",")
 )  # comma-separated 2-letter ISO codes
 ENCODER_SUPPORTED_LANGUAGES: Set[str] = {"en"}
+FILES_TO_PROCESS = os.getenv("FILES_TO_PROCESS")

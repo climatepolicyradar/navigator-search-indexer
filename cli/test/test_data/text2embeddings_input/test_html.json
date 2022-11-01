@@ -9,7 +9,11 @@
         "en"
     ],
     "document_metadata": {
-        "document_source_url": "http://climate-laws.org"
+        "publication_ts": "2022-10-25 12:43:00.869045",
+        "geography": "test_geo",
+        "category": "test_category",
+        "source": "test_source",
+        "type": "test_type"
     },
     "translated": false,
     "document_slug": "YYY",
