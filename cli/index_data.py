@@ -88,7 +88,7 @@ def get_text_document_generator(
     content_types: Optional[Sequence[ContentType]] = None,
 ) -> Generator[dict, None, None]:
     """
-    Generator for text documents to index: those containing text passages and their embeddings.
+    Get generator for text documents to index: those containing text passages and their embeddings. Optionally filter by whether text passages have been translated and/or the document content type.
 
     :param tasks: list of tasks from the document parser
     :param embedding_dir_as_path: directory containing embeddings .npy files. These are named with IDs corresponding to the IDs in the tasks.
