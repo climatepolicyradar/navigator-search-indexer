@@ -3,7 +3,7 @@ from typing import Optional, Sequence
 
 import pytest
 
-from src.base import IndexerInput, ContentType
+from src.base import IndexerInput, CONTENT_TYPE_HTML, CONTENT_TYPE_PDF
 from src.index_mapping import ALL_FIELDS
 from cli.index_data import get_core_document_generator, get_text_document_generator
 
@@ -84,11 +84,13 @@ def test_get_core_document_generator(test_input_dir: Path):
 
 
 @pytest.mark.parametrize("translated", [True, False, None])
-@pytest.mark.parametrize("content_types", [[ContentType.PDF], [ContentType.HTML], None])
+@pytest.mark.parametrize(
+    "content_types", [[CONTENT_TYPE_PDF], [CONTENT_TYPE_HTML], None]
+)
 def test_get_text_document_generator(
     test_input_dir: Path,
     translated: Optional[bool],
-    content_types: Optional[Sequence[ContentType]],
+    content_types: Optional[Sequence[str]],
 ):
     """Test that the document generator returns documents in the correct format."""
 
@@ -150,7 +152,7 @@ def test_get_text_document_generator(
             assert doc["translated"] == translated
 
         if content_types:
-            assert doc["document_content_type"] == content_types[0].value
+            assert doc["document_content_type"] == content_types[0]
 
 
 def test_document_generator_mapping_alignment(test_input_dir: Path):

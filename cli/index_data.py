@@ -11,7 +11,7 @@ import click
 from cloudpathlib import S3Path
 
 from src.index import OpenSearchIndex
-from src.base import IndexerInput, ContentType
+from src.base import IndexerInput, CONTENT_TYPE_HTML, CONTENT_TYPE_PDF
 from src.index_mapping import COMMON_FIELDS
 from src import config
 
@@ -88,7 +88,7 @@ def get_text_document_generator(
     tasks: Sequence[IndexerInput],
     embedding_dir_as_path: Union[Path, S3Path],
     translated: Optional[bool] = None,
-    content_types: Optional[Sequence[ContentType]] = None,
+    content_types: Optional[Sequence[str]] = None,
 ) -> Generator[dict, None, None]:
     """
     Get generator for text documents to index: those containing text passages and their embeddings. Optionally filter by whether text passages have been translated and/or the document content type.
@@ -201,7 +201,7 @@ def main(
     )
 
     pdfs_non_translated_doc_generator = get_text_document_generator(
-        tasks, embedding_dir_as_path, translated=False, content_types=[ContentType.PDF]
+        tasks, embedding_dir_as_path, translated=False, content_types=[CONTENT_TYPE_PDF]
     )
     populate_and_warmup_index(
         pdfs_non_translated_doc_generator,
@@ -209,7 +209,7 @@ def main(
     )
 
     pdfs_translated_doc_generator = get_text_document_generator(
-        tasks, embedding_dir_as_path, translated=True, content_types=[ContentType.PDF]
+        tasks, embedding_dir_as_path, translated=True, content_types=[CONTENT_TYPE_PDF]
     )
     populate_and_warmup_index(
         pdfs_translated_doc_generator,
@@ -217,7 +217,10 @@ def main(
     )
 
     htmls_non_translated_doc_generator = get_text_document_generator(
-        tasks, embedding_dir_as_path, translated=False, content_types=[ContentType.HTML]
+        tasks,
+        embedding_dir_as_path,
+        translated=False,
+        content_types=[CONTENT_TYPE_HTML],
     )
     populate_and_warmup_index(
         htmls_non_translated_doc_generator,
@@ -225,7 +228,7 @@ def main(
     )
 
     htmls_translated_doc_generator = get_text_document_generator(
-        tasks, embedding_dir_as_path, translated=True, content_types=[ContentType.HTML]
+        tasks, embedding_dir_as_path, translated=True, content_types=[CONTENT_TYPE_HTML]
     )
     populate_and_warmup_index(
         htmls_translated_doc_generator,
