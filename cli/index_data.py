@@ -9,6 +9,7 @@ import logging.config
 import numpy as np
 import click
 from cloudpathlib import S3Path
+from tqdm.auto import tqdm
 
 from src.index import OpenSearchIndex
 from src.base import IndexerInput, CONTENT_TYPE_HTML, CONTENT_TYPE_PDF
@@ -190,9 +191,10 @@ def main(
     else:
         embedding_dir_as_path = Path(text2embedding_output_dir)
 
+    logger.info(f"Getting tasks from {'s3' if s3 else 'local'}")
     tasks = [
         IndexerInput.parse_raw(path.read_text())
-        for path in list(embedding_dir_as_path.glob("*.json"))
+        for path in tqdm(list(embedding_dir_as_path.glob("*.json")))
     ]
 
     core_doc_generator = get_core_document_generator(tasks, embedding_dir_as_path)
