@@ -42,6 +42,9 @@ OPENSEARCH_VERIFY_CERTS: bool = _convert_to_bool(
 OPENSEARCH_SSL_SHOW_WARN: bool = _convert_to_bool(
     os.getenv("OPENSEARCH_SSL_SHOW_WARN", "True")
 )
+OPENSEARCH_BULK_REQUEST_TIMEOUT: int = int(
+    os.getenv("OPENSEARCH_BULK_REQUEST_TIMEOUT", "60")
+)
 TARGET_LANGUAGES: Set[str] = set(
     os.getenv("TARGET_LANGUAGES", "en").lower().split(",")
 )  # comma-separated 2-letter ISO codes
