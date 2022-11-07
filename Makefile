@@ -1,5 +1,4 @@
 .PHONY: build test dev_install
-include .env
 
 setup:
 	cp .env.example .env
@@ -11,7 +10,8 @@ run_encoding_docker:
 	docker run --entrypoint python -v ${PWD}/data:/app/data navigator-search-indexer -m cli.text2embeddings ./data/raw ./data/processed
 
 run_indexing_docker:
-	docker run --entrypoint python --network=host --env-file=.env -v ${PWD}/data:/app/data navigator-search-indexer -m cli.index_data ./data/processed
+	docker run --entrypoint python --env-file=.env -v ${PWD}/data:/app/data aws s3 sync ${INDEXER_INPUT_PREFIX} /app/data/processed
+	docker run --entrypoint python --network=host --env-file=.env -v ${PWD}/data:/app/data navigator-search-indexer -m cli.index_data /app/data/processed
 
 test:
 	docker run --entrypoint python navigator-search-indexer -m pytest -vvv
