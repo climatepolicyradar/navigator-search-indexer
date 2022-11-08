@@ -12,10 +12,8 @@
         "source": "test_source",
         "type": "test_type"
 },
-    "languages": [
-        "en"
-    ],
-    "translated": true,
+    "languages": null,
+    "translated": false,
     "document_slug": "YYY",
     "document_content_type": null,
     "html_data": null,

@@ -165,17 +165,20 @@ def main(
             f"The following languages have been requested for encoding but are not supported by the encoder: {unsupported_languages}. Only the following languages will be encoded: {config.ENCODER_SUPPORTED_LANGUAGES}."
         )
 
+    # Encode documents either with one language where the lanugage is in the target languages, or with no language and no content type. This assumes that the document name and description are in English.
     tasks = [
         task
         for task in tasks
-        if task.languages
-        and (len(task.languages) == 1)
-        and (
-            task.languages[0]
-            in config.ENCODER_SUPPORTED_LANGUAGES.union(config.TARGET_LANGUAGES)
+        if (
+            task.languages
+            and (len(task.languages) == 1)
+            and (
+                task.languages[0]
+                in config.ENCODER_SUPPORTED_LANGUAGES.union(config.TARGET_LANGUAGES)
+            )
         )
+        or (not task.languages and task.html_data is None and task.pdf_data is None)
     ]
-
     # TODO: check we have all the files we need here i.e. (no ids * no languages)? Or do in the indexing step?
 
     if limit:
