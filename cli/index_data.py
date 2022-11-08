@@ -168,17 +168,10 @@ def populate_and_warmup_index(
     opensearch.warmup_knn()
 
 
-@click.command()
-@click.argument("text2embedding-output-dir")
-@click.option(
-    "--s3",
-    is_flag=True,
-    required=False,
-    help="Whether or not we are reading from and writing to S3.",
-)
 def main(
     text2embedding_output_dir: str,
     s3: bool,
+    files_to_index: Optional[str],
 ) -> None:
     """
     Index documents into Opensearch.
@@ -196,6 +189,18 @@ def main(
         IndexerInput.parse_raw(path.read_text())
         for path in tqdm(list(embedding_dir_as_path.glob("*.json")))
     ]
+
+    if files_to_index is not None:
+        tasks = [
+            task for task in tasks if task.document_id in files_to_index.split(",")
+        ]
+
+        if missing_ids := set(files_to_index.split(",")) - set(
+            [task.document_id for task in tasks]
+        ):
+            logger.warning(
+                f"Missing files in the input directory for {', '.join(missing_ids)}"
+            )
 
     core_doc_generator = get_core_document_generator(tasks, embedding_dir_as_path)
     populate_and_warmup_index(
@@ -238,5 +243,26 @@ def main(
     )
 
 
+@click.command()
+@click.argument("text2embedding-output-dir")
+@click.option(
+    "--s3",
+    is_flag=True,
+    required=False,
+    help="Whether or not we are reading from and writing to S3.",
+)
+@click.option(
+    "--files-to-index",
+    required=False,
+    help="Comma-separated list of IDs of files to index.",
+)
+def run_as_cli(
+    text2embedding_output_dir: str,
+    s3: bool,
+    files_to_index: Optional[str],
+) -> None:
+    main(text2embedding_output_dir, s3, files_to_index)
+
+
 if __name__ == "__main__":
-    main()
+    run_as_cli()

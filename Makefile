@@ -1,4 +1,4 @@
-.PHONY: build test dev_install
+.PHONY: build test dev_install opensearch_test_data
 
 setup:
 	cp .env.example .env
@@ -28,3 +28,11 @@ run_local_against_aws:
 	cp Dockerfile.aws.example Dockerfile
 	docker build -t navigator-search-indexer-aws .
 	docker run -e EMBEDDINGS_INPUT_PREFIX=${EMBEDDINGS_INPUT_PREFIX} -e INDEXER_INPUT_PREFIX=${INDEXER_INPUT_PREFIX} -it navigator-search-indexer-aws
+
+# test data for backend
+create_test_index:
+	docker run --entrypoint python --network=host --env-file=.env -e OPENSEARCH_INDEX_PREFIX=navigator_test -v ${PWD}/data:/app/data navigator-search-indexer -m cli.test.create_test_index /app/data/raw/cpr-dev-data-pipeline-cache
+
+opensearch_test_dump: create_test_index
+	rm -rf ./data/test/**
+	multielasticdump --input=http://admin:admin@localhost:9200 --output=./data/test --match="navigator_test_.*" --ignoreType=template
