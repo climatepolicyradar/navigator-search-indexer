@@ -12,7 +12,7 @@ from cloudpathlib.exceptions import OverwriteNewerCloudError
 from cloudpathlib import S3Path
 from tqdm.auto import tqdm
 
-from src.base import IndexerInput
+from src.base import Text2EmbeddingsInput
 from src.ml import SBERTEncoder, SentenceEncoder
 from src import config
 
@@ -41,7 +41,7 @@ logging.config.dictConfig(DEFAULT_LOGGING)
 
 def encode_indexer_input(
     encoder: SentenceEncoder,
-    input: IndexerInput,
+    input: Text2EmbeddingsInput,
     batch_size: int,
     device: Optional[str] = None,
 ) -> Tuple[np.ndarray, Optional[np.ndarray]]:
@@ -138,7 +138,9 @@ def main(
     else:
         files_to_process = list(input_dir_as_path.glob("*.json"))
 
-    tasks = [IndexerInput.parse_raw(path.read_text()) for path in files_to_process]
+    tasks = [
+        Text2EmbeddingsInput.parse_raw(path.read_text()) for path in files_to_process
+    ]
 
     if not redo and document_ids_previously_parsed.intersection(
         {task.document_id for task in tasks}
