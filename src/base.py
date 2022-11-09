@@ -124,10 +124,10 @@ class IndexerInput(BaseModel):
 
                 # flip top and bottom so y values are still increasing as you go through the coordinates list
                 text_block.coords = [
-                    text_block.coords[2],
                     text_block.coords[3],
-                    text_block.coords[0],
+                    text_block.coords[2],
                     text_block.coords[1],
+                    text_block.coords[0],
                 ]
 
         return self
