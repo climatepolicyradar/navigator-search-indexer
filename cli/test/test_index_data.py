@@ -33,6 +33,7 @@ def test_get_core_document_generator(test_input_dir: Path):
         for field in [
             "document_id",
             "document_name",
+            "document_name_and_slug",
             "document_description",
             "document_source_url",
             "document_cdn_object",
@@ -117,7 +118,13 @@ def test_get_text_document_generator(
             "document_md5_sum",
             "translated",
             "document_slug",
+            "document_name_and_slug",
             "document_content_type",
+            "document_geography",
+            "document_category",
+            "document_source",
+            "document_type",
+            "document_date",
         ]:
             assert field in doc, f"{field} not found in {doc}"
 
