@@ -52,6 +52,7 @@ def get_metadata_dict(task: IndexerInput) -> dict:
         **{f"document_{k}": v for k, v in task.document_metadata.dict().items()},
     }
     task_dict["document_name_and_slug"] = f"{task.document_name} {task.document_slug}"
+    task_dict["document_sector"] = []
     required_fields = [field for fields in COMMON_FIELDS.values() for field in fields]
 
     return {k: v for k, v in task_dict.items() if k in required_fields}
