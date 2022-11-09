@@ -112,7 +112,7 @@ def get_text_document_generator(
         embeddings = np.load(str(embedding_dir_as_path / f"{task.document_id}.npy"))
 
         # Generate text block docs
-        text_blocks = task.get_text_blocks()
+        text_blocks = task.vertically_flip_text_block_coords().get_text_blocks()
 
         for text_block, embedding in zip(text_blocks, embeddings[1:, :]):
             yield {
@@ -176,9 +176,17 @@ def populate_and_warmup_index(
     required=False,
     help="Whether or not we are reading from and writing to S3.",
 )
+@click.option(
+    "--limit",
+    "-l",
+    type=int,
+    required=False,
+    help="Optionally limit the number of documents to index.",
+)
 def main(
     text2embedding_output_dir: str,
     s3: bool,
+    limit: Optional[int],
 ) -> None:
     """
     Index documents into Opensearch.
@@ -196,6 +204,9 @@ def main(
         IndexerInput.parse_raw(path.read_text())
         for path in tqdm(list(embedding_dir_as_path.glob("*.json")))
     ]
+
+    if limit is not None:
+        tasks = tasks[:limit]
 
     core_doc_generator = get_core_document_generator(tasks, embedding_dir_as_path)
     populate_and_warmup_index(

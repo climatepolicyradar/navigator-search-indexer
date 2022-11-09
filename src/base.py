@@ -1,5 +1,4 @@
 from typing import Optional, Sequence, Tuple, List
-from enum import Enum
 import datetime
 
 from pydantic import BaseModel, AnyHttpUrl, Field, root_validator
@@ -104,6 +103,35 @@ class IndexerInput(BaseModel):
     html_data: Optional[HTMLData] = None
     pdf_data: Optional[PDFData] = None
 
+    def vertically_flip_text_block_coords(self) -> "IndexerInput":
+        """Flips the coordinates of all PDF text blocks vertically. Acts in-place on the coordinates in the IndexerInput object."""
+
+        # TODO: move this to the document parser
+
+        if self.pdf_data is None:
+            return self
+
+        page_height_map = {
+            page.page_number: page.dimensions[1] for page in self.pdf_data.page_metadata
+        }
+
+        for text_block in self.pdf_data.text_blocks:
+            if text_block.coords is not None and text_block.page_number is not None:
+                text_block.coords = [
+                    (x, page_height_map[text_block.page_number] - y)
+                    for x, y in text_block.coords
+                ]
+
+                # flip top and bottom so y values are still increasing as you go through the coordinates list
+                text_block.coords = [
+                    text_block.coords[2],
+                    text_block.coords[3],
+                    text_block.coords[0],
+                    text_block.coords[1],
+                ]
+
+        return self
+
     def get_text_blocks(self) -> Sequence[TextBlock]:  # type: ignore
         """Returns the text blocks contained in the document."""
 
@@ -136,10 +164,10 @@ class IndexerInput(BaseModel):
         ):
             raise ValueError("pdf_metadata must be null for HTML documents")
 
-        if (
-            values["document_content_type"] not in {CONTENT_TYPE_HTML, CONTENT_TYPE_PDF}
-            and (values["html_data"] is not None or values["pdf_data"] is not None)
-        ):
+        if values["document_content_type"] not in {
+            CONTENT_TYPE_HTML,
+            CONTENT_TYPE_PDF,
+        } and (values["html_data"] is not None or values["pdf_data"] is not None):
             raise ValueError(
                 "html_metadata and pdf_metadata must be null for documents an "
                 "unsupported content type."
