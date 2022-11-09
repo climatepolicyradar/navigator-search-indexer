@@ -10,7 +10,8 @@
         "geography": "test_geo",
         "category": "test_category",
         "source": "test_source",
-        "type": "test_type"
+        "type": "test_type",
+        "sector": ["sector1", "sector2"]
 },
     "languages": [
         "en"
