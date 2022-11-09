@@ -1,5 +1,4 @@
 from typing import Optional, Sequence, Tuple, List
-from enum import Enum
 import datetime
 
 from pydantic import BaseModel, AnyHttpUrl, Field, root_validator
@@ -17,6 +16,7 @@ class DocumentMetadata(BaseModel):
     category: str
     source: str
     type: str
+    sector: Sequence[str]
 
     @root_validator
     def convert_publication_ts_to_date(cls, values):
@@ -136,13 +136,19 @@ class IndexerInput(BaseModel):
         ):
             raise ValueError("pdf_metadata must be null for HTML documents")
 
-        if (
-            values["document_content_type"] not in {CONTENT_TYPE_HTML, CONTENT_TYPE_PDF}
-            and (values["html_data"] is not None or values["pdf_data"] is not None)
-        ):
+        if values["document_content_type"] not in {
+            CONTENT_TYPE_HTML,
+            CONTENT_TYPE_PDF,
+        } and (values["html_data"] is not None or values["pdf_data"] is not None):
             raise ValueError(
                 "html_metadata and pdf_metadata must be null for documents an "
                 "unsupported content type."
             )
 
         return values
+
+
+class Text2EmbeddingsInput(IndexerInput):
+    """Input to text2embeddings. Same as the input to the indexing process, but makes no assumptions about what's in document metadata."""
+
+    document_metadata: dict
