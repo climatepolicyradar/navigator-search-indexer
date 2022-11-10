@@ -22,9 +22,9 @@ RUN mkdir /models
 RUN python -c "from sentence_transformers import SentenceTransformer; SentenceTransformer('sentence-transformers/msmarco-distilbert-dot-v5', cache_folder='/models')"
 
 # Copy files to image
+COPY ./data ./data
 COPY ./src ./src
 COPY ./cli ./cli
-COPY ./data ./data
 
 # Run the indexer on the input s3 directory
 ENTRYPOINT [ "sh", "./cli/run.sh" ]
