@@ -31,7 +31,7 @@ run_local_against_aws:
 
 # test data for backend
 create_test_index:
-	docker run --entrypoint python --network=host --env-file=.env -e OPENSEARCH_INDEX_PREFIX=navigator_test -v ${PWD}/data:/app/data navigator-search-indexer -m cli.test.create_test_index /app/data/raw/cpr-dev-data-pipeline-cache
+	docker run --entrypoint python --network=host --env-file=.env -e OPENSEARCH_INDEX_PREFIX=navigator_test -v ${PWD}/data:/app/data navigator-search-indexer -m cli.test.create_test_index /app/data/cpr-dev-data-pipeline-cache/embeddings_input
 
 opensearch_test_dump: create_test_index
 	rm -rf ./data/test/**
