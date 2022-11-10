@@ -16,7 +16,7 @@ class DocumentMetadata(BaseModel):
     category: str
     source: str
     type: str
-    sector: Sequence[str]
+    sectors: Sequence[str]
 
     @root_validator
     def convert_publication_ts_to_date(cls, values):

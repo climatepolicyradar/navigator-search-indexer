@@ -172,8 +172,8 @@ def populate_and_warmup_index(
 def main(
     text2embedding_output_dir: str,
     s3: bool,
-    files_to_index: Optional[str],
-    limit: Optional[int],
+    files_to_index: Optional[str] = None,
+    limit: Optional[int] = None,
 ) -> None:
     """
     Index documents into Opensearch.

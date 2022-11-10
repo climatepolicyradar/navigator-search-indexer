@@ -7,6 +7,10 @@ The code in this folder contains multiple CLIs used to index data into the Navig
 
 There is also an `opensearch-query-example.ipynb` notebook that demonstrates running a query on the index. This is to be developed further and integrated into the Navigator APIs.
 
+## Creating a test data dump for the backend
+
+See `make opensearch_test_dump` and `cli/test/create_test_index.py`.
+
 ## Running
 
 ### 1. Building
