@@ -51,6 +51,7 @@ def get_metadata_dict(task: IndexerInput) -> dict:
         **{k: v for k, v in task.dict().items() if k != "document_metadata"},
         **{f"document_{k}": v for k, v in task.document_metadata.dict().items()},
     }
+    task_dict["document_name_and_slug"] = f"{task.document_name} {task.document_slug}"
     required_fields = [field for fields in COMMON_FIELDS.values() for field in fields]
 
     return {k: v for k, v in task_dict.items() if k in required_fields}
@@ -112,7 +113,7 @@ def get_text_document_generator(
         embeddings = np.load(str(embedding_dir_as_path / f"{task.document_id}.npy"))
 
         # Generate text block docs
-        text_blocks = task.get_text_blocks()
+        text_blocks = task.vertically_flip_text_block_coords().get_text_blocks()
 
         for text_block, embedding in zip(text_blocks, embeddings[1:, :]):
             yield {
@@ -172,6 +173,7 @@ def main(
     text2embedding_output_dir: str,
     s3: bool,
     files_to_index: Optional[str],
+    limit: Optional[int],
 ) -> None:
     """
     Index documents into Opensearch.
@@ -201,6 +203,9 @@ def main(
             logger.warning(
                 f"Missing files in the input directory for {', '.join(missing_ids)}"
             )
+
+    if limit is not None:
+        tasks = tasks[:limit]
 
     core_doc_generator = get_core_document_generator(tasks, embedding_dir_as_path)
     populate_and_warmup_index(
@@ -256,12 +261,20 @@ def main(
     required=False,
     help="Comma-separated list of IDs of files to index.",
 )
+@click.option(
+    "--limit",
+    "-l",
+    type=int,
+    required=False,
+    help="Optionally limit the number of documents to index.",
+)
 def run_as_cli(
     text2embedding_output_dir: str,
     s3: bool,
     files_to_index: Optional[str],
+    limit: Optional[int],
 ) -> None:
-    main(text2embedding_output_dir, s3, files_to_index)
+    main(text2embedding_output_dir, s3, files_to_index, limit)
 
 
 if __name__ == "__main__":

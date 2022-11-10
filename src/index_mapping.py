@@ -3,8 +3,8 @@ from typing import List, Dict
 
 # Fields that should appear in every Opensearch document
 COMMON_FIELDS: Dict[str, List[str]] = {
-    "id": ["document_id"],
-    "sortable": ["document_name", "document_description"],
+    "id": ["document_name_and_slug"],  # eagerly loads inverted index for fast grouping
+    "sortable": ["document_id", "document_name", "document_description"],
     "date": [
         "document_date",
     ],
@@ -19,6 +19,7 @@ COMMON_FIELDS: Dict[str, List[str]] = {
         "document_category",
         "document_source",
         "document_type",
+        "document_sector",
     ],
 }
 

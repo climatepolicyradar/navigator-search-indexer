@@ -12,7 +12,7 @@ from cloudpathlib.exceptions import OverwriteNewerCloudError
 from cloudpathlib import S3Path
 from tqdm.auto import tqdm
 
-from src.base import IndexerInput
+from src.base import Text2EmbeddingsInput
 from src.ml import SBERTEncoder, SentenceEncoder
 from src import config
 
@@ -41,7 +41,7 @@ logging.config.dictConfig(DEFAULT_LOGGING)
 
 def encode_indexer_input(
     encoder: SentenceEncoder,
-    input: IndexerInput,
+    input: Text2EmbeddingsInput,
     batch_size: int,
     device: Optional[str] = None,
 ) -> Tuple[np.ndarray, Optional[np.ndarray]]:
@@ -138,7 +138,9 @@ def main(
     else:
         files_to_process = list(input_dir_as_path.glob("*.json"))
 
-    tasks = [IndexerInput.parse_raw(path.read_text()) for path in files_to_process]
+    tasks = [
+        Text2EmbeddingsInput.parse_raw(path.read_text()) for path in files_to_process
+    ]
 
     if not redo and document_ids_previously_parsed.intersection(
         {task.document_id for task in tasks}
@@ -165,17 +167,20 @@ def main(
             f"The following languages have been requested for encoding but are not supported by the encoder: {unsupported_languages}. Only the following languages will be encoded: {config.ENCODER_SUPPORTED_LANGUAGES}."
         )
 
+    # Encode documents either with one language where the lanugage is in the target languages, or with no language and no content type. This assumes that the document name and description are in English.
     tasks = [
         task
         for task in tasks
-        if task.languages
-        and (len(task.languages) == 1)
-        and (
-            task.languages[0]
-            in config.ENCODER_SUPPORTED_LANGUAGES.union(config.TARGET_LANGUAGES)
+        if (
+            task.languages
+            and (len(task.languages) == 1)
+            and (
+                task.languages[0]
+                in config.ENCODER_SUPPORTED_LANGUAGES.union(config.TARGET_LANGUAGES)
+            )
         )
+        or (not task.languages and task.html_data is None and task.pdf_data is None)
     ]
-
     # TODO: check we have all the files we need here i.e. (no ids * no languages)? Or do in the indexing step?
 
     if limit:
