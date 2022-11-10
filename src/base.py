@@ -107,8 +107,6 @@ class IndexerInput(BaseModel):
     def vertically_flip_text_block_coords(self) -> "IndexerInput":
         """Flips the coordinates of all PDF text blocks vertically. Acts in-place on the coordinates in the IndexerInput object."""
 
-        # TODO: move this to the document parser
-
         if self.pdf_data is None:
             return self
 
