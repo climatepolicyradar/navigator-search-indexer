@@ -14,7 +14,7 @@
         "category": "test_category",
         "source": "test_source",
         "type": "test_type",
-        "sector": ["sector1", "sector2"]
+        "sectors": ["sector1", "sector2"]
     },
     "translated": false,
     "document_slug": "YYY",

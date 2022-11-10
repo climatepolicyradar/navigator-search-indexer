@@ -45,7 +45,7 @@ def test_get_core_document_generator(test_input_dir: Path):
             "document_category",
             "document_source",
             "document_type",
-            "document_sector",
+            "document_sectors",
             "document_date",
         ]:
             assert field in doc, f"{field} not found in {doc}"
@@ -120,6 +120,7 @@ def test_get_text_document_generator(
             "document_slug",
             "document_name_and_slug",
             "document_content_type",
+            "document_sectors",
             "document_geography",
             "document_category",
             "document_source",

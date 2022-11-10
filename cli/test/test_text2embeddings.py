@@ -7,7 +7,7 @@ from cloudpathlib.local import LocalS3Path
 import pytest
 import numpy as np
 
-from cli.text2embeddings import main as cli_main
+from cli.text2embeddings import run_as_cli
 from src.base import IndexerInput
 
 
@@ -26,7 +26,7 @@ def test_run_encoder_local(test_input_dir: Path):
 
     with tempfile.TemporaryDirectory() as output_dir:
         runner = CliRunner()
-        result = runner.invoke(cli_main, [str(test_input_dir), output_dir])
+        result = runner.invoke(run_as_cli, [str(test_input_dir), output_dir])
         assert result.exit_code == 0
 
         assert set(Path(output_dir).glob("*.json")) == {
@@ -55,7 +55,7 @@ def test_run_encoder_local_fail_bad_input(test_input_dir_bad_data: Path):
 
     with tempfile.TemporaryDirectory() as output_dir:
         runner = CliRunner()
-        result = runner.invoke(cli_main, [str(test_input_dir_bad_data), output_dir])
+        result = runner.invoke(run_as_cli, [str(test_input_dir_bad_data), output_dir])
         assert result.exit_code == 1
 
 
@@ -71,7 +71,7 @@ def test_run_encoder_s3(test_input_dir: Path):
 
     with mock.patch("cli.text2embeddings.S3Path", LocalS3Path):
         runner = CliRunner()
-        result = runner.invoke(cli_main, [input_dir, output_dir, "--s3"])
+        result = runner.invoke(run_as_cli, [input_dir, output_dir, "--s3"])
 
         assert result.exit_code == 0
 
@@ -91,7 +91,7 @@ def test_run_parser_skip_already_done(caplog, test_input_dir) -> None:
 
         runner = CliRunner()
         result = runner.invoke(
-            cli_main,
+            run_as_cli,
             [
                 str(test_input_dir),
                 output_dir,
