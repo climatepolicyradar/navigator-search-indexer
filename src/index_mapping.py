@@ -19,7 +19,7 @@ COMMON_FIELDS: Dict[str, List[str]] = {
         "document_category",
         "document_source",
         "document_type",
-        "document_sector",
+        "document_sectors",
     ],
 }
 

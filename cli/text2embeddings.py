@@ -68,46 +68,13 @@ def encode_indexer_input(
     return description_embedding, text_embeddings
 
 
-@click.command()
-@click.argument(
-    "input-dir",
-)
-@click.argument(
-    "output-dir",
-)
-@click.option(
-    "--s3",
-    is_flag=True,
-    required=False,
-    help="Whether or not we are reading from and writing to S3.",
-)
-@click.option(
-    "--redo",
-    "-r",
-    help="Redo encoding for files that have already been parsed. By default, files with IDs that already exist in the output directory are skipped.",
-    is_flag=True,
-    default=False,
-)
-@click.option(
-    "--limit",
-    type=int,
-    default=None,
-    help="Optionally limit the number of text samples to process. Useful for debugging.",
-)
-@click.option(
-    "--device",
-    type=click.Choice(["cuda", "cpu"]),
-    help="Device to use for embeddings generation",
-    required=True,
-    default="cpu",
-)
 def main(
     input_dir: str,
     output_dir: str,
     s3: bool,
-    redo: bool,
-    limit: Optional[int],
-    device: str,
+    redo: bool = False,
+    device: str = "cpu",
+    limit: Optional[int] = None,
 ):
     """
     Run CLI to produce embeddings from document parser JSON outputs. Each embeddings file is called {id}.json where {id} is the document ID of the input. Its first line is the description embedding and all other lines are embeddings of each of the text blocks in the document in order. Encoding will automatically run on the GPU if one is available.
@@ -229,5 +196,56 @@ def main(
             np.save(f, combined_embeddings, allow_pickle=False)
 
 
+@click.command()
+@click.argument(
+    "input-dir",
+)
+@click.argument(
+    "output-dir",
+)
+@click.option(
+    "--s3",
+    is_flag=True,
+    required=False,
+    help="Whether or not we are reading from and writing to S3.",
+)
+@click.option(
+    "--redo",
+    "-r",
+    help="Redo encoding for files that have already been parsed. By default, files with IDs that already exist in the output directory are skipped.",
+    is_flag=True,
+    default=False,
+)
+@click.option(
+    "--device",
+    type=click.Choice(["cuda", "cpu"]),
+    help="Device to use for embeddings generation",
+    required=True,
+    default="cpu",
+)
+@click.option(
+    "--limit",
+    type=int,
+    default=None,
+    help="Optionally limit the number of text samples to process. Useful for debugging.",
+)
+def run_as_cli(
+    input_dir: str,
+    output_dir: str,
+    s3: bool,
+    redo: bool,
+    device: str,
+    limit: Optional[int],
+):
+    main(
+        input_dir=input_dir,
+        output_dir=output_dir,
+        s3=s3,
+        redo=redo,
+        limit=limit,
+        device=device,
+    )
+
+
 if __name__ == "__main__":
-    main()
+    run_as_cli()

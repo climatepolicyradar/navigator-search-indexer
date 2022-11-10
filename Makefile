@@ -34,5 +34,5 @@ create_test_index:
 	docker run --entrypoint python --network=host --env-file=.env -e OPENSEARCH_INDEX_PREFIX=navigator_test -v ${PWD}/data:/app/data navigator-search-indexer -m cli.test.create_test_index /app/data/cpr-dev-data-pipeline-cache/embeddings_input
 
 opensearch_test_dump: create_test_index
-	rm -rf ./data/test/**
-	multielasticdump --input=http://admin:admin@localhost:9200 --output=./data/test --match="navigator_test_.*" --ignoreType=template
+	rm -rf ./data/opensearch_test_dump/**
+	multielasticdump --input=http://admin:admin@localhost:9200 --output=./data/opensearch_test_dump --match="navigator_test_.*" --ignoreType=template
