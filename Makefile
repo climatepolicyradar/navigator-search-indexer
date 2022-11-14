@@ -1,3 +1,5 @@
+include .env
+
 .PHONY: build test dev_install opensearch_test_data
 
 setup:
@@ -6,12 +8,14 @@ setup:
 build:
 	docker build -t navigator-search-indexer .
 
-run_encoding_docker:
-	docker run --entrypoint python -v ${PWD}/data:/app/data navigator-search-indexer -m cli.text2embeddings ./data/raw ./data/processed
+download_indexer_inputs:
+	docker run --entrypoint aws --env-file=.env -v ${PWD}/data:/app/data navigator-search-indexer s3 sync ${INDEXER_INPUT_PREFIX} /app/data/indexer_input
 
-run_indexing_docker:
-	docker run --entrypoint python --env-file=.env -v ${PWD}/data:/app/data aws s3 sync ${INDEXER_INPUT_PREFIX} /app/data/processed
-	docker run --entrypoint python --network=host --env-file=.env -v ${PWD}/data:/app/data navigator-search-indexer -m cli.index_data /app/data/processed
+run_encoding_docker:
+	docker run --entrypoint python -v ${PWD}/data:/app/data navigator-search-indexer -m cli.text2embeddings ./data/embeddings_input ./data/indexer_input
+
+run_indexing_docker: download_indexer_inputs
+	docker run --entrypoint python --network=host --env-file=.env -v ${PWD}/data:/app/data navigator-search-indexer -m cli.index_data /app/data/indexer_input
 
 test:
 	docker run --entrypoint python navigator-search-indexer -m pytest -vvv
@@ -31,7 +35,7 @@ run_local_against_aws:
 
 # test data for backend
 create_test_index:
-	docker run --entrypoint python --network=host --env-file=.env -e OPENSEARCH_INDEX_PREFIX=navigator_test -v ${PWD}/data:/app/data navigator-search-indexer -m cli.test.create_test_index /app/data/cpr-dev-data-pipeline-cache/embeddings_input
+	docker run --entrypoint python --network=host --env-file=.env -e OPENSEARCH_INDEX_PREFIX=navigator_test -v ${PWD}/data:/app/data navigator-search-indexer -m cli.test.create_test_index /app/data/embeddings_input
 
 opensearch_test_dump: create_test_index
 	rm -rf ./data/opensearch_test_dump/**
