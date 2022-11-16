@@ -23,7 +23,7 @@ project="$1"
 image_tag="$2"
 
 # login
-aws ecr get-login-password --region eu-west-1 | \
+aws ecr get-login-password --region eu-west-2 | \
     docker login --username AWS --password-stdin "${DOCKER_REGISTRY}"
 
 name=$(clean_string "${DOCKER_REGISTRY}/${project}")
