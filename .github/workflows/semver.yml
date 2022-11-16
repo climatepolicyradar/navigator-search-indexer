@@ -22,15 +22,12 @@ jobs:
 
       - name: Docker pull
         run: |
-          docker pull ${DOCKER_REGISTRY}/navigator-backend:main-${GITHUB_SHA::8}
-          docker pull ${DOCKER_REGISTRY}/navigator-frontend:main-${GITHUB_SHA::8}
+          docker pull ${DOCKER_REGISTRY}/navigator-search-indexer:main-${GITHUB_SHA::8}
 
       - name: Docker retag locally
         run: |
-          docker tag ${DOCKER_REGISTRY}/navigator-backend:main-${GITHUB_SHA::8}  navigator-backend:main-${GITHUB_SHA::8} 
-          docker tag ${DOCKER_REGISTRY}/navigator-frontend:main-${GITHUB_SHA::8}  navigator-frontend:main-${GITHUB_SHA::8} 
+          docker tag ${DOCKER_REGISTRY}/navigator-search-indexer:main-${GITHUB_SHA::8}  navigator-search-indexer:main-${GITHUB_SHA::8} 
 
       - name: Docker push
         run: |
-          .github/retag-and-push.sh navigator-backend main-${GITHUB_SHA::8}
-          .github/retag-and-push.sh navigator-frontend main-${GITHUB_SHA::8}
+          .github/retag-and-push.sh navigator-search-indexer main-${GITHUB_SHA::8}
