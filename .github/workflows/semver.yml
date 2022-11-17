@@ -18,7 +18,7 @@ jobs:
 
       - name: Docker login
         run: |
-          aws ecr get-login-password --region eu-west-1 | docker login --username AWS --password-stdin "${DOCKER_REGISTRY}"
+          aws ecr get-login-password --region eu-west-2 | docker login --username AWS --password-stdin "${DOCKER_REGISTRY}"
 
       - name: Docker pull
         run: |
