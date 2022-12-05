@@ -23,8 +23,8 @@ project="$1"
 image_tag="$2"
 
 # login
-aws ecr get-login-password --region eu-west-2 | \
-    docker login --username AWS --password-stdin "${DOCKER_REGISTRY}"
+# This should now be performed as a GA
+# See: https://docs.docker.com/build/ci/github-actions/#step-three-define-the-workflow-steps
 
 name=$(clean_string "${DOCKER_REGISTRY}/${project}")
 input_image="${project}:${image_tag}"
@@ -69,7 +69,7 @@ if [[ "${GITHUB_REF}" == "refs/heads"* ]]; then
         docker_tag "${input_image}" "${name}:${branch}-${short_sha}"
         docker push "${name}:${branch}-${short_sha}"
     fi
-elif is_tagged_verion ${GITHUB_REF} ; then
+elif is_tagged_version ${GITHUB_REF} ; then
     # push `semver` tagged image
     semver="${GITHUB_REF/refs\/tags\/v/}"
     echo "Detected Tag: ${semver}"
