@@ -16,8 +16,8 @@ class DocumentMetadata(BaseModel):
     category: str
     source: str
     type: str
-    # TODO: re-enable sector when it's gone through the pipeline
-    # sectors: Sequence[str]
+    # TODO: remove default value for sectors once they are in the pipeline
+    sectors: Sequence[str] = []
 
     @root_validator
     def convert_publication_ts_to_date(cls, values):
