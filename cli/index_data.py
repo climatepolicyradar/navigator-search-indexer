@@ -39,6 +39,15 @@ logger = logging.getLogger(__name__)
 logging.config.dictConfig(DEFAULT_LOGGING)
 
 
+def _map_old_category_to_new(supplied_category: str) -> str:
+    """Map old category names to new category names, or return existing string"""
+    if supplied_category.lower() == "law":
+        return "Legislative"
+    if supplied_category.lower() == "policy":
+        return "Executive"
+    return supplied_category
+
+
 def get_metadata_dict(task: IndexerInput) -> dict:
     """
     Get key-value pairs for metadata fields: fields which are not required for search.
@@ -51,6 +60,10 @@ def get_metadata_dict(task: IndexerInput) -> dict:
         **{k: v for k, v in task.dict().items() if k != "document_metadata"},
         **{f"document_{k}": v for k, v in task.document_metadata.dict().items()},
     }
+    if "document_category" in task_dict:
+        supplied_categories = task_dict["document_categories"]
+        mapped_categories = [_map_old_category_to_new(c) for c in supplied_categories]
+        task_dict["document_category"] = mapped_categories
     task_dict["document_name_and_slug"] = f"{task.document_name} {task.document_slug}"
     required_fields = [field for fields in COMMON_FIELDS.values() for field in fields]
 
