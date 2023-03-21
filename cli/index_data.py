@@ -60,10 +60,8 @@ def get_metadata_dict(task: IndexerInput) -> dict:
         **{k: v for k, v in task.dict().items() if k != "document_metadata"},
         **{f"document_{k}": v for k, v in task.document_metadata.dict().items()},
     }
-    if "document_category" in task_dict:
-        supplied_categories = task_dict["document_category"]
-        mapped_categories = [_map_old_category_to_new(c) for c in supplied_categories]
-        task_dict["document_category"] = mapped_categories
+    supplied_category = task_dict["document_category"]
+    task_dict["document_category"] = _map_old_category_to_new(supplied_category)
     task_dict["document_name_and_slug"] = f"{task.document_name} {task.document_slug}"
     required_fields = [field for fields in COMMON_FIELDS.values() for field in fields]
 
