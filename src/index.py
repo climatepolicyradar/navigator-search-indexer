@@ -210,3 +210,14 @@ class OpenSearchIndex:
                 f"KNN index warmup API call returned non-200 status code. Full response {response.json()}"
             )
             return False
+
+    def set_num_replicas(self, n_replicas: int):
+        """Set the number of replicas for the index.
+
+        Args:
+            n_replicas (int): number of replicas to create for the index.
+        """
+        self.opns.indices.put_settings(
+            index=self.index_name,
+            body={"index.number_of_replicas": n_replicas},
+        )
