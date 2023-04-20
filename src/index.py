@@ -184,7 +184,7 @@ class OpenSearchIndex:
             index=self.index_name,
             actions=actions,
             request_timeout=config.OPENSEARCH_BULK_REQUEST_TIMEOUT,
-            max_retries=config.OPENSEARCH_BULK_MAX_RETRIES,
+            max_retries=5, # Hardcoded for now as purpose to avoid HTTP/429
         ):
             successes += ok
 
