@@ -211,16 +211,31 @@ class OpenSearchIndex:
         """
 
         actions = tqdm(actions, unit="docs")
-        successes = 0
+        batch_successes = 0
+        batch_failures = 0
 
-        for ok, _ in helpers.streaming_bulk(
+        for ok, info in helpers.streaming_bulk(
             client=self.opns,
             index=self.index_name,
             actions=actions,
             request_timeout=config.OPENSEARCH_BULK_REQUEST_TIMEOUT,
-            max_retries=5, # Hardcoded for now as purpose to avoid HTTP/429
+            max_retries=10, # Hardcoded for now as purpose to avoid HTTP/429
+            initial_backoff=10,
+            chunk_size=200,
+            max_chunk_bytes=20 * 1000 * 1000,
         ):
-            successes += ok
+            if ok:
+                batch_successes += 1
+            else:
+                batch_failures += 1
+                logger.error(f"Failed to process batch: '{info}'")
+
+        logger.info(f"Processed {batch_successes} batch(es) successfully")
+        logger.info(f"Processed {batch_failures} batch(es) unsuccessfully")
+
+        if batch_failures:
+            raise RuntimeError(f"Failed to process {batch_failures} batch(es) during index generation")
+
 
     def warmup_knn(self) -> bool:
         """Load the KNN index into memory by calling the index warmup API.
