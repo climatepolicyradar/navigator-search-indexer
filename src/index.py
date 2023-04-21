@@ -1,7 +1,8 @@
+from time import sleep
 from typing import Optional, Iterable
 import logging
 
-from opensearchpy import OpenSearch, helpers
+from opensearchpy import ConnectionTimeout, OpenSearch, helpers
 from tqdm.auto import tqdm
 import requests
 
@@ -150,10 +151,43 @@ class OpenSearchIndex:
         Args:
             n_replicas (int): number of replicas to create for the index.
         """
-        self.opns.indices.delete(index=self.index_name, ignore=[400, 404])
-        self.opns.indices.create(
-            index=self.index_name, body=self._index_body(n_replicas)
-        )
+        delete_attempt_count = 0
+        delete_succeeded = False
+        while delete_attempt_count < 5 and not delete_succeeded:
+            try:
+                self.opns.indices.delete(
+                    index=self.index_name,
+                    ignore=[400, 404],
+                    request_timeout=config.OPENSEARCH_BULK_REQUEST_TIMEOUT,
+                )
+                delete_succeeded = True
+            except ConnectionTimeout:
+                delete_attempt_count += 1
+                sleep(5)
+        if not delete_succeeded:
+            raise RuntimeError(
+                f"Failed to delete existing index '{self.index_name}' after "
+                f"{delete_attempt_count} attempts"
+            )
+
+        create_attempt_count = 0
+        create_succeeded = False
+        while create_attempt_count < 5 and not create_succeeded:
+            try:
+                self.opns.indices.create(
+                    index=self.index_name,
+                    body=self._index_body(n_replicas),
+                    request_timeout=config.OPENSEARCH_BULK_REQUEST_TIMEOUT,
+                )
+                create_succeeded = True
+            except ConnectionTimeout:
+                create_attempt_count += 1
+                sleep(5)
+        if not create_succeeded:
+            raise RuntimeError(
+                f"Failed to create index '{self.index_name}' after "
+                f"{create_attempt_count} attempts"
+            )
 
     def set_index_refresh_interval(self, interval: int, timeout: int = 10):
         """Set the refresh interval (seconds) for the index. If interval=-1, refresh is disabled."""
