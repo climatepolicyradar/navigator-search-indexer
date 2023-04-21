@@ -152,12 +152,16 @@ def populate_and_warmup_index(
         },
         embedding_dim=config.OPENSEARCH_INDEX_EMBEDDING_DIM,
     )
-    opensearch.delete_and_create_index(n_replicas=config.OPENSEARCH_INDEX_NUM_REPLICAS)
+    # Disabling replicas during indexing means that the KNN index is copied to replicas after indexing is complete rather than multiple, potentially different KNN indices being created in parallel.
+    # It should also speed up indexing.
+    opensearch.delete_and_create_index(n_replicas=0)
+
     # We disable index refreshes during indexing to speed up the indexing process,
     # and to ensure only 1 segment is created per shard. This also speeds up KNN
     # queries and aggregations according to the Opensearch and Elasticsearch docs.
     opensearch.set_index_refresh_interval(-1, timeout=60)
     opensearch.bulk_index(actions=doc_generator)
+    opensearch.set_num_replicas(config.OPENSEARCH_INDEX_NUM_REPLICAS)
 
     # TODO: we wrap this in a try/except block because for now because sometimes it times out, and we don't want the whole >1hr indexing process to fail if this happens. We should stop doing this if we ever care what the refresh interval is, i.e. when we plan on incrementally adding data to the index.
     try:
