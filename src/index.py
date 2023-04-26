@@ -122,14 +122,19 @@ class OpenSearchIndex:
                         "ascii_folding_preserve_original": {
                             "type": "asciifolding",
                             "preserve_original": True,
-                        }
+                        },
+                        "stemming": {"type": "stemmer", "language": "english"},
                     },
                     # This analyser folds non-ASCII characters into ASCII equivalents, but preserves the original.
                     # E.g. a search for "é" will return results for "e" and "é".
                     "analyzer": {
                         "folding": {
                             "tokenizer": "standard",
-                            "filter": ["lowercase", "ascii_folding_preserve_original"],
+                            "filter": [
+                                "lowercase",
+                                "ascii_folding_preserve_original",
+                                "stemming",
+                            ],
                         }
                     },
                     # This normalizer does the same as the folding analyser, but is used for keyword fields.
@@ -219,7 +224,7 @@ class OpenSearchIndex:
             index=self.index_name,
             actions=actions,
             request_timeout=config.OPENSEARCH_BULK_REQUEST_TIMEOUT,
-            max_retries=10, # Hardcoded for now as purpose to avoid HTTP/429
+            max_retries=10,  # Hardcoded for now as purpose to avoid HTTP/429
             initial_backoff=10,
             chunk_size=200,
             max_chunk_bytes=20 * 1000 * 1000,
@@ -234,8 +239,9 @@ class OpenSearchIndex:
         logger.info(f"Processed {batch_failures} batch(es) unsuccessfully")
 
         if batch_failures:
-            raise RuntimeError(f"Failed to process {batch_failures} batch(es) during index generation")
-
+            raise RuntimeError(
+                f"Failed to process {batch_failures} batch(es) during index generation"
+            )
 
     def warmup_knn(self) -> bool:
         """Load the KNN index into memory by calling the index warmup API.
