@@ -3,6 +3,8 @@
 import os
 from typing import Set
 
+from src.base import BlockTypes
+
 
 def _convert_to_bool(x: str) -> bool:
     if x.lower() == "true":
@@ -50,3 +52,4 @@ TARGET_LANGUAGES: Set[str] = set(
 )  # comma-separated 2-letter ISO codes
 ENCODER_SUPPORTED_LANGUAGES: Set[str] = {"en"}
 FILES_TO_PROCESS = os.getenv("FILES_TO_PROCESS")
+BLOCKS_TO_FILTER = os.getenv("BLOCKS_TO_FILTER", "Table,Figure").split(",")

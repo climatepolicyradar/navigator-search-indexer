@@ -15,6 +15,7 @@ from tqdm.auto import tqdm
 from src.base import Text2EmbeddingsInput
 from src.ml import SBERTEncoder, SentenceEncoder
 from src import config
+from src.utils import filter_on_block_type
 
 LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO").upper()
 DEFAULT_LOGGING = {
@@ -155,6 +156,12 @@ def main(
             f"Limiting to {limit} documents as the --limit flag has been passed."
         )
         tasks = tasks[:limit]
+
+    logger.info(
+        "Filtering unwanted text block types.",
+        extra={"props": {"BLOCKS_TO_FILTER": config.BLOCKS_TO_FILTER}}
+    )
+    tasks = filter_on_block_type(inputs=tasks, remove_block_types=config.BLOCKS_TO_FILTER)
 
     logger.info(f"Loading sentence-transformer model {config.SBERT_MODEL}")
     encoder = SBERTEncoder(config.SBERT_MODEL)

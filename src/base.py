@@ -1,3 +1,4 @@
+from enum import Enum
 from typing import Optional, Sequence, Tuple, List
 import datetime
 
@@ -5,6 +6,19 @@ from pydantic import BaseModel, AnyHttpUrl, Field, root_validator
 
 CONTENT_TYPE_HTML = "text/html"
 CONTENT_TYPE_PDF = "application/pdf"
+
+
+class BlockTypes(str, Enum):
+    """Known text block types for the IndexerInput in title format."""
+
+    GOOGLE_TEXT_BLOCK = "Google Text Block",
+    TEXT = "Text",
+    LIST = "List",
+    TITLE = "Title",
+    AMBIGUOUS = "Ambiguous",
+    INFERRED_FROM_GAPS = "Inferred from gaps",
+    TABLE = "Table",
+    FIGURE = "Figure"
 
 
 class DocumentMetadata(BaseModel):
