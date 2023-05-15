@@ -105,6 +105,14 @@ class IndexerInput(BaseModel):
     html_data: Optional[HTMLData] = None
     pdf_data: Optional[PDFData] = None
 
+    def update_text_blocks(self, new_text_blocks: Sequence[TextBlock]):
+        """Updates the text blocks in the IndexerInput object."""
+
+        if self.pdf_data is not None:
+            self.pdf_data.text_blocks = new_text_blocks
+        elif self.html_data is not None:
+            self.html_data.text_blocks = new_text_blocks
+
     def vertically_flip_text_block_coords(self) -> "IndexerInput":
         """Flips the coordinates of all PDF text blocks vertically. Acts in-place on the coordinates in the IndexerInput object."""
 

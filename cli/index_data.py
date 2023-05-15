@@ -15,6 +15,7 @@ from src.index import OpenSearchIndex
 from src.base import IndexerInput, CONTENT_TYPE_HTML, CONTENT_TYPE_PDF
 from src.index_mapping import COMMON_FIELDS
 from src import config
+from src.utils import filter_on_block_type
 
 LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO").upper()
 DEFAULT_LOGGING = {
@@ -107,6 +108,12 @@ def get_text_document_generator(
 
     if content_types is not None:
         tasks = [task for task in tasks if task.document_content_type in content_types]
+
+    logger.info(
+        "Filtering unwanted text block types.",
+        extra={"props": {"BLOCKS_TO_FILTER": config.BLOCKS_TO_FILTER}}
+    )
+    tasks = filter_on_block_type(inputs=tasks, remove_block_types=config.BLOCKS_TO_FILTER)
 
     for task in tasks:
         all_metadata = get_metadata_dict(task)
