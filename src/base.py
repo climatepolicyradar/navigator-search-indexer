@@ -113,6 +113,8 @@ class IndexerInput(BaseModel):
         elif self.html_data is not None:
             self.html_data.text_blocks = new_text_blocks
 
+        return self
+
     def vertically_flip_text_block_coords(self) -> "IndexerInput":
         """Flips the coordinates of all PDF text blocks vertically. Acts in-place on the coordinates in the IndexerInput object."""
 
