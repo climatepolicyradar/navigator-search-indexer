@@ -2,7 +2,8 @@ from src.base import IndexerInput
 
 
 def filter_on_block_type(inputs: list[IndexerInput], remove_block_types: list[str]) -> list[IndexerInput]:
-    """Filter a sequence of IndexerInputs to remove the textblocks that are of the type Table or Figure."""
+    """Filter a sequence of IndexerInputs to remove the textblocks that are of the types declared in the remove block
+    types array. """
 
     return [
         input.update_text_blocks(
