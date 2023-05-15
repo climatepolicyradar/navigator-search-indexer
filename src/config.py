@@ -3,6 +3,8 @@
 import os
 from typing import Set
 
+from src.base import BlockTypes
+
 
 def _convert_to_bool(x: str) -> bool:
     if x.lower() == "true":

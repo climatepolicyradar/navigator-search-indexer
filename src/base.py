@@ -1,3 +1,4 @@
+from enum import Enum
 from typing import Optional, Sequence, Tuple, List
 import datetime
 
@@ -5,6 +6,19 @@ from pydantic import BaseModel, AnyHttpUrl, Field, root_validator
 
 CONTENT_TYPE_HTML = "text/html"
 CONTENT_TYPE_PDF = "application/pdf"
+
+
+class BlockTypes(str, Enum):
+    """Known text block types for the IndexerInput in title format."""
+
+    GOOGLE_TEXT_BLOCK = "Google Text Block",
+    TEXT = "Text",
+    LIST = "List",
+    TITLE = "Title",
+    AMBIGUOUS = "Ambiguous",
+    INFERRED_FROM_GAPS = "Inferred from gaps",
+    TABLE = "Table",
+    FIGURE = "Figure"
 
 
 class DocumentMetadata(BaseModel):
@@ -104,16 +118,6 @@ class IndexerInput(BaseModel):
     document_content_type: Optional[str]
     html_data: Optional[HTMLData] = None
     pdf_data: Optional[PDFData] = None
-
-    def update_text_blocks(self, new_text_blocks: Sequence[TextBlock]):
-        """Updates the text blocks in the IndexerInput object."""
-
-        if self.pdf_data is not None:
-            self.pdf_data.text_blocks = new_text_blocks
-        elif self.html_data is not None:
-            self.html_data.text_blocks = new_text_blocks
-
-        return self
 
     def vertically_flip_text_block_coords(self) -> "IndexerInput":
         """Flips the coordinates of all PDF text blocks vertically. Acts in-place on the coordinates in the IndexerInput object."""
