@@ -146,18 +146,17 @@ class IndexerInput(BaseModel):
 
         return self
 
-    def get_text_blocks(self) -> Sequence[TextBlock]:  # type: ignore
+    def get_text_blocks(self, including_invalid_html=False) -> Sequence[TextBlock]:
         """Returns the text blocks contained in the document."""
-
         if self.document_content_type is None:
             return []
         elif self.document_content_type == CONTENT_TYPE_PDF:
-            return self.pdf_data.text_blocks  # type: ignore
+            return self.pdf_data.text_blocks
         elif self.document_content_type == CONTENT_TYPE_HTML:
-            if self.html_data.has_valid_text:  # type: ignore
-                return self.html_data.text_blocks  # type: ignore
-            else:
+            if not including_invalid_html and not self.html_data.has_valid_text:
                 return []
+            else:
+                return self.html_data.text_blocks
 
     @root_validator
     def check_html_pdf_metadata(cls, values):

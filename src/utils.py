@@ -18,7 +18,7 @@ def replace_text_blocks(block: IndexerInput, new_text_blocks: list[TextBlock]):
 def filter_blocks(indexer_input: IndexerInput, remove_block_types: list[str]) -> list[TextBlock]:
     """Given an Indexer Input filter the contained TextBlocks and return this as a list of TextBlocks."""
     filtered_blocks = []
-    for block in indexer_input.get_text_blocks():
+    for block in indexer_input.get_text_blocks(including_invalid_html=True):
         if block.type.title() not in remove_block_types:
             filtered_blocks.append(block)
         else:
