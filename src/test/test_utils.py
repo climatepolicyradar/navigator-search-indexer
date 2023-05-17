@@ -117,3 +117,15 @@ def test_filter_on_block_type(test_indexer_input_array):
     assert filtered_inputs[1].html_data.text_blocks[1].type == "Google Text Block"
     assert filtered_inputs[1].html_data.text_blocks[1].text == ["test_text"]
 
+
+def test_has_valid_text_override(test_indexer_input_array):
+    """Test that the get_text_blocks method provides the right response when using the including_invalid_html
+    parameter."""
+
+    assert test_indexer_input_array[1].get_text_blocks() == []
+    assert test_indexer_input_array[1].get_text_blocks(including_invalid_html=True) is not []
+    assert test_indexer_input_array[1].get_text_blocks(including_invalid_html=True) is [
+        get_text_block("Table"),
+        get_text_block("Text"),
+        get_text_block("Google Text Block"),
+    ]
