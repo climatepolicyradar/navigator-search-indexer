@@ -2,7 +2,7 @@ from enum import Enum
 from typing import Optional, Sequence, Tuple, List
 import datetime
 
-from pydantic import BaseModel, AnyHttpUrl, Field, root_validator
+from pydantic import BaseModel, Field, root_validator
 
 CONTENT_TYPE_HTML = "text/html"
 CONTENT_TYPE_PDF = "application/pdf"
@@ -109,7 +109,7 @@ class IndexerInput(BaseModel):
     document_metadata: DocumentMetadata
     document_name: str
     document_description: str
-    document_source_url: Optional[AnyHttpUrl]
+    document_source_url: Optional[str]
     document_cdn_object: Optional[str]
     document_md5_sum: Optional[str]
     languages: Optional[Sequence[str]]
