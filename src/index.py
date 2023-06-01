@@ -116,6 +116,7 @@ class OpenSearchIndex:
                     "knn.algo_param.ef_search": config.KNN_PARAM_EF_SEARCH,
                     "number_of_shards": config.OPENSEARCH_INDEX_NUM_SHARDS,
                     "number_of_replicas": n_replicas,
+                    "auto_expand_replicas": "0-1",
                 },
                 "analysis": {
                     "filter": {
@@ -219,7 +220,7 @@ class OpenSearchIndex:
             index=self.index_name,
             actions=actions,
             request_timeout=config.OPENSEARCH_BULK_REQUEST_TIMEOUT,
-            max_retries=10, # Hardcoded for now as purpose to avoid HTTP/429
+            max_retries=10,  # Hardcoded for now as purpose to avoid HTTP/429
             initial_backoff=10,
             chunk_size=200,
             max_chunk_bytes=20 * 1000 * 1000,
@@ -234,8 +235,9 @@ class OpenSearchIndex:
         logger.info(f"Processed {batch_failures} batch(es) unsuccessfully")
 
         if batch_failures:
-            raise RuntimeError(f"Failed to process {batch_failures} batch(es) during index generation")
-
+            raise RuntimeError(
+                f"Failed to process {batch_failures} batch(es) during index generation"
+            )
 
     def warmup_knn(self) -> bool:
         """Load the KNN index into memory by calling the index warmup API.
