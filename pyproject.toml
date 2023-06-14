@@ -6,8 +6,6 @@ authors = ["CPR Tech <tech@climatepolicyradar.org>"]
 
 [tool.poetry.dependencies]
 python = "^3.8"
-opensearch-py = "^1.1.0"
-cloudpathlib = {version = "^0.7.0", extras = ["s3"]}
 sentence-transformers = "2.2.0"
 huggingface_hub = "0.4.0"
 click = "^8.0.4"
@@ -15,6 +13,9 @@ pytest = "^7.1.1"
 pydantic = "^1.10.2"
 python-json-logger = "^2.0.4"
 awscli = "^1.27.8"
+boto3 = "^1.26.153"
+aws-error-utils = "^2.7.0"
+moto = "^4.1.11"
 
 [tool.poetry.dev-dependencies]
 black = "^22.1.0"

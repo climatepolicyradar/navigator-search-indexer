@@ -11,13 +11,13 @@ CONTENT_TYPE_PDF = "application/pdf"
 class BlockTypes(str, Enum):
     """Known text block types for the IndexerInput in title format."""
 
-    GOOGLE_TEXT_BLOCK = "Google Text Block",
-    TEXT = "Text",
-    LIST = "List",
-    TITLE = "Title",
-    AMBIGUOUS = "Ambiguous",
-    INFERRED_FROM_GAPS = "Inferred from gaps",
-    TABLE = "Table",
+    GOOGLE_TEXT_BLOCK = ("Google Text Block",)
+    TEXT = ("Text",)
+    LIST = ("List",)
+    TITLE = ("Title",)
+    AMBIGUOUS = ("Ambiguous",)
+    INFERRED_FROM_GAPS = ("Inferred from gaps",)
+    TABLE = ("Table",)
     FIGURE = "Figure"
 
 
@@ -82,10 +82,9 @@ class PDFData(BaseModel):
     """
     Set of metadata unique to PDF documents.
 
-    :attribute pages: List of pages contained in the document
-    :attribute filename: Name of the PDF file, without extension
-    :attribute md5sum: md5sum of PDF content
-    :attribute language: list of 2-letter ISO language codes, optional. If null, the OCR processor didn't support language detection
+    :attribute pages: List of pages contained in the document :attribute filename: Name of the PDF file,
+    without extension :attribute md5sum: md5sum of PDF content :attribute language: list of 2-letter ISO
+    language codes, optional. If null, the OCR processor didn't support language detection
     """
 
     page_metadata: Sequence[PDFPageMetadata]
@@ -120,7 +119,8 @@ class IndexerInput(BaseModel):
     pdf_data: Optional[PDFData] = None
 
     def vertically_flip_text_block_coords(self) -> "IndexerInput":
-        """Flips the coordinates of all PDF text blocks vertically. Acts in-place on the coordinates in the IndexerInput object."""
+        """Flips the coordinates of all PDF text blocks vertically. Acts in-place on the coordinates in the
+        IndexerInput object."""
 
         if self.pdf_data is None:
             return self
@@ -163,7 +163,8 @@ class IndexerInput(BaseModel):
         """
         Check that html_data is set if content_type is HTML, or pdf_data is set if content_type is PDF.
 
-        TODO: this is copied from `ParserOutput` in the document parser. Do we want to move it to a common place so both repos can use it?
+        TODO: this is copied from `ParserOutput` in the document parser. Do we want to move it to a common place
+        so both repos can use it?
         """
         if (
             values["document_content_type"] == CONTENT_TYPE_HTML
@@ -190,6 +191,7 @@ class IndexerInput(BaseModel):
 
 
 class Text2EmbeddingsInput(IndexerInput):
-    """Input to text2embeddings. Same as the input to the indexing process, but makes no assumptions about what's in document metadata."""
+    """Input to text2embeddings. Same as the input to the indexing process, but makes no assumptions about
+    what's in document metadata."""
 
     document_metadata: dict

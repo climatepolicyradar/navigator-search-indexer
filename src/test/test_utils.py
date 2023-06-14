@@ -86,7 +86,7 @@ def test_indexer_input_array() -> list[IndexerInput]:
                 ],
             ),
             pdf_data=None,
-        )
+        ),
     ]
 
 
@@ -123,5 +123,14 @@ def test_has_valid_text_override(test_indexer_input_array):
     parameter."""
 
     assert test_indexer_input_array[1].get_text_blocks() == []
-    assert test_indexer_input_array[1].get_text_blocks(including_invalid_html=True) is not []
-    assert len(test_indexer_input_array[1].get_text_blocks(including_invalid_html=True)) == 3
+    assert (
+        test_indexer_input_array[1].get_text_blocks(including_invalid_html=True)
+        is not []
+    )
+    assert (
+        len(test_indexer_input_array[1].get_text_blocks(including_invalid_html=True))
+        == 3
+    )
+
+
+# TODO add tests for the other methods in utils.py
