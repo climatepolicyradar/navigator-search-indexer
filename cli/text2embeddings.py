@@ -222,12 +222,12 @@ def get_Text2EmbeddingsInput_array(
     help="Optionally limit the number of text samples to process. Useful for debugging.",
 )
 def run_as_cli(
-        input_dir: str,
-        output_dir: str,
-        s3: bool,
-        redo: bool,
-        device: str,
-        limit: Optional[int],
+    input_dir: str,
+    output_dir: str,
+    s3: bool,
+    redo: bool,
+    device: str,
+    limit: Optional[int],
 ):
     """
     Run CLI to produce embeddings from document parser JSON outputs. Each embeddings file is called {id}.json
