@@ -11,13 +11,13 @@ CONTENT_TYPE_PDF = "application/pdf"
 class BlockTypes(str, Enum):
     """Known text block types for the IndexerInput in title format."""
 
-    GOOGLE_TEXT_BLOCK = "Google Text Block",
-    TEXT = "Text",
-    LIST = "List",
-    TITLE = "Title",
-    AMBIGUOUS = "Ambiguous",
-    INFERRED_FROM_GAPS = "Inferred from gaps",
-    TABLE = "Table",
+    GOOGLE_TEXT_BLOCK = ("Google Text Block",)
+    TEXT = ("Text",)
+    LIST = ("List",)
+    TITLE = ("Title",)
+    AMBIGUOUS = ("Ambiguous",)
+    INFERRED_FROM_GAPS = ("Inferred from gaps",)
+    TABLE = ("Table",)
     FIGURE = "Figure"
 
 
@@ -120,7 +120,7 @@ class IndexerInput(BaseModel):
 
     def vertically_flip_text_block_coords(self) -> "IndexerInput":
         """Flips the coordinates of all PDF text blocks vertically. Acts in-place on the coordinates in the
-        IndexerInput object. """
+        IndexerInput object."""
 
         if self.pdf_data is None:
             return self
@@ -192,6 +192,6 @@ class IndexerInput(BaseModel):
 
 class Text2EmbeddingsInput(IndexerInput):
     """Input to text2embeddings. Same as the input to the indexing process, but makes no assumptions about
-    what's in document metadata. """
+    what's in document metadata."""
 
     document_metadata: dict

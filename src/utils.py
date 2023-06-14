@@ -23,7 +23,9 @@ def replace_text_blocks(block: IndexerInput, new_text_blocks: list[TextBlock]):
     return block
 
 
-def filter_blocks(indexer_input: IndexerInput, remove_block_types: list[str]) -> list[TextBlock]:
+def filter_blocks(
+    indexer_input: IndexerInput, remove_block_types: list[str]
+) -> list[TextBlock]:
     """Given an Indexer Input filter the contained TextBlocks and return this as a list of TextBlocks."""
     filtered_blocks = []
     for block in indexer_input.get_text_blocks(including_invalid_html=True):
@@ -36,34 +38,40 @@ def filter_blocks(indexer_input: IndexerInput, remove_block_types: list[str]) ->
                     "props": {
                         "document_id": indexer_input.document_id,
                         "block_type": block.type,
-                        "remove_block_types": remove_block_types
+                        "remove_block_types": remove_block_types,
                     }
-                }
+                },
             )
     return filtered_blocks
 
 
-def filter_on_block_type(inputs: list[IndexerInput], remove_block_types: list[str]) -> list[IndexerInput]:
+def filter_on_block_type(
+    inputs: list[IndexerInput], remove_block_types: list[str]
+) -> list[IndexerInput]:
     """Filter a sequence of IndexerInputs to remove the textblocks that are of the types declared in the remove block
     types array."""
     for _filter in remove_block_types:
         try:
             BlockTypes(_filter)
         except NameError:
-            logger.warning(f"Blocks to filter should be of a known block type, removing {_filter} from the list.")
+            logger.warning(
+                f"Blocks to filter should be of a known block type, removing {_filter} from the list."
+            )
             remove_block_types.remove(_filter)
 
     return [
         replace_text_blocks(
             block=_input,
-            new_text_blocks=filter_blocks(indexer_input=_input, remove_block_types=remove_block_types)
+            new_text_blocks=filter_blocks(
+                indexer_input=_input, remove_block_types=remove_block_types
+            ),
         )
         for _input in inputs
     ]
 
 
 # TODO do we want to instantiate one client object and pass that through rather than reinstatiating each time?
-def _get_s3_keys_with_prefix(s3_prefix: str) -> list[str]:
+def get_s3_keys_with_prefix(s3_prefix: str) -> list[str]:
     """
     Get a list of keys in an S3 bucket with a given prefix. Returns an empty list if the prefix does not exist or is empty.
 
@@ -106,7 +114,7 @@ def _get_s3_keys_with_prefix(s3_prefix: str) -> list[str]:
     return files
 
 
-def _s3_object_read_text(s3_path: str) -> str:
+def s3_object_read_text(s3_path: str) -> str:
     """
     Read text from an S3 object.
 
@@ -134,7 +142,7 @@ def _s3_object_read_text(s3_path: str) -> str:
     return response["Body"].read().decode("utf-8")
 
 
-def _write_json_to_s3(json_data: dict, s3_path: str) -> None:
+def write_json_to_s3(json_data: dict, s3_path: str) -> None:
     """Writes JSON data to an S3 bucket."""
     s3_match = S3_PATTERN.match(s3_path)
     if s3_match is None:
@@ -156,7 +164,7 @@ def _write_json_to_s3(json_data: dict, s3_path: str) -> None:
         raise e
 
 
-def _save_ndarray_to_s3_as_npy(array: Any, s3_path: str) -> None:
+def save_ndarray_to_s3_as_npy(array: Any, s3_path: str) -> None:
     """Saves a NumPy ndarray to an S3 bucket as a .npy file."""
     s3_match = S3_PATTERN.match(s3_path)
     if s3_match is None:
@@ -178,7 +186,7 @@ def _save_ndarray_to_s3_as_npy(array: Any, s3_path: str) -> None:
         raise e
 
 
-def _check_file_exists_in_s3(s3_path: str):
+def check_file_exists_in_s3(s3_path: str):
     """Checks whether a file exists in an S3 bucket."""
     s3_match = S3_PATTERN.match(s3_path)
     if s3_match is None:
@@ -197,7 +205,7 @@ def _check_file_exists_in_s3(s3_path: str):
         raise e
 
 
-def _get_ids_with_suffix(files: list[str], suffix: str) -> set[str]:
+def get_ids_with_suffix(files: list[str], suffix: str) -> set[str]:
     """Get a set of the ids of the files with the given suffix."""
     files = [file for file in files if file.endswith(suffix)]
     return set([os.path.splitext(os.path.basename(file))[0] for file in files])

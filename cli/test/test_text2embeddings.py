@@ -10,13 +10,22 @@ from cli.text2embeddings import run_as_cli
 from src.base import IndexerInput
 
 
-def test_run_encoder_local(test_file_name, test_html_file_json, test_pdf_file_json, test_no_content_type_file_json):
+def test_run_encoder_local(
+    test_file_name,
+    test_html_file_json,
+    test_pdf_file_json,
+    test_no_content_type_file_json,
+):
     """Test that the encoder runs with local input and output paths and outputs the correct files."""
 
     with tempfile.TemporaryDirectory() as input_dir:
         with tempfile.TemporaryDirectory() as output_dir:
             # Create test files
-            for file in [test_html_file_json, test_pdf_file_json, test_no_content_type_file_json]:
+            for file in [
+                test_html_file_json,
+                test_pdf_file_json,
+                test_no_content_type_file_json,
+            ]:
                 file_path = Path(input_dir) / f"{file['document_id']}.json"
                 file_path.write_text(json.dumps(file))
 
@@ -57,13 +66,19 @@ def test_run_encoder_s3(pipeline_s3_client, test_input_dir_s3, test_output_dir_s
     # TODO assert output files exist
 
 
-def test_run_parser_skip_already_done(test_html_file_json, test_pdf_file_json, test_no_content_type_file_json, caplog) -> None:
+def test_run_parser_skip_already_done(
+    test_html_file_json, test_pdf_file_json, test_no_content_type_file_json, caplog
+) -> None:
     """Test that files which have already been parsed are skipped by default."""
 
     with tempfile.TemporaryDirectory() as input_dir:
         with tempfile.TemporaryDirectory() as output_dir:
             # Create test files in input and output directories
-            for file in [test_html_file_json, test_pdf_file_json, test_no_content_type_file_json]:
+            for file in [
+                test_html_file_json,
+                test_pdf_file_json,
+                test_no_content_type_file_json,
+            ]:
                 file_path = Path(input_dir) / f"{file['document_id']}.json"
                 file_path.write_text(json.dumps(file))
 
