@@ -1,14 +1,16 @@
-import json
 import logging
 import os
-from typing import Any
+from pathlib import Path
+from typing import Optional, Tuple, Union
 
-import boto3
-from aws_error_utils.aws_error_utils import errors
+import numpy as np
 
+from cli.text2embeddings import logger
+from src import config
 
-from src.base import IndexerInput, TextBlock, BlockTypes
-from src.config import S3_PATTERN
+from src.base import IndexerInput, TextBlock, BlockTypes, Text2EmbeddingsInput
+from src.ml import SentenceEncoder
+from src.s3 import get_s3_keys_with_prefix, s3_object_read_text
 
 logger = logging.getLogger(__name__)
 
@@ -70,142 +72,101 @@ def filter_on_block_type(
     ]
 
 
-# TODO do we want to instantiate one client object and pass that through rather than reinstatiating each time?
-def get_s3_keys_with_prefix(s3_prefix: str) -> list[str]:
-    """
-    Get a list of keys in an S3 bucket with a given prefix. Returns an empty list if the prefix does not exist or is empty.
-
-    We use this instead of cloudpathlib's glob because it's much faster. Relevant issue: https://github.com/drivendataorg/cloudpathlib/issues/274.
-
-    :param s3_prefix: prefix, including s3:// at the start
-    :raises Exception: if prefix does not represent an s3 path
-    :return list[str]: list of full paths to objects in bucket, excluding s3:// prefix
-    """
-    s3_match = S3_PATTERN.match(s3_prefix)
-    if s3_match is None:
-        raise Exception(f"Prefix does not represent an s3 path: {s3_prefix}")
-
-    bucket = s3_match.group("bucket")
-    prefix = s3_match.group("prefix").rstrip("/") + "/"
-    s3client = boto3.client("s3")
-
-    try:
-        list_response = s3client.list_objects_v2(Bucket=bucket, Prefix=prefix)
-    except errors.NoSuchBucket:
-        raise ValueError(f"Bucket {bucket} does not exist")
-    except Exception as e:
-        raise e
-
-    files = [o["Key"] for o in list_response.get("Contents", []) if o["Key"] != prefix]
-
-    finished_listing = not list_response["IsTruncated"]
-    while not finished_listing:
-        continuation_token = list_response.get("NextContinuationToken")
-        list_response = s3client.list_objects_v2(
-            Bucket=bucket,
-            Prefix=prefix,
-            ContinuationToken=continuation_token,
-        )
-        files.extend(
-            [o["Key"] for o in list_response["Contents"] if o["Key"] != prefix]
-        )
-        finished_listing = not list_response["IsTruncated"]
-
-    return files
-
-
-def s3_object_read_text(s3_path: str) -> str:
-    """
-    Read text from an S3 object.
-
-    :param s3_key: path to S3 object, including s3:// prefix
-    :return str: text of S3 object
-    """
-    # TODO de-duplicate code repetition
-    s3_match = S3_PATTERN.match(s3_path)
-    if s3_match is None:
-        raise Exception(f"Key does not represent an s3 path: {s3_path}")
-
-    bucket = s3_match.group("bucket")
-    key = s3_match.group("prefix")
-    s3client = boto3.client("s3")
-
-    try:
-        response = s3client.get_object(Bucket=bucket, Key=key)
-    except errors.NoSuchBucket:
-        raise ValueError(f"Bucket {bucket} does not exist")
-    except errors.NoSuchKey:
-        raise ValueError(f"Key {key} does not exist")
-    except Exception as e:
-        raise e
-
-    return response["Body"].read().decode("utf-8")
-
-
-def write_json_to_s3(json_data: dict, s3_path: str) -> None:
-    """Writes JSON data to an S3 bucket."""
-    s3_match = S3_PATTERN.match(s3_path)
-    if s3_match is None:
-        raise Exception(f"Key does not represent an s3 path: {s3_path}")
-
-    bucket = s3_match.group("bucket")
-    key = s3_match.group("prefix")
-    s3client = boto3.client("s3")
-
-    # Convert JSON data to a string
-    json_string = json.dumps(json_data)
-
-    # Upload the JSON string to S3
-    try:
-        s3client.put_object(Body=json_string, Bucket=bucket, Key=key)
-    except errors.NoSuchBucket:
-        raise ValueError(f"Bucket {bucket} does not exist")
-    except Exception as e:
-        raise e
-
-
-def save_ndarray_to_s3_as_npy(array: Any, s3_path: str) -> None:
-    """Saves a NumPy ndarray to an S3 bucket as a .npy file."""
-    s3_match = S3_PATTERN.match(s3_path)
-    if s3_match is None:
-        raise Exception(f"Key does not represent an s3 path: {s3_path}")
-
-    bucket = s3_match.group("bucket")
-    key = s3_match.group("prefix")
-    s3client = boto3.client("s3")
-
-    # Convert the NumPy array to bytes
-    array_bytes = array.tobytes()
-
-    # Upload the array bytes to S3
-    try:
-        s3client.put_object(Body=array_bytes, Bucket=bucket, Key=key)
-    except errors.NoSuchBucket:
-        raise ValueError(f"Bucket {bucket} does not exist")
-    except Exception as e:
-        raise e
-
-
-def check_file_exists_in_s3(s3_path: str):
-    """Checks whether a file exists in an S3 bucket."""
-    s3_match = S3_PATTERN.match(s3_path)
-    if s3_match is None:
-        raise Exception(f"Key does not represent an s3 path: {s3_path}")
-
-    bucket = s3_match.group("bucket")
-    key = s3_match.group("prefix")
-    s3client = boto3.client("s3")
-
-    try:
-        s3client.head_object(Bucket=bucket, Key=key)
-        return True
-    except errors.NoSuchBucket or errors.NoSuchKey:
-        return False
-    except Exception as e:
-        raise e
-
-
 def get_ids_with_suffix(files: list[str], suffix: str) -> set[str]:
     """Get a set of the ids of the files with the given suffix."""
     files = [file for file in files if file.endswith(suffix)]
     return set([os.path.splitext(os.path.basename(file))[0] for file in files])
+
+
+def encode_indexer_input(
+    encoder: SentenceEncoder,
+    input_obj: Text2EmbeddingsInput,
+    batch_size: int,
+    device: Optional[str] = None,
+) -> Tuple[np.ndarray, Optional[np.ndarray]]:
+    """
+    Produce a numpy array of description embedding and a numpy array of text embeddings for an indexer input.
+
+    :param encoder: sentence encoder
+    :param input_obj: indexer input object
+    :param batch_size: batch size for encoding text blocks
+    :param device: device to use for encoding
+    """
+
+    description_embedding = encoder.encode(input_obj.document_description, device=device)
+
+    text_blocks = input_obj.get_text_blocks()
+
+    if text_blocks:
+        text_embeddings = encoder.encode_batch(
+            [block.to_string() for block in text_blocks],
+            batch_size=batch_size,
+            device=device,
+        )
+    else:
+        text_embeddings = None
+
+    return description_embedding, text_embeddings
+
+
+def get_files_to_process(s3: bool, input_dir: str, output_dir: str, redo: bool, limit: Union[None, int]) -> list:
+    """Get the list of files to process, either from the config or from the input directory."""
+    if s3:
+        document_paths_previously_parsed = get_s3_keys_with_prefix(output_dir)
+    else:
+        document_paths_previously_parsed = set(os.listdir(output_dir))
+
+    document_ids_previously_parsed = get_ids_with_suffix(
+        document_paths_previously_parsed, ".npy"
+    )
+
+    if config.FILES_TO_PROCESS is not None:
+        files_to_process_subset = config.FILES_TO_PROCESS.split("$")[1:]
+        files_to_process = [os.path.join(input_dir, f) for f in files_to_process_subset]
+    else:
+        if s3:
+            files_to_process = get_s3_keys_with_prefix(input_dir)
+        else:
+            files_to_process = os.listdir(input_dir)
+    files_to_process_ids = get_ids_with_suffix(files_to_process, ".json")
+
+    if not redo and document_ids_previously_parsed.intersection(files_to_process_ids):
+        logger.warning(
+            f"Found {len(document_ids_previously_parsed.intersection(files_to_process_ids))} documents that have "
+            f"already been encoded. Skipping. "
+        )
+        files_to_process_ids = [
+            id_
+            for id_ in files_to_process_ids
+            if id_ not in document_ids_previously_parsed
+        ]
+
+        if not files_to_process_ids:
+            logger.warning("No more documents to encode. Exiting.")
+            return []
+
+    if limit:
+        logger.info(
+            f"Limiting to {files_to_process_ids} documents as the --limit flag has been passed."
+        )
+        files_to_process_ids = files_to_process_ids[:limit]
+
+    return files_to_process_ids
+
+
+def get_Text2EmbeddingsInput_array(
+        input_dir: str, s3: bool, files_to_process_ids
+) -> list[Text2EmbeddingsInput]:
+    """Construct Text2EmbeddingsInput objects from parser output jsons.
+
+    These objects will be used to generate embeddings and are either read in from S3 or from the local file
+    system.
+    """
+    return [
+        Text2EmbeddingsInput.parse_raw(
+            s3_object_read_text(os.path.join(input_dir, id_ + ".json"))
+            if s3
+            else Path(os.path.join(input_dir, id_ + ".json")).read_text()
+        )
+        for id_ in files_to_process_ids
+    ]
