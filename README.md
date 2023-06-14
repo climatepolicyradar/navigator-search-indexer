@@ -1,4 +1,4 @@
-# PDF Parsing Pipeline to Embeddings CLI
+# Text to Embeddings CLI
 
 This repository contains a command-line interface (CLI) tool for converting JSON documents outputted by the PDF parsing pipeline to embeddings. The tool is designed to process the parsed documents and generate embeddings using the SentenceTransformer model.
 
