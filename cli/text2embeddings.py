@@ -164,7 +164,6 @@ def run_as_cli(
 
     tasks = [
         Text2EmbeddingsInput.parse_raw(
-            # TODO if local read local
             _s3_object_read_text(os.path.join(input_dir, id_ + '.json')) if s3 else Path(os.path.join(input_dir, id_ + '.json')).read_text()
         )
         for id_ in files_to_process_ids
@@ -226,7 +225,6 @@ def run_as_cli(
         task_output_path = os.path.join(output_dir, task.document_id + '.json')
         logger.info("Writing json to s3.")
         try:
-            # TODO if local save locally
             _write_json_to_s3(task.json(), task_output_path) if s3 else Path(task_output_path).write_text(task.json())
         except Exception as e:
             logger.info(
@@ -236,7 +234,6 @@ def run_as_cli(
 
         embeddings_output_path = os.path.join(output_dir, task.document_id + '.npy')
         logger.info("Checking if embeddings file exists.")
-        # TODO if local look locally
         file_exists = _check_file_exists_in_s3(embeddings_output_path) if s3 else os.path.exists(embeddings_output_path)
         if file_exists:
             logger.info(
@@ -254,7 +251,6 @@ def run_as_cli(
             else description_embedding.reshape(1, -1)
         )
         logger.info("Saving embeddings to s3.")
-        # TODO if local save locally
         _save_ndarray_to_s3_as_npy(combined_embeddings, embeddings_output_path) if s3 else np.save(embeddings_output_path, combined_embeddings)
 
 
