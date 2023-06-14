@@ -29,12 +29,12 @@ jobs:
 
       - name: Docker pull
         run: |
-          docker pull ${DOCKER_REGISTRY}/navigator-search-indexer:main-${GITHUB_SHA::8}
+          docker pull ${DOCKER_REGISTRY}/navigator-embeddings-generation:main-${GITHUB_SHA::8}
 
       - name: Docker retag locally
         run: |
-          docker tag ${DOCKER_REGISTRY}/navigator-search-indexer:main-${GITHUB_SHA::8}  navigator-search-indexer:main-${GITHUB_SHA::8} 
+          docker tag ${DOCKER_REGISTRY}/navigator-embeddings-generation:main-${GITHUB_SHA::8}  navigator-embeddings-generation:main-${GITHUB_SHA::8} 
 
       - name: Docker push
         run: |
-          .github/retag-and-push.sh navigator-search-indexer main-${GITHUB_SHA::8}
+          .github/retag-and-push.sh navigator-embeddings-generation main-${GITHUB_SHA::8}
