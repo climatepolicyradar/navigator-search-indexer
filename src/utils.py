@@ -1,5 +1,6 @@
 import json
 import logging
+import os
 from typing import Any
 
 import boto3
@@ -194,3 +195,9 @@ def _check_file_exists_in_s3(s3_path: str):
         return False
     except Exception as e:
         raise e
+
+
+def _get_ids_with_suffix(files: list[str], suffix: str) -> set[str]:
+    """Get a set of the ids of the files with the given suffix."""
+    files = [file for file in files if file.endswith(suffix)]
+    return set([os.path.splitext(os.path.basename(file))[0] for file in files])

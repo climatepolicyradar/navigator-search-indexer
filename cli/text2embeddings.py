@@ -3,20 +3,17 @@
 import logging
 import logging.config
 import os
-from pathlib import Path
 from typing import Optional, Tuple
 
 import click
 import numpy as np
-from cloudpathlib.exceptions import OverwriteNewerCloudError
-from cloudpathlib import S3Path
 from tqdm.auto import tqdm
 
 from src.base import Text2EmbeddingsInput
 from src.ml import SBERTEncoder, SentenceEncoder
 from src import config
 from src.utils import filter_on_block_type, _get_s3_keys_with_prefix, _s3_object_read_text, \
-    _save_ndarray_to_s3_as_npy, _check_file_exists_in_s3, _write_json_to_s3
+    _save_ndarray_to_s3_as_npy, _check_file_exists_in_s3, _write_json_to_s3, _get_ids_with_suffix
 
 LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO").upper()
 DEFAULT_LOGGING = {
@@ -95,11 +92,6 @@ def main(
         document_paths_previously_parsed = set(
             os.listdir(output_dir)
         )
-
-    def _get_ids_with_suffix(files: list[str], suffix: str) -> set[str]:
-        """Get a set of the ids of the files with the given suffix."""
-        files = [file for file in files if file.endswith(suffix)]
-        return set([os.path.splitext(os.path.basename(file))[0] for file in files])
 
     document_ids_previously_parsed = _get_ids_with_suffix(document_paths_previously_parsed, '.npy')
 
@@ -192,12 +184,10 @@ def main(
         task_output_path = os.path.join(output_dir, task.document_id + '.json')
         try:
             _write_json_to_s3(task.json(), task_output_path)
-        except OverwriteNewerCloudError:
-            # TODO: investigate why this happens, and why we're copying the input
+        except Exception as e:
             logger.info(
-                f"Tried to write to {task_output_path}, received "
-                "OverwriteNewerCloudError, assuming a newer task definition "
-                "is the one we want, continuing to process."
+                "Failed to write embeddings data to s3.",
+                extra={"props": {"task_output_path": task_output_path, "exception": e}}
             )
 
         embeddings_output_path = os.path.join(output_dir, task.document_id + '.npy')
@@ -235,7 +225,8 @@ def main(
 @click.option(
     "--redo",
     "-r",
-    help="Redo encoding for files that have already been parsed. By default, files with IDs that already exist in the output directory are skipped.",
+    help="Redo encoding for files that have already been parsed. By default, files with IDs that already exist "
+         "in the output directory are skipped.",
     is_flag=True,
     default=False,
 )
