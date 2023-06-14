@@ -95,10 +95,13 @@ def main(
         document_paths_previously_parsed = set(
             os.listdir(output_dir)
         )
-    # TODO filter for correct suffix (.npy)
-    # TODO process to get the ids
-    # TODO convert to a set
-    document_ids_previously_parsed = set(document_paths_previously_parsed)
+
+    def _get_ids_with_suffix(files: list[str], suffix: str) -> set[str]:
+        """Get a set of the ids of the files with the given suffix."""
+        files = [file for file in files if file.endswith(suffix)]
+        return set([os.path.splitext(os.path.basename(file))[0] for file in files])
+
+    document_ids_previously_parsed = _get_ids_with_suffix(document_paths_previously_parsed, '.npy')
 
     if config.FILES_TO_PROCESS is not None:
         files_to_process_subset = config.FILES_TO_PROCESS.split("$")[1:]
@@ -108,10 +111,7 @@ def main(
             files_to_process = _get_s3_keys_with_prefix(input_dir)
         else:
             files_to_process = os.listdir(input_dir)
-        # TODO filter for correct suffix (.json)
-        # TODO process to get the ids
-        # TODO convert to a set
-    files_to_process_ids = set(files_to_process)
+    files_to_process_ids = _get_ids_with_suffix(files_to_process, '.json')
 
     if not redo and document_ids_previously_parsed.intersection(
         files_to_process_ids
