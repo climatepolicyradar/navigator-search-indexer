@@ -95,7 +95,8 @@ def main(
     else:
         input_dir_as_path = Path(input_dir)
         output_dir_as_path = Path(output_dir)
-
+    
+    # FIXME: Remove glob as it's taking 15 mins / glob.     
     document_ids_previously_parsed = set(
         [path.stem for path in output_dir_as_path.glob("*.npy")]
     )
@@ -104,6 +105,7 @@ def main(
         files_to_process_subset = config.FILES_TO_PROCESS.split("$")[1:]
         files_to_process = [input_dir_as_path / f for f in files_to_process_subset]
     else:
+        # FIXME: Remove glob as it's taking 15 mins / glob. 
         files_to_process = list(input_dir_as_path.glob("*.json"))
 
     tasks = [
@@ -125,7 +127,9 @@ def main(
         if not tasks:
             logger.warning("No more documents to encode. Exiting.")
             return
-
+    
+    # FIXME: This solution assumes that we have a json document with language = en (supported target language) for every document in the parser output. This isn't very robust. 
+        # This solution also requires passing every document into the embeddings stage so we are declaring tasks that are immediately dropped due to content.          
     # Filter only to tasks that have one language and where the language is supported. These could either be translated or in the original language.
     if (
         unsupported_languages := config.TARGET_LANGUAGES
