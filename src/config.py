@@ -1,6 +1,7 @@
 """In-app config. Set by environment variables."""
 
 import os
+import re
 from typing import Set
 
 from src.base import BlockTypes
@@ -53,3 +54,6 @@ TARGET_LANGUAGES: Set[str] = set(
 ENCODER_SUPPORTED_LANGUAGES: Set[str] = {"en"}
 FILES_TO_PROCESS = os.getenv("FILES_TO_PROCESS")
 BLOCKS_TO_FILTER = os.getenv("BLOCKS_TO_FILTER", "Table,Figure").split(",")
+# TODO make sure this aligns with the updates to the fanout etc.
+ID_PATTERN = re.compile(r"^[a-zA-Z0-9]+\.[a-zA-Z0-9]+\.[a-zA-Z0-9]+\.[a-zA-Z0-9]+")
+S3_PATTERN = re.compile(r"s3://(?P<bucket>[\w-]+)/(?P<prefix>.+)")

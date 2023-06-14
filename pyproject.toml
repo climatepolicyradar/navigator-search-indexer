@@ -15,6 +15,7 @@ pydantic = "^1.10.2"
 python-json-logger = "^2.0.4"
 awscli = "^1.27.8"
 boto3 = "^1.26.153"
+aws-error-utils = "^2.7.0"
 
 [tool.poetry.dev-dependencies]
 black = "^22.1.0"

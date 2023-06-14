@@ -15,7 +15,8 @@ from tqdm.auto import tqdm
 from src.base import Text2EmbeddingsInput
 from src.ml import SBERTEncoder, SentenceEncoder
 from src import config
-from src.utils import filter_on_block_type
+from src.utils import filter_on_block_type, _get_s3_keys_with_prefix, _s3_object_read_text, \
+    _save_ndarray_to_s3_as_npy, _check_file_exists_in_s3, _write_json_to_s3
 
 LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO").upper()
 DEFAULT_LOGGING = {
@@ -88,58 +89,71 @@ def main(
         limit (Optional[int]): Optionally limit the number of text samples to process. Useful for debugging.
         device (str): Device to use for embeddings generation. Must be either "cuda" or "cpu".
     """
-
     if s3:
-        input_dir_as_path = S3Path(input_dir)
-        output_dir_as_path = S3Path(output_dir)
+        document_paths_previously_parsed = _get_s3_keys_with_prefix(output_dir)
     else:
-        input_dir_as_path = Path(input_dir)
-        output_dir_as_path = Path(output_dir)
-    
-    # FIXME: Remove glob as it's taking 15 mins / glob.     
-    document_ids_previously_parsed = set(
-        [path.stem for path in output_dir_as_path.glob("*.npy")]
-    )
+        document_paths_previously_parsed = set(
+            os.listdir(output_dir)
+        )
+    # TODO filter for correct suffix (.npy)
+    # TODO process to get the ids
+    # TODO convert to a set
+    document_ids_previously_parsed = set(document_paths_previously_parsed)
 
     if config.FILES_TO_PROCESS is not None:
         files_to_process_subset = config.FILES_TO_PROCESS.split("$")[1:]
-        files_to_process = [input_dir_as_path / f for f in files_to_process_subset]
+        files_to_process = [os.path.join(input_dir, f) for f in files_to_process_subset]
     else:
-        # FIXME: Remove glob as it's taking 15 mins / glob. 
-        files_to_process = list(input_dir_as_path.glob("*.json"))
-
-    tasks = [
-        Text2EmbeddingsInput.parse_raw(path.read_text()) for path in files_to_process
-    ]
+        if s3:
+            files_to_process = _get_s3_keys_with_prefix(input_dir)
+        else:
+            files_to_process = os.listdir(input_dir)
+        # TODO filter for correct suffix (.json)
+        # TODO process to get the ids
+        # TODO convert to a set
+    files_to_process_ids = set(files_to_process)
 
     if not redo and document_ids_previously_parsed.intersection(
-        {task.document_id for task in tasks}
+        files_to_process_ids
     ):
         logger.warning(
-            f"Found {len(document_ids_previously_parsed.intersection({task.document_id for task in tasks}))} documents that have already been encoded. Skipping."
+            f"Found {len(document_ids_previously_parsed.intersection(files_to_process_ids))} documents that have "
+            f"already been encoded. Skipping. "
         )
-        tasks = [
-            task
-            for task in tasks
-            if task.document_id not in document_ids_previously_parsed
+        files_to_process_ids = [
+            id_
+            for id_ in files_to_process_ids
+            if id_ not in document_ids_previously_parsed
         ]
 
-        if not tasks:
+        if not files_to_process_ids:
             logger.warning("No more documents to encode. Exiting.")
             return
+
+    tasks = [
+        Text2EmbeddingsInput.parse_raw(
+            _s3_object_read_text(os.path.join(input_dir, id_ + '.json'))
+        )
+        for id_ in files_to_process_ids
+    ]
     
-    # FIXME: This solution assumes that we have a json document with language = en (supported target language) for every document in the parser output. This isn't very robust. 
-        # This solution also requires passing every document into the embeddings stage so we are declaring tasks that are immediately dropped due to content.          
-    # Filter only to tasks that have one language and where the language is supported. These could either be translated or in the original language.
+    # FIXME: This solution assumes that we have a json document with language = en (supported target language)
+    #  for every document in the parser output. This isn't very robust. This solution also requires passing
+    #  every document into the embeddings stage so we are declaring tasks that are immediately dropped due to
+    #  content. Filter only to tasks that have one language and where the language is supported. These could
+    #  either be translated or in the original language.
     if (
         unsupported_languages := config.TARGET_LANGUAGES
         - config.ENCODER_SUPPORTED_LANGUAGES
     ):
         logger.warning(
-            f"The following languages have been requested for encoding but are not supported by the encoder: {unsupported_languages}. Only the following languages will be encoded: {config.ENCODER_SUPPORTED_LANGUAGES}."
+            f"The following languages have been requested for encoding but are not supported by the encoder: "
+            f"{unsupported_languages}. Only the following languages will be encoded: "
+            f"{config.ENCODER_SUPPORTED_LANGUAGES}. "
         )
 
-    # Encode documents either with one language where the lanugage is in the target languages, or with no language and no content type. This assumes that the document name and description are in English.
+    # Encode documents either with one language where the lanugage is in the target languages, or with no
+    # language and no content type. This assumes that the document name and description are in English.
     tasks = [
         task
         for task in tasks
@@ -175,10 +189,9 @@ def main(
         f"of {config.ENCODING_BATCH_SIZE} text blocks."
     )
     for task in tqdm(tasks, unit="docs"):
-        task_output_path = output_dir_as_path / f"{task.document_id}.json"
-
+        task_output_path = os.path.join(output_dir, task.document_id + '.json')
         try:
-            task_output_path.write_text(task.json())
+            _write_json_to_s3(task.json(), task_output_path)
         except OverwriteNewerCloudError:
             # TODO: investigate why this happens, and why we're copying the input
             logger.info(
@@ -187,8 +200,8 @@ def main(
                 "is the one we want, continuing to process."
             )
 
-        embeddings_output_path = output_dir_as_path / f"{task.document_id}.npy"
-        if embeddings_output_path.exists():
+        embeddings_output_path = os.path.join(output_dir, task.document_id + '.npy')
+        if _check_file_exists_in_s3(embeddings_output_path):
             logger.info(
                 f"Embeddings output file '{embeddings_output_path}' already exists, "
                 "skipping processing."
@@ -203,8 +216,7 @@ def main(
             if text_embeddings is not None
             else description_embedding.reshape(1, -1)
         )
-        with embeddings_output_path.open("wb") as f:
-            np.save(f, combined_embeddings, allow_pickle=False)
+        _save_ndarray_to_s3_as_npy(combined_embeddings, embeddings_output_path)
 
 
 @click.command()
