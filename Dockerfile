@@ -26,5 +26,9 @@ COPY ./data ./data
 COPY ./src ./src
 COPY ./cli ./cli
 
+# Pre-download the model
+ENV PYTHONPATH "${PYTHONPATH}:/app"
+RUN python '/app/src/warm_up_model.py'
+
 # Run the indexer on the input s3 directory
 ENTRYPOINT [ "sh", "./cli/run.sh" ]
