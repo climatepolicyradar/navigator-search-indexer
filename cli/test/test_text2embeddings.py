@@ -5,6 +5,7 @@ from pathlib import Path
 
 import numpy as np
 from click.testing import CliRunner
+import boto3
 
 from cli.text2embeddings import run_as_cli
 from src.base import IndexerInput
@@ -55,7 +56,13 @@ def test_run_encoder_local(
             assert np.load(str(Path(output_dir) / "test_html.npy")).shape == (1, 768)
 
 
-def test_run_encoder_s3(pipeline_s3_client, test_input_dir_s3, test_output_dir_s3):
+def test_run_encoder_s3(
+        s3_bucket_and_region,
+        pipeline_s3_objects,
+        pipeline_s3_client,
+        test_input_dir_s3,
+        test_output_dir_s3
+):
     """Test that the encoder runs with S3 input and output paths and outputs the correct files."""
 
     runner = CliRunner()
@@ -63,7 +70,16 @@ def test_run_encoder_s3(pipeline_s3_client, test_input_dir_s3, test_output_dir_s
 
     assert result.exit_code == 0
 
-    # TODO assert output files exist
+    s3client = boto3.client("s3")
+
+    for key in pipeline_s3_objects.keys():
+        try:
+            s3client.head_object(Bucket=s3_bucket_and_region['bucket'], Key=key)
+            exists = True
+        except Exception:
+            exists = False
+        assert exists
+
 
 
 def test_run_parser_skip_already_done(

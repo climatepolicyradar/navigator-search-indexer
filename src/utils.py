@@ -5,7 +5,6 @@ from typing import Optional, Tuple, Union
 
 import numpy as np
 
-from cli.text2embeddings import logger
 from src import config
 
 from src.base import IndexerInput, TextBlock, BlockTypes, Text2EmbeddingsInput
@@ -13,7 +12,6 @@ from src.ml import SentenceEncoder
 from src.s3 import get_s3_keys_with_prefix, s3_object_read_text
 
 logger = logging.getLogger(__name__)
-
 
 def replace_text_blocks(block: IndexerInput, new_text_blocks: list[TextBlock]):
     """Updates the text blocks in the IndexerInput object."""
