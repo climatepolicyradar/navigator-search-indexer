@@ -1,7 +1,9 @@
-from cli.text2embeddings import logger
+import logging
+
 from src import config
 from src.base import Text2EmbeddingsInput
 
+logger = logging.getLogger(__name__)
 
 def validate_languages_decorator(func):
     """Validate that the languages requested for encoding are supported by the encoder."""

@@ -1,5 +1,6 @@
 """CLI to convert JSON documents outputted by the PDF parsing pipeline to embeddings."""
 
+import logging
 import logging.config
 import os
 from pathlib import Path
