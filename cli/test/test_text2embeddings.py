@@ -72,6 +72,7 @@ def test_run_encoder_s3(
 
     s3client = boto3.client("s3")
 
+    # Check that the correct files were created
     for key in pipeline_s3_objects.keys():
         try:
             s3client.head_object(Bucket=s3_bucket_and_region['bucket'], Key=key)
