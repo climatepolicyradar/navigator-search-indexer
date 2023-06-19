@@ -2,6 +2,7 @@ import json
 from typing import Any
 
 import boto3
+from botocore.exceptions import ClientError
 from aws_error_utils import errors
 
 from src.config import S3_PATTERN
@@ -12,11 +13,9 @@ def validate_s3_pattern(s3_path: str):
     s3_match = S3_PATTERN.match(s3_path)
     if s3_match is None:
         raise Exception(f"Key does not represent an s3 path: {s3_path}")
-
     bucket = s3_match.group("bucket")
     key = s3_match.group("prefix")
     s3client = boto3.client("s3")
-
     return bucket, key, s3client
 
 
@@ -24,11 +23,14 @@ def validate_s3_pattern(s3_path: str):
 def check_file_exists_in_s3(s3_path: str):
     """Checks whether a file exists in an S3 bucket."""
     bucket, key, s3client = validate_s3_pattern(s3_path)
-
     try:
         s3client.head_object(Bucket=bucket, Key=key)
         return True
-    except errors.NoSuchBucket or errors.NoSuchKey:
+    except ClientError:
+        return False
+    except errors.NoSuchBucket:
+        return False
+    except errors.NoSuchKey:
         return False
     except Exception as e:
         raise e
