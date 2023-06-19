@@ -2,6 +2,7 @@ import json
 from typing import Any
 
 import boto3
+import botocore.exceptions
 from aws_error_utils import errors
 
 from src.config import S3_PATTERN
@@ -28,7 +29,7 @@ def check_file_exists_in_s3(s3_path: str):
     try:
         s3client.head_object(Bucket=bucket, Key=key)
         return True
-    except errors.NoSuchBucket or errors.NoSuchKey or errors.ClientError:
+    except errors.NoSuchBucket or errors.NoSuchKey or botocore.exceptions.ClientError:
         return False
     except Exception as e:
         raise e
