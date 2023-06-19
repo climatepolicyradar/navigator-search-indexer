@@ -28,7 +28,7 @@ def check_file_exists_in_s3(s3_path: str):
     try:
         s3client.head_object(Bucket=bucket, Key=key)
         return True
-    except errors.NoSuchBucket or errors.NoSuchKey:
+    except errors.NoSuchBucket or errors.NoSuchKey or errors.ClientError:
         return False
     except Exception as e:
         raise e
