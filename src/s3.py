@@ -106,12 +106,9 @@ def write_json_to_s3(json_data: dict, s3_path: str) -> None:
     """Writes JSON data to an S3 bucket."""
     bucket, key, s3client = validate_s3_pattern(s3_path)
 
-    # Convert JSON data to a string
-    json_string = json.dumps(json_data)
-
     # Upload the JSON string to S3
     try:
-        s3client.put_object(Body=json_string, Bucket=bucket, Key=key)
+        s3client.put_object(Body=json_data, Bucket=bucket, Key=key)
     except errors.NoSuchBucket:
         raise ValueError(f"Bucket {bucket} does not exist")
     except Exception as e:
