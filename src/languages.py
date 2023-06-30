@@ -1,9 +1,11 @@
 import logging
+from typing import List
 
 from src import config
 from src.base import Text2EmbeddingsInput
 
 logger = logging.getLogger(__name__)
+
 
 def validate_languages_decorator(func):
     """Validate that the languages requested for encoding are supported by the encoder."""
@@ -24,7 +26,7 @@ def validate_languages_decorator(func):
 
 
 @validate_languages_decorator
-def get_docs_of_supported_language(tasks: list[Text2EmbeddingsInput]):
+def get_docs_of_supported_language(tasks: List[Text2EmbeddingsInput]):
     """Filter out documents that don't meet language requirements.
 
     Persist documents with either:
@@ -44,9 +46,9 @@ def get_docs_of_supported_language(tasks: list[Text2EmbeddingsInput]):
                    in config.ENCODER_SUPPORTED_LANGUAGES.union(config.TARGET_LANGUAGES)
                )
            )
-           or (
-                not task.languages
-                and task.html_data is None
-                and task.pdf_data is None
-           )
+           # or (
+           #      not task.languages
+           #      and task.html_data is None
+           #      and task.pdf_data is None
+           # )
     ]

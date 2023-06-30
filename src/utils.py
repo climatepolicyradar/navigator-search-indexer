@@ -1,7 +1,7 @@
 import logging
 import os
 from pathlib import Path
-from typing import Optional, Tuple, Union
+from typing import Optional, Tuple, Union, List, Set
 
 import numpy as np
 
@@ -12,6 +12,7 @@ from src.ml import SentenceEncoder
 from src.s3 import get_s3_keys_with_prefix, s3_object_read_text
 
 logger = logging.getLogger(__name__)
+
 
 def replace_text_blocks(block: IndexerInput, new_text_blocks: list[TextBlock]):
     """Updates the text blocks in the IndexerInput object."""
@@ -70,7 +71,7 @@ def filter_on_block_type(
     ]
 
 
-def get_ids_with_suffix(files: list[str], suffix: str) -> set[str]:
+def get_ids_with_suffix(files: List[str], suffix: str) -> Set[str]:
     """Get a set of the ids of the files with the given suffix."""
     files = [file for file in files if file.endswith(suffix)]
     return set([os.path.splitext(os.path.basename(file))[0] for file in files])
@@ -114,6 +115,7 @@ def get_files_to_process(s3: bool, input_dir: str, output_dir: str, redo: bool, 
     else:
         document_paths_previously_parsed = set(os.listdir(output_dir))
 
+    # TODO will this work for translated
     document_ids_previously_parsed = get_ids_with_suffix(
         document_paths_previously_parsed, ".npy"
     )
