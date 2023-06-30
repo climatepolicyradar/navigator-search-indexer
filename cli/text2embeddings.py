@@ -119,6 +119,8 @@ def run_as_cli(
 
     logger.info("Getting files to process.")
     files_to_process_ids = get_files_to_process(s3, input_dir, output_dir, redo, limit)
+    logger.info(f"Found {len(files_to_process_ids)} files to process.",
+                extra={"props": {"files_to_process_ids": files_to_process_ids}})
 
     logger.info("Constructing Text2EmbeddingsInput objects from parser output jsons.")
     tasks = get_Text2EmbeddingsInput_array(input_dir, s3, files_to_process_ids)
@@ -128,6 +130,8 @@ def run_as_cli(
         extra={"props": {"target_languages": config.TARGET_LANGUAGES}}
     )
     tasks = get_docs_of_supported_language(tasks)
+    logger.info(f"Found {len(tasks)} tasks with supported languages.",
+                extra={"props": {"tasks": [{'lang': task.languages, 'translated': task.translated, 'document_id': task.document_id} for task in tasks]}})
 
     logger.info(
         "Filtering unwanted text block types.",
