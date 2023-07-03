@@ -15,10 +15,11 @@ from src.ml import SBERTEncoder
 from src import config
 from src.utils import (
     filter_on_block_type,
-    encode_indexer_input, get_files_to_process, get_Text2EmbeddingsInput_array,
+    encode_indexer_input,
+    get_files_to_process,
+    get_Text2EmbeddingsInput_array,
 )
-from src.s3 import check_file_exists_in_s3, write_json_to_s3, \
-    save_ndarray_to_s3_as_npy
+from src.s3 import check_file_exists_in_s3, write_json_to_s3, save_ndarray_to_s3_as_npy
 
 LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO").upper()
 DEFAULT_LOGGING = {
@@ -60,7 +61,7 @@ logging.config.dictConfig(DEFAULT_LOGGING)
     "--redo",
     "-r",
     help="Redo encoding for files that have already been parsed. By default, files with IDs that already exist "
-         "in the output directory are skipped.",
+    "in the output directory are skipped.",
     is_flag=True,
     default=False,
 )
@@ -104,7 +105,7 @@ def run_as_cli(
     #  either be translated or in the original language.
 
     logger.info(
-        f"Running text2embeddings.",
+        f"Running embeddings generation...",
         extra={
             "props": {
                 "input_dir": input_dir,
@@ -117,21 +118,36 @@ def run_as_cli(
         },
     )
 
-    logger.info("Getting files to process.")
+    logger.info("Identifying files to process.")
     files_to_process_ids = get_files_to_process(s3, input_dir, output_dir, redo, limit)
-    logger.info(f"Found {len(files_to_process_ids)} files to process.",
-                extra={"props": {"files_to_process_ids": files_to_process_ids}})
+    logger.info(
+        f"Found {len(files_to_process_ids)} files to process.",
+        extra={"props": {"files_to_process_ids": files_to_process_ids}},
+    )
 
     logger.info("Constructing Text2EmbeddingsInput objects from parser output jsons.")
     tasks = get_Text2EmbeddingsInput_array(input_dir, s3, files_to_process_ids)
 
     logger.info(
         "Filtering tasks to those with supported languages.",
-        extra={"props": {"target_languages": config.TARGET_LANGUAGES}}
+        extra={"props": {"target_languages": config.TARGET_LANGUAGES}},
     )
     tasks = get_docs_of_supported_language(tasks)
-    logger.info(f"Found {len(tasks)} tasks with supported languages.",
-                extra={"props": {"tasks": [{'lang': task.languages, 'translated': task.translated, 'document_id': task.document_id} for task in tasks]}})
+    logger.info(
+        f"Found {len(tasks)} tasks with supported languages.",
+        extra={
+            "props": {
+                "tasks": [
+                    {
+                        "lang": task.languages,
+                        "translated": task.translated,
+                        "document_id": task.document_id,
+                    }
+                    for task in tasks
+                ]
+            }
+        },
+    )
 
     logger.info(
         "Filtering unwanted text block types.",
@@ -146,7 +162,12 @@ def run_as_cli(
 
     logger.info(
         "Encoding text from documents.",
-        extra={"props": {"ENCODING_BATCH_SIZE": config.ENCODING_BATCH_SIZE, "tasks_number": len(tasks)}}
+        extra={
+            "props": {
+                "ENCODING_BATCH_SIZE": config.ENCODING_BATCH_SIZE,
+                "tasks_number": len(tasks),
+            }
+        },
     )
     for task in tqdm(tasks, unit="docs"):
         task_output_path = os.path.join(output_dir, task.document_id + ".json")

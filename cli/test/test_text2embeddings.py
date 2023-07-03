@@ -61,7 +61,7 @@ def test_run_encoder_s3(
     pipeline_s3_objects_main,
     pipeline_s3_client_main,
     test_input_dir_s3,
-    test_output_dir_s3
+    test_output_dir_s3,
 ):
     """Test that the encoder runs with S3 input and output paths and outputs the correct files."""
 
@@ -75,7 +75,7 @@ def test_run_encoder_s3(
     # Check that the correct files were created
     for key in pipeline_s3_objects_main.keys():
         try:
-            s3client.head_object(Bucket=s3_bucket_and_region['bucket'], Key=key)
+            s3client.head_object(Bucket=s3_bucket_and_region["bucket"], Key=key)
             exists = True
         except Exception:
             exists = False

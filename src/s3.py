@@ -1,5 +1,5 @@
 import json
-from typing import Any
+from typing import Any, Sequence
 
 import boto3
 from botocore.exceptions import ClientError
@@ -20,7 +20,7 @@ def validate_s3_pattern(s3_path: str):
 
 
 # TODO do we want to instantiate one client object and pass that through rather than instantiating each time?
-def check_file_exists_in_s3(s3_path: str):
+def check_file_exists_in_s3(s3_path: str) -> bool:
     """Checks whether a file exists in an S3 bucket."""
     bucket, key, s3client = validate_s3_pattern(s3_path)
     try:
@@ -36,7 +36,7 @@ def check_file_exists_in_s3(s3_path: str):
         raise e
 
 
-def get_s3_keys_with_prefix(s3_prefix: str) -> list[str]:
+def get_s3_keys_with_prefix(s3_prefix: str) -> Sequence[str]:
     """
     Get a list of keys in an S3 bucket with a given prefix. Returns an empty list if the prefix does not exist
     or is empty.
@@ -102,7 +102,7 @@ def s3_object_read_text(s3_path: str) -> str:
     return response["Body"].read().decode("utf-8")
 
 
-def write_json_to_s3(json_data: dict, s3_path: str) -> None:
+def write_json_to_s3(json_data: str, s3_path: str) -> None:
     """Writes JSON data to an S3 bucket."""
     bucket, key, s3client = validate_s3_pattern(s3_path)
 

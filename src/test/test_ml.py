@@ -13,6 +13,6 @@ def test_encoder():
 
     assert isinstance(encoder.encode("Hello world!"), np.ndarray)
 
-    assert isinstance(encoder.encode_batch(["Hello world!"]*100), np.ndarray)
+    assert isinstance(encoder.encode_batch(["Hello world!"] * 100), np.ndarray)
 
     assert encoder.dimension == 768

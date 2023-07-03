@@ -1,7 +1,7 @@
 import logging
 import os
 from pathlib import Path
-from typing import Optional, Tuple, Union, List, Set
+from typing import Optional, Tuple, Union, List, Set, Sequence
 
 import numpy as np
 
@@ -14,7 +14,7 @@ from src.s3 import get_s3_keys_with_prefix, s3_object_read_text
 logger = logging.getLogger(__name__)
 
 
-def replace_text_blocks(block: IndexerInput, new_text_blocks: list[TextBlock]):
+def replace_text_blocks(block: IndexerInput, new_text_blocks: Sequence[TextBlock]):
     """Updates the text blocks in the IndexerInput object."""
     if block.pdf_data is not None:
         block.pdf_data.text_blocks = new_text_blocks
@@ -25,8 +25,8 @@ def replace_text_blocks(block: IndexerInput, new_text_blocks: list[TextBlock]):
 
 
 def filter_blocks(
-    indexer_input: IndexerInput, remove_block_types: list[str]
-) -> list[TextBlock]:
+    indexer_input: IndexerInput, remove_block_types: Sequence[str]
+) -> Sequence[TextBlock]:
     """Given an Indexer Input filter the contained TextBlocks and return this as a list of TextBlocks."""
     filtered_blocks = []
     for block in indexer_input.get_text_blocks(including_invalid_html=True):
@@ -47,10 +47,10 @@ def filter_blocks(
 
 
 def filter_on_block_type(
-    inputs: list[IndexerInput], remove_block_types: list[str]
-) -> list[IndexerInput]:
-    """Filter a sequence of IndexerInputs to remove the textblocks that are of the types declared in the remove block
-    types array."""
+    inputs: Sequence[IndexerInput], remove_block_types: List[str]
+) -> Sequence[IndexerInput]:
+    """Filter a sequence of IndexerInputs to remove the textblocks that are of the types declared in the remove
+    block types array."""
     for _filter in remove_block_types:
         try:
             BlockTypes(_filter)
@@ -71,7 +71,7 @@ def filter_on_block_type(
     ]
 
 
-def get_ids_with_suffix(files: List[str], suffix: str) -> Set[str]:
+def get_ids_with_suffix(files: Sequence[str], suffix: str) -> Set[str]:
     """Get a set of the ids of the files with the given suffix."""
     files = [file for file in files if file.endswith(suffix)]
     return set([os.path.splitext(os.path.basename(file))[0] for file in files])
@@ -92,7 +92,9 @@ def encode_indexer_input(
     :param device: device to use for encoding
     """
 
-    description_embedding = encoder.encode(input_obj.document_description, device=device)
+    description_embedding = encoder.encode(
+        input_obj.document_description, device=device
+    )
 
     text_blocks = input_obj.get_text_blocks()
 
@@ -108,7 +110,9 @@ def encode_indexer_input(
     return description_embedding, text_embeddings
 
 
-def get_files_to_process(s3: bool, input_dir: str, output_dir: str, redo: bool, limit: Union[None, int]) -> list:
+def get_files_to_process(
+    s3: bool, input_dir: str, output_dir: str, redo: bool, limit: Union[None, int]
+) -> Sequence[str]:
     """Get the list of files to process, either from the config or from the input directory."""
     if s3:
         document_paths_previously_parsed = get_s3_keys_with_prefix(output_dir)
@@ -154,7 +158,7 @@ def get_files_to_process(s3: bool, input_dir: str, output_dir: str, redo: bool, 
 
 
 def get_Text2EmbeddingsInput_array(
-        input_dir: str, s3: bool, files_to_process_ids
+    input_dir: str, s3: bool, files_to_process_ids: List[str]
 ) -> List[Text2EmbeddingsInput]:
     """Construct Text2EmbeddingsInput objects from parser output jsons.
 

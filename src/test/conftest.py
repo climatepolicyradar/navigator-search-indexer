@@ -66,7 +66,9 @@ def pipeline_s3_objects(
     Thus, we have a document that embeddings can be generated from in s3.
     """
     return {
-        f'{test_prefix}/test_id.json': bytes(json.dumps(test_file_json).encode("UTF-8")),
+        f"{test_prefix}/test_id.json": bytes(
+            json.dumps(test_file_json).encode("UTF-8")
+        ),
     }
 
 
