@@ -158,7 +158,7 @@ def get_files_to_process(
 
 
 def get_Text2EmbeddingsInput_array(
-    input_dir: str, s3: bool, files_to_process_ids: List[str]
+    input_dir: str, s3: bool, files_to_process_ids: Sequence[str]
 ) -> List[Text2EmbeddingsInput]:
     """Construct Text2EmbeddingsInput objects from parser output jsons.
 
