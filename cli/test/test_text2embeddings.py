@@ -57,11 +57,11 @@ def test_run_encoder_local(
 
 
 def test_run_encoder_s3(
-        s3_bucket_and_region,
-        pipeline_s3_objects,
-        pipeline_s3_client,
-        test_input_dir_s3,
-        test_output_dir_s3
+    s3_bucket_and_region,
+    pipeline_s3_objects_main,
+    pipeline_s3_client_main,
+    test_input_dir_s3,
+    test_output_dir_s3
 ):
     """Test that the encoder runs with S3 input and output paths and outputs the correct files."""
 
@@ -73,14 +73,13 @@ def test_run_encoder_s3(
     s3client = boto3.client("s3")
 
     # Check that the correct files were created
-    for key in pipeline_s3_objects.keys():
+    for key in pipeline_s3_objects_main.keys():
         try:
             s3client.head_object(Bucket=s3_bucket_and_region['bucket'], Key=key)
             exists = True
         except Exception:
             exists = False
         assert exists
-
 
 
 def test_run_parser_skip_already_done(

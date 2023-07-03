@@ -7,15 +7,7 @@ import botocore.client
 import pytest
 from moto import mock_s3
 
-
-@pytest.fixture()
-def test_input_dir() -> Path:
-    return (Path(__file__).parent / "test_data" / "text2embeddings_input").resolve()
-
-
-@pytest.fixture()
-def test_input_dir_bad_data() -> Path:
-    return (Path(__file__).parent / "test_data" / "text2embeddings_input_bad").resolve()
+from src.base import TextBlock
 
 
 class S3Client:
@@ -1072,7 +1064,7 @@ def test_html_file_json() -> dict:
 
 
 @pytest.fixture
-def pipeline_s3_objects(
+def pipeline_s3_objects_main(
     test_file_key,
     test_html_file_json,
 ):
@@ -1090,7 +1082,7 @@ def pipeline_s3_objects(
 
 
 @pytest.fixture
-def pipeline_s3_client(s3_bucket_and_region, pipeline_s3_objects):
+def pipeline_s3_client_main(s3_bucket_and_region, pipeline_s3_objects_main):
     with mock_s3():
         s3_client = S3Client(s3_bucket_and_region["region"])
 
@@ -1101,11 +1093,24 @@ def pipeline_s3_client(s3_bucket_and_region, pipeline_s3_objects):
             },
         )
 
-        for key in pipeline_s3_objects:
+        for key in pipeline_s3_objects_main:
             s3_client.client.put_object(
                 Bucket=s3_bucket_and_region["bucket"],
                 Key=key,
-                Body=pipeline_s3_objects[key],
+                Body=pipeline_s3_objects_main[key],
             )
 
         yield s3_client
+
+
+def get_text_block(text_block_type: str) -> TextBlock:
+    """Returns a TextBlock object with the given type."""
+    return TextBlock(
+        text=["test_text"],
+        text_block_id="test_text_block_id",
+        language="test_language",
+        type=text_block_type,
+        type_confidence=1.0,
+        coords=[(0, 0), (0, 0), (0, 0), (0, 0)],
+        page_number=0,
+    )

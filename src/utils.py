@@ -155,7 +155,7 @@ def get_files_to_process(s3: bool, input_dir: str, output_dir: str, redo: bool, 
 
 def get_Text2EmbeddingsInput_array(
         input_dir: str, s3: bool, files_to_process_ids
-) -> list[Text2EmbeddingsInput]:
+) -> List[Text2EmbeddingsInput]:
     """Construct Text2EmbeddingsInput objects from parser output jsons.
 
     These objects will be used to generate embeddings and are either read in from S3 or from the local file

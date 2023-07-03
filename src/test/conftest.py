@@ -8,7 +8,7 @@ import pytest
 from moto import mock_s3
 
 from src.base import IndexerInput, DocumentMetadata, HTMLData
-from src.test.test_utils import get_text_block
+from cli.test.conftest import get_text_block
 
 
 class S3Client:
