@@ -55,7 +55,7 @@ def test_s3_object_read_text(pipeline_s3_client, test_file_key, test_file_json):
 def test_write_json_to_s3(pipeline_s3_client, s3_bucket_and_region, test_file_json):
     """Test that we can write json to an s3 object."""
     write_json_to_s3(
-        str(test_file_json), f"s3://{s3_bucket_and_region['bucket']}/prefix/test.json"
+        json.dumps(test_file_json), f"s3://{s3_bucket_and_region['bucket']}/prefix/test.json"
     )
     assert (
         json.loads(
