@@ -116,3 +116,33 @@ def test_indexer_input_no_lang() -> List[IndexerInput]:
             pdf_data=None,
         )
     ]
+
+
+@pytest.fixture
+def test_indexer_input_no_source_url() -> List[IndexerInput]:
+    """Test IndexerInput array with html containing various text block types."""
+    return [
+        IndexerInput(
+            document_id="test_id",
+            document_metadata=DocumentMetadata(
+                publication_ts=datetime.datetime.now(),
+                date="test_date",
+                geography="test_geography",
+                category="test_category",
+                source="test_source",
+                type="test_type",
+                sectors=["test_sector"],
+            ),
+            document_name="test_name",
+            document_description="test_description",
+            document_source_url=None,
+            document_cdn_object=None,
+            document_md5_sum="test_md5_sum",
+            languages=None,
+            translated=False,
+            document_slug="test_slug",
+            document_content_type=None,
+            html_data=None,
+            pdf_data=None,
+        )
+    ]

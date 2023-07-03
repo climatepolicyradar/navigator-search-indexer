@@ -115,7 +115,6 @@ def get_files_to_process(s3: bool, input_dir: str, output_dir: str, redo: bool, 
     else:
         document_paths_previously_parsed = set(os.listdir(output_dir))
 
-    # TODO will this work for translated
     document_ids_previously_parsed = get_ids_with_suffix(
         document_paths_previously_parsed, ".npy"
     )

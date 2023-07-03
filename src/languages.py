@@ -46,9 +46,10 @@ def get_docs_of_supported_language(tasks: List[Text2EmbeddingsInput]):
                    in config.ENCODER_SUPPORTED_LANGUAGES.union(config.TARGET_LANGUAGES)
                )
            )
-           # or (
-           #      not task.languages
-           #      and task.html_data is None
-           #      and task.pdf_data is None
-           # )
+           or (
+                not task.document_source_url
+                and not task.languages
+                and task.html_data is None
+                and task.pdf_data is None
+           )
     ]

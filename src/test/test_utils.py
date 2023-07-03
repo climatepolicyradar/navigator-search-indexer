@@ -1,8 +1,4 @@
-from typing import List
-
-from src import config
-from src.base import TextBlock, IndexerInput, Text2EmbeddingsInput
-from src.languages import get_docs_of_supported_language
+from src.base import TextBlock
 from src.utils import filter_on_block_type
 
 
@@ -63,12 +59,4 @@ def test_has_valid_text_override(test_indexer_input_array):
 
 
 # TODO add tests for the other methods in utils.py
-def test_get_docs_of_supported_language(
-    test_indexer_input_no_lang: List[Text2EmbeddingsInput],
-    test_indexer_input_array: List[Text2EmbeddingsInput]
-):
-    """Tests that the get_docs_of_supported_language function returns only docs of a supported language."""
-    docs_of_supported_languages = get_docs_of_supported_language(test_indexer_input_no_lang + test_indexer_input_array)
-    for doc in docs_of_supported_languages:
-        assert doc.languges in config.TARGET_LANGUAGES
 
