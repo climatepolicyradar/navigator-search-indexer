@@ -46,7 +46,7 @@ def test_run_encoder_local(
             }
 
             for path in Path(output_dir).glob("*.json"):
-                assert IndexerInput.parse_raw(json.loads(path.read_text()))
+                assert IndexerInput.parse_obj(json.loads(path.read_text()))
 
             for path in Path(output_dir).glob("*.npy"):
                 assert np.load(str(path)).shape[1] == 768
