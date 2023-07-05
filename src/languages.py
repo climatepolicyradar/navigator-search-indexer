@@ -13,7 +13,7 @@ def validate_languages_decorator(func):
     def wrapper(*args, **kwargs):
         if (
                 unsupported_languages := config.TARGET_LANGUAGES
-                                         - config.ENCODER_SUPPORTED_LANGUAGES
+                - config.ENCODER_SUPPORTED_LANGUAGES
         ):
             logger.warning(
                 f"The following languages have been requested for encoding but are not supported by the encoder: "
