@@ -1,5 +1,5 @@
 import datetime
-from typing import List
+from typing import List, Sequence, Union
 import json
 import os
 import boto3
@@ -94,11 +94,15 @@ def pipeline_s3_client(s3_bucket_and_region, pipeline_s3_objects):
         yield s3_client
 
 
-@pytest.fixture
-def test_indexer_input_array() -> List[IndexerInput]:
-    """Test IndexerInput array with html containing various text block types."""
-    return [
-        IndexerInput(
+def get_indexer_input(
+    html_data: Union[HTMLData, None],
+    source_url: Union[str, None],
+    languages: Union[Sequence[str], None],
+    content_type: Union[str, None],
+    translated: bool
+):
+    """Return a IndexerInput object with the given parameters."""
+    return IndexerInput(
             document_id="test_id",
             document_metadata=DocumentMetadata(
                 publication_ts=datetime.datetime.now(),
@@ -111,13 +115,23 @@ def test_indexer_input_array() -> List[IndexerInput]:
             ),
             document_name="test_name",
             document_description="test_description",
-            document_source_url="https://www.google.com/path.html",
+            document_source_url=source_url,
             document_cdn_object="test_cdn_object",
             document_md5_sum="test_md5_sum",
-            languages=["test_language"],
-            translated=True,
+            languages=languages,
+            translated=translated,
             document_slug="test_slug",
-            document_content_type="text/html",
+            document_content_type=content_type,
+            html_data=html_data,
+            pdf_data=None,
+        )
+
+
+@pytest.fixture
+def test_indexer_input_array() -> List[IndexerInput]:
+    """Returns an array of indexer inputs with varying block types and non/valid text."""
+    return [
+        get_indexer_input(
             html_data=HTMLData(
                 has_valid_text=True,
                 text_blocks=[
@@ -130,28 +144,12 @@ def test_indexer_input_array() -> List[IndexerInput]:
                     get_text_block("Google Text Block"),
                 ],
             ),
-            pdf_data=None,
-        ),
-        IndexerInput(
-            document_id="test_id",
-            document_metadata=DocumentMetadata(
-                publication_ts=datetime.datetime.now(),
-                date="test_date",
-                geography="test_geography",
-                category="test_category",
-                source="test_source",
-                type="test_type",
-                sectors=["test_sector"],
-            ),
-            document_name="test_name",
-            document_description="test_description",
-            document_source_url="https://www.google.com/path.html",
-            document_cdn_object="test_cdn_object",
-            document_md5_sum="test_md5_sum",
+            source_url="https://www.google.com/path.html",
             languages=["test_language"],
+            content_type="text/html",
             translated=True,
-            document_slug="test_slug",
-            document_content_type="text/html",
+        ),
+        get_indexer_input(
             html_data=HTMLData(
                 has_valid_text=False,
                 text_blocks=[
@@ -160,77 +158,74 @@ def test_indexer_input_array() -> List[IndexerInput]:
                     get_text_block("Google Text Block"),
                 ],
             ),
-            pdf_data=None,
+            source_url="https://www.google.com/path.html",
+            languages=["test_language"],
+            content_type="text/html",
+            translated=True,
         ),
     ]
 
 
 @pytest.fixture
-def test_indexer_input_no_lang() -> List[IndexerInput]:
-    """Test IndexerInput array with html containing various text block types."""
+def test_indexer_input_no_source_url_no_lang_no_data() -> List[IndexerInput]:
     return [
-        IndexerInput(
-            document_id="test_id",
-            document_metadata=DocumentMetadata(
-                publication_ts=datetime.datetime.now(),
-                date="test_date",
-                geography="test_geography",
-                category="test_category",
-                source="test_source",
-                type="test_type",
-                sectors=["test_sector"],
-            ),
-            document_name="test_name",
-            document_description="test_description",
-            document_source_url="https://www.google.com/path.html",
-            document_cdn_object="test_cdn_object",
-            document_md5_sum="test_md5_sum",
+        get_indexer_input(
+            html_data=None,
+            source_url=None,
             languages=None,
+            content_type=None,
             translated=False,
-            document_slug="test_slug",
-            document_content_type="text/html",
-            html_data=HTMLData(
-                has_valid_text=True,
-                text_blocks=[
-                    get_text_block("Table"),
-                    get_text_block("Text"),
-                    get_text_block("Text"),
-                    get_text_block("Figure"),
-                    get_text_block("Text"),
-                    get_text_block("Random"),
-                    get_text_block("Google Text Block"),
-                ],
-            ),
-            pdf_data=None,
         )
     ]
 
 
 @pytest.fixture
-def test_indexer_input_no_source_url() -> List[IndexerInput]:
-    """Test IndexerInput array with html containing various text block types."""
+def test_indexer_input_source_url_no_lang_no_data() -> List[IndexerInput]:
     return [
-        IndexerInput(
-            document_id="test_id",
-            document_metadata=DocumentMetadata(
-                publication_ts=datetime.datetime.now(),
-                date="test_date",
-                geography="test_geography",
-                category="test_category",
-                source="test_source",
-                type="test_type",
-                sectors=["test_sector"],
-            ),
-            document_name="test_name",
-            document_description="test_description",
-            document_source_url=None,
-            document_cdn_object=None,
-            document_md5_sum="test_md5_sum",
-            languages=None,
-            translated=False,
-            document_slug="test_slug",
-            document_content_type=None,
+        get_indexer_input(
             html_data=None,
-            pdf_data=None,
+            source_url="https://www.example.com/files/climate-document.pdf",
+            languages=None,
+            content_type=None,
+            translated=False
         )
     ]
+
+
+@pytest.fixture
+def test_indexer_input_source_url_supported_lang_data() -> List[IndexerInput]:
+    return [
+        get_indexer_input(
+            html_data=HTMLData(
+                has_valid_text=True,
+                text_blocks=[
+                    get_text_block("Table"),
+                    get_text_block("Google Text Block"),
+                ],
+            ),
+            source_url="https://www.example.com/files/climate-document.pdf",
+            languages=["en"],
+            content_type="text/html",
+            translated=False,
+        )
+    ]
+
+
+@pytest.fixture
+def test_indexer_input_source_url_un_supported_lang_data() -> List[IndexerInput]:
+    return [
+        get_indexer_input(
+            html_data=HTMLData(
+                has_valid_text=True,
+                text_blocks=[
+                    get_text_block("Table"),
+                    get_text_block("Google Text Block"),
+                ],
+            ),
+            source_url="https://www.example.com/files/climate-document.pdf",
+            languages=["fr"],
+            content_type="text/html",
+            translated=False,
+        )
+    ]
+
