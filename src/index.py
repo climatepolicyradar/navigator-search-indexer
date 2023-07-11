@@ -145,7 +145,7 @@ class OpenSearchIndex:
             "mappings": {"properties": self._generate_mapping_properties()},
         }
 
-    def delete_and_create_index(self, n_replicas: int):
+    def delete_index(self, n_replicas: int):
         """Create the index, deleting any existing index of the same name first.
 
         Args:
@@ -170,6 +170,7 @@ class OpenSearchIndex:
                 f"{delete_attempt_count} attempts"
             )
 
+    def create_index(self, n_replicas: int):
         create_attempt_count = 0
         create_succeeded = False
         while create_attempt_count < 5 and not create_succeeded:
@@ -219,7 +220,7 @@ class OpenSearchIndex:
             index=self.index_name,
             actions=actions,
             request_timeout=config.OPENSEARCH_BULK_REQUEST_TIMEOUT,
-            max_retries=10, # Hardcoded for now as purpose to avoid HTTP/429
+            max_retries=10,  # Hardcoded for now as purpose to avoid HTTP/429
             initial_backoff=10,
             chunk_size=200,
             max_chunk_bytes=20 * 1000 * 1000,
@@ -234,8 +235,9 @@ class OpenSearchIndex:
         logger.info(f"Processed {batch_failures} batch(es) unsuccessfully")
 
         if batch_failures:
-            raise RuntimeError(f"Failed to process {batch_failures} batch(es) during index generation")
-
+            raise RuntimeError(
+                f"Failed to process {batch_failures} batch(es) during index generation"
+            )
 
     def warmup_knn(self) -> bool:
         """Load the KNN index into memory by calling the index warmup API.

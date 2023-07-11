@@ -2,7 +2,7 @@
 
 import os
 from pathlib import Path
-from typing import Generator, Sequence, Union, Optional
+from typing import Generator, Sequence, Tuple, Union, Optional
 import logging
 import logging.config
 
@@ -135,6 +135,32 @@ def get_text_document_generator(
             }
 
 
+def delete_index(index_name: str):
+    """
+    Deletes the index.
+
+    :param index_name: name of index to delete
+    """
+
+    logger.info(f"Deleting index {index_name}")
+
+    opensearch = OpenSearchIndex(
+        url=os.environ["OPENSEARCH_URL"],
+        username=os.environ["OPENSEARCH_USER"],
+        password=os.environ["OPENSEARCH_PASSWORD"],
+        index_name=index_name,
+        opensearch_connector_kwargs={
+            "use_ssl": config.OPENSEARCH_USE_SSL,
+            "verify_certs": config.OPENSEARCH_VERIFY_CERTS,
+            "ssl_show_warn": config.OPENSEARCH_SSL_SHOW_WARN,
+        },
+        embedding_dim=config.OPENSEARCH_INDEX_EMBEDDING_DIM,
+    )
+    # Disabling replicas during indexing means that the KNN index is copied to replicas after indexing is complete rather than multiple, potentially different KNN indices being created in parallel.
+    # It should also speed up indexing.
+    opensearch.delete_index(n_replicas=0)
+
+
 def populate_and_warmup_index(
     doc_generator: Generator[dict, None, None], index_name: str
 ):
@@ -161,7 +187,7 @@ def populate_and_warmup_index(
     )
     # Disabling replicas during indexing means that the KNN index is copied to replicas after indexing is complete rather than multiple, potentially different KNN indices being created in parallel.
     # It should also speed up indexing.
-    opensearch.delete_and_create_index(n_replicas=0)
+    opensearch.create_index(n_replicas=0)
 
     # We disable index refreshes during indexing to speed up the indexing process,
     # and to ensure only 1 segment is created per shard. This also speeds up KNN
@@ -218,45 +244,22 @@ def main(
     if limit is not None:
         tasks = tasks[:limit]
 
-    core_doc_generator = get_core_document_generator(tasks, embedding_dir_as_path)
-    populate_and_warmup_index(
-        core_doc_generator, f"{config.OPENSEARCH_INDEX_PREFIX}_core"
-    )
+    index_args: Tuple[Generator[dict, None, None], str] = [
+        (get_core_document_generator(tasks, embedding_dir_as_path), f"{config.OPENSEARCH_INDEX_PREFIX}_core" ),
+        (get_text_document_generator(tasks, embedding_dir_as_path, translated=False, content_types=[CONTENT_TYPE_PDF]), f"{config.OPENSEARCH_INDEX_PREFIX}_pdfs_non_translated"),
+        (get_text_document_generator(tasks, embedding_dir_as_path, translated=True, content_types=[CONTENT_TYPE_PDF], ), f"{config.OPENSEARCH_INDEX_PREFIX}_pdfs_translated"),
+        (get_text_document_generator(tasks, embedding_dir_as_path, translated=False, content_types=[CONTENT_TYPE_HTML]), f"{config.OPENSEARCH_INDEX_PREFIX}_htmls_non_translated"),
+        (get_text_document_generator(tasks, embedding_dir_as_path, translated=True, content_types=[CONTENT_TYPE_HTML]), f"{config.OPENSEARCH_INDEX_PREFIX}_htmls_translated"),
+    ]
 
-    pdfs_non_translated_doc_generator = get_text_document_generator(
-        tasks, embedding_dir_as_path, translated=False, content_types=[CONTENT_TYPE_PDF]
-    )
-    populate_and_warmup_index(
-        pdfs_non_translated_doc_generator,
-        f"{config.OPENSEARCH_INDEX_PREFIX}_pdfs_non_translated",
-    )
+    # First remove the indices
+    for _, index_name in index_args:
+        delete_index(index_name)
+    
+    # Now populate
+    for generator, index_name in index_args:
+        populate_and_warmup_index(generator, index_name)
 
-    pdfs_translated_doc_generator = get_text_document_generator(
-        tasks, embedding_dir_as_path, translated=True, content_types=[CONTENT_TYPE_PDF]
-    )
-    populate_and_warmup_index(
-        pdfs_translated_doc_generator,
-        f"{config.OPENSEARCH_INDEX_PREFIX}_pdfs_translated",
-    )
-
-    htmls_non_translated_doc_generator = get_text_document_generator(
-        tasks,
-        embedding_dir_as_path,
-        translated=False,
-        content_types=[CONTENT_TYPE_HTML],
-    )
-    populate_and_warmup_index(
-        htmls_non_translated_doc_generator,
-        f"{config.OPENSEARCH_INDEX_PREFIX}_htmls_non_translated",
-    )
-
-    htmls_translated_doc_generator = get_text_document_generator(
-        tasks, embedding_dir_as_path, translated=True, content_types=[CONTENT_TYPE_HTML]
-    )
-    populate_and_warmup_index(
-        htmls_translated_doc_generator,
-        f"{config.OPENSEARCH_INDEX_PREFIX}_htmls_translated",
-    )
 
 
 @click.command()
