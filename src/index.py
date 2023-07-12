@@ -145,11 +145,9 @@ class OpenSearchIndex:
             "mappings": {"properties": self._generate_mapping_properties()},
         }
 
-    def delete_index(self, n_replicas: int):
+    def delete_index(self):
         """Create the index, deleting any existing index of the same name first.
 
-        Args:
-            n_replicas (int): number of replicas to create for the index.
         """
         delete_attempt_count = 0
         delete_succeeded = False
@@ -157,13 +155,13 @@ class OpenSearchIndex:
             try:
                 self.opns.indices.delete(
                     index=self.index_name,
-                    ignore=[400, 404],
+                    ignore=[404],
                     request_timeout=config.OPENSEARCH_BULK_REQUEST_TIMEOUT,
                 )
                 delete_succeeded = True
             except ConnectionTimeout:
                 delete_attempt_count += 1
-                sleep(5)
+                sleep(5 * delete_attempt_count)
         if not delete_succeeded:
             raise RuntimeError(
                 f"Failed to delete existing index '{self.index_name}' after "

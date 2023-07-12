@@ -156,9 +156,7 @@ def delete_index(index_name: str):
         },
         embedding_dim=config.OPENSEARCH_INDEX_EMBEDDING_DIM,
     )
-    # Disabling replicas during indexing means that the KNN index is copied to replicas after indexing is complete rather than multiple, potentially different KNN indices being created in parallel.
-    # It should also speed up indexing.
-    opensearch.delete_index(n_replicas=0)
+    opensearch.delete_index()
 
 
 def populate_and_warmup_index(
