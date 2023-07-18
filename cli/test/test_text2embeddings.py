@@ -74,12 +74,12 @@ def test_run_encoder_s3(
 
     # Check that the correct files were created
     for key in pipeline_s3_objects_main.keys():
-        try:
-            s3client.head_object(Bucket=s3_bucket_and_region["bucket"], Key=key)
-            exists = True
-        except Exception:
-            exists = False
-        assert exists
+        assert s3client.head_object(Bucket=s3_bucket_and_region["bucket"], Key=key) is not None
+
+    # Check that the files have the correct format
+    for key in pipeline_s3_objects_main.keys():
+        obj = s3client.get_object(Bucket=s3_bucket_and_region["bucket"], Key=key)
+        assert np.load(obj).shape == (1, 768)
 
 
 def test_run_parser_skip_already_done(
