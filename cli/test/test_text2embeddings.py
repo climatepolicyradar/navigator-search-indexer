@@ -9,6 +9,7 @@ import boto3
 
 from cli.text2embeddings import run_as_cli
 from src.base import IndexerInput
+from src.s3 import get_s3_keys_with_prefix
 
 
 def test_run_encoder_local(
@@ -73,8 +74,8 @@ def test_run_encoder_s3(
 
     s3client = boto3.client("s3")
 
-    s3_files = s3client.list_objects_v2(Bucket=s3_bucket_and_region['bucket'], Prefix=output_prefix)
-    s3_files = [o["Key"] for o in s3_files.get("Contents", []) if o["Key"] != output_prefix]
+    s3_files = get_s3_keys_with_prefix(s3_prefix=f's3://{s3_bucket_and_region["bucket"]}/{output_prefix}')
+
     # TODO get a set of output dir files json
     s3_files_json = [f for f in s3_files if f.endswith(".json")]
     # TODO get a set of output dir files npy
