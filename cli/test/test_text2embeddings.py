@@ -62,6 +62,7 @@ def test_run_encoder_s3(
     pipeline_s3_client_main,
     test_input_dir_s3,
     test_output_dir_s3,
+    output_prefix
 ):
     """Test that the encoder runs with S3 input and output paths and outputs the correct files."""
 
@@ -72,14 +73,36 @@ def test_run_encoder_s3(
 
     s3client = boto3.client("s3")
 
-    # Check that the correct files were created
-    for key in pipeline_s3_objects_main.keys():
-        assert s3client.head_object(Bucket=s3_bucket_and_region["bucket"], Key=key) is not None
+    s3_files = s3client.list_objects_v2(Bucket=s3_bucket_and_region['bucket'], Prefix=output_prefix)
+    s3_files = [o["Key"] for o in s3_files.get("Contents", []) if o["Key"] != output_prefix]
+    # TODO get a set of output dir files json
+    s3_files_json = [f for f in s3_files if f.endswith(".json")]
+    # TODO get a set of output dir files npy
+    s3_files_npy = [f for f in s3_files if f.endswith(".npy")]
 
-    # Check that the files have the correct format
-    for key in pipeline_s3_objects_main.keys():
-        obj = s3client.get_object(Bucket=s3_bucket_and_region["bucket"], Key=key)
-        assert np.load(obj).shape == (1, 768)
+    assert set(s3_files_json) == {
+        test_output_dir_s3 + "test_html.json",
+        test_output_dir_s3 + "test_pdf.json",
+        test_output_dir_s3 + "test_no_content_type.json",
+    }
+    assert set(s3_files_npy) == {
+        test_output_dir_s3 + "test_html.npy",
+        test_output_dir_s3 + "test_pdf.npy",
+        test_output_dir_s3 + "test_no_content_type.npy",
+    }
+
+    # TODO read in all the json files
+    for file in s3_files_json:
+        file_obj = s3client.get_object(Bucket=s3_bucket_and_region['bucket'], Key=file)
+        file_text = file_obj["Body"].read().decode("utf-8")
+        file_json = json.loads(file_text)
+        assert IndexerInput.parse_obj(file_json)
+
+    # TODO download all the npy files
+    for file in s3_files_npy:
+        file_obj = s3client.get_object(Bucket=s3_bucket_and_region['bucket'], Key=file)
+        file_text = file_obj["Body"].read().decode("utf-8")
+        assert np.load(file_text).shape == (1, 768)
 
 
 def test_run_parser_skip_already_done(
