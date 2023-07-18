@@ -1,7 +1,9 @@
 import json
+import tempfile
 from typing import Any, Sequence
 
 import boto3
+import numpy as np
 from botocore.exceptions import ClientError
 from aws_error_utils import errors
 
@@ -119,13 +121,13 @@ def save_ndarray_to_s3_as_npy(array: Any, s3_path: str) -> None:
     """Saves a NumPy ndarray to an S3 bucket as a .npy file."""
     bucket, key, s3client = validate_s3_pattern(s3_path)
 
-    # Convert the NumPy array to bytes
-    array_bytes = array.tobytes()
+    with tempfile.TemporaryFile() as f:
+        np.save(f, array)
+        f.seek(0)
 
-    # Upload the array bytes to S3
-    try:
-        s3client.put_object(Body=array_bytes, Bucket=bucket, Key=key)
-    except errors.NoSuchBucket:
-        raise ValueError(f"Bucket {bucket} does not exist")
-    except Exception as e:
-        raise e
+        try:
+            s3client.upload_fileobj(f, bucket, key)
+        except errors.NoSuchBucket:
+            raise ValueError(f"Bucket {bucket} does not exist")
+        except Exception as e:
+            raise e
