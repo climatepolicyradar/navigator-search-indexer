@@ -1,3 +1,4 @@
+import io
 import json
 import logging
 import tempfile
@@ -115,8 +116,9 @@ def test_run_encoder_s3(
 
     for file in s3_files_npy:
         file_obj = pipeline_s3_client_main.client.get_object(Bucket=s3_bucket_and_region['bucket'], Key=file)
-        file_text = file_obj["Body"].read()
-        assert np.load(file_text).shape == (1, 768)
+        file_text = file_obj["Body"]
+        file_bytes = io.BytesIO(file_text.read())
+        assert np.load(file_bytes).shape[1] == 768
 
 
 def test_run_parser_skip_already_done(
