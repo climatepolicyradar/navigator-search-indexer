@@ -80,6 +80,9 @@ def test_run_encoder_s3(
     # TODO get a set of output dir files npy
     s3_files_npy = [f for f in s3_files if f.endswith(".npy")]
 
+    assert len(s3_files_json) == 3
+    assert len(s3_files_npy) == 3
+
     assert set(s3_files_json) == {
         test_output_dir_s3 + "test_html.json",
         test_output_dir_s3 + "test_pdf.json",
