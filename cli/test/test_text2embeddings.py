@@ -5,17 +5,15 @@ from pathlib import Path
 
 import numpy as np
 from click.testing import CliRunner
-import boto3
 
 from cli.text2embeddings import run_as_cli
 from src.base import IndexerInput
-from src.s3 import get_s3_keys_with_prefix
 
 
 def test_run_encoder_local(
-        test_html_file_json,
-        test_pdf_file_json,
-        test_no_content_type_file_json,
+    test_html_file_json,
+    test_pdf_file_json,
+    test_no_content_type_file_json,
 ):
     """Test that the encoder runs with local input and output paths and outputs the correct files."""
 
@@ -57,10 +55,10 @@ def test_run_encoder_local(
 
 
 def test_s3_client(
-        s3_bucket_and_region,
-        pipeline_s3_objects_main,
-        pipeline_s3_client_main,
-        input_prefix,
+    s3_bucket_and_region,
+    pipeline_s3_objects_main,
+    pipeline_s3_client_main,
+    input_prefix,
 ):
     """Prior to running the embeddings generation tests assert that the mock s3 bucket is in the required state."""
     list_response = pipeline_s3_client_main.client.list_objects_v2(
@@ -70,13 +68,13 @@ def test_s3_client(
 
 
 def test_run_encoder_s3(
-        s3_bucket_and_region,
-        pipeline_s3_objects_main,
-        pipeline_s3_client_main,
-        test_input_dir_s3,
-        test_output_dir_s3,
-        output_prefix,
-        input_prefix
+    s3_bucket_and_region,
+    pipeline_s3_objects_main,
+    pipeline_s3_client_main,
+    test_input_dir_s3,
+    test_output_dir_s3,
+    output_prefix,
+    input_prefix
 ):
     """Test that the encoder runs with S3 input and output paths and outputs the correct files."""
 
@@ -95,13 +93,13 @@ def test_run_encoder_s3(
     assert len(files) == len(pipeline_s3_objects_main) * 2
 
     assert set(files) == {
-            f'{output_prefix}/test_html.json',
-            f'{output_prefix}/test_html.npy',
-            f'{output_prefix}/test_no_content_type.json',
-            f'{output_prefix}/test_no_content_type.npy',
-            f'{output_prefix}/test_pdf.json',
-            f'{output_prefix}/test_pdf.npy',
-        }
+        f'{output_prefix}/test_html.json',
+        f'{output_prefix}/test_html.npy',
+        f'{output_prefix}/test_no_content_type.json',
+        f'{output_prefix}/test_no_content_type.npy',
+        f'{output_prefix}/test_pdf.json',
+        f'{output_prefix}/test_pdf.npy',
+    }
 
     s3_files_json = [file for file in files if file.endswith('.json')]
     s3_files_npy = [file for file in files if file.endswith('.npy')]
@@ -110,10 +108,10 @@ def test_run_encoder_s3(
     assert len(s3_files_npy) == len(pipeline_s3_objects_main)
 
     for file in s3_files_json:
-            file_obj = pipeline_s3_client_main.client.get_object(Bucket=s3_bucket_and_region['bucket'], Key=file)
-            file_text = file_obj["Body"].read().decode("utf-8")
-            file_json = json.loads(file_text)
-            assert IndexerInput.parse_obj(file_json)
+        file_obj = pipeline_s3_client_main.client.get_object(Bucket=s3_bucket_and_region['bucket'], Key=file)
+        file_text = file_obj["Body"].read().decode("utf-8")
+        file_json = json.loads(file_text)
+        assert IndexerInput.parse_obj(file_json)
 
     for file in s3_files_npy:
         file_obj = pipeline_s3_client_main.client.get_object(Bucket=s3_bucket_and_region['bucket'], Key=file)
@@ -122,7 +120,7 @@ def test_run_encoder_s3(
 
 
 def test_run_parser_skip_already_done(
-        test_html_file_json, test_pdf_file_json, test_no_content_type_file_json, caplog
+    test_html_file_json, test_pdf_file_json, test_no_content_type_file_json, caplog
 ) -> None:
     """Test that files which have already been parsed are skipped by default."""
 
