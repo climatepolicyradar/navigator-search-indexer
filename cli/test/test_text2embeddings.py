@@ -75,7 +75,6 @@ def test_run_encoder_s3(
     test_input_dir_s3,
     test_output_dir_s3,
     output_prefix,
-    input_prefix
 ):
     """Test that the encoder runs with S3 input and output paths and outputs the correct files."""
 
@@ -84,8 +83,10 @@ def test_run_encoder_s3(
 
     assert result.exit_code == 0
 
-    list_response = pipeline_s3_client_main.client.list_objects_v2(Bucket=s3_bucket_and_region['bucket'],
-                                                                   Prefix=output_prefix)
+    list_response = pipeline_s3_client_main.client.list_objects_v2(
+        Bucket=s3_bucket_and_region['bucket'],
+        Prefix=output_prefix
+    )
 
     assert list_response['KeyCount'] == len(pipeline_s3_objects_main) * 2
 
@@ -157,8 +158,8 @@ def test_run_parser_skip_already_done(
                 all_messages = all_messages + i
 
             assert (
-                    "Found 3 documents that have already been encoded. Skipping."
-                    in all_messages
+                "Found 3 documents that have already been encoded. Skipping."
+                in all_messages
             )
 
             assert "No more documents to encode. Exiting." in all_messages
