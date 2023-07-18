@@ -44,16 +44,6 @@ def output_prefix() -> str:
 
 
 @pytest.fixture
-def test_file_name() -> str:
-    return "CCLWTEST.executive.1.1.json"
-
-
-@pytest.fixture
-def test_file_key(s3_bucket_and_region, input_prefix, test_file_name) -> str:
-    return "embeddings_input_test/test.txt"
-
-
-@pytest.fixture
 def test_input_dir_s3(s3_bucket_and_region, input_prefix) -> str:
     return f"s3://{s3_bucket_and_region['bucket']}/{input_prefix}/"
 
@@ -1064,8 +1054,10 @@ def test_html_file_json() -> dict:
 
 @pytest.fixture
 def pipeline_s3_objects_main(
-    test_file_key,
+    input_prefix,
     test_html_file_json,
+    test_pdf_file_json,
+    test_no_content_type_file_json
 ):
     """
     Return a dict of s3 objects to be used in the pipeline s3 client fixture.
@@ -1076,7 +1068,9 @@ def pipeline_s3_objects_main(
     Thus, we have a document that embeddings can be generated from in s3.
     """
     return {
-        test_file_key: bytes(json.dumps(test_html_file_json).encode("UTF-8")),
+        f'{input_prefix}/CCLWTEST.executive.1000.1000.json': bytes(json.dumps(test_html_file_json).encode("UTF-8")),
+        f'{input_prefix}/CCLWTEST.executive.1001.1001.json': bytes(json.dumps(test_pdf_file_json).encode("UTF-8")),
+        f'{input_prefix}/CCLWTEST.executive.1002.1002.json': bytes(json.dumps(test_no_content_type_file_json).encode("UTF-8")),
     }
 
 
