@@ -1,11 +1,13 @@
 from enum import Enum
-from typing import Optional, Sequence, Tuple, List
+from typing import Any, Mapping, Optional, Sequence, Tuple
 import datetime
 
 from pydantic import BaseModel, Field, root_validator
 
 CONTENT_TYPE_HTML = "text/html"
 CONTENT_TYPE_PDF = "application/pdf"
+
+Json = Mapping[str, Any]
 
 
 class BlockTypes(str, Enum):
@@ -30,8 +32,7 @@ class DocumentMetadata(BaseModel):
     category: str
     source: str
     type: str
-    # TODO: remove default value for sectors once they are in the pipeline
-    sectors: Sequence[str] = []
+    metadata: Json
 
     @root_validator
     def convert_publication_ts_to_date(cls, values):
@@ -53,12 +54,12 @@ class TextBlock(BaseModel):
     :attribute type_confidence: confidence score of the text block being of the predicted type
     """
 
-    text: List[str]
+    text: Sequence[str]
     text_block_id: str
     language: Optional[str]
     type: str
     type_confidence: float = Field(ge=0, le=1)
-    coords: Optional[List[Tuple[float, float]]] = None  # PDF only
+    coords: Optional[Sequence[Tuple[float, float]]] = None  # PDF only
     page_number: Optional[int] = None  # PDF only
 
     def to_string(self) -> str:
@@ -150,13 +151,20 @@ class IndexerInput(BaseModel):
         """Returns the text blocks contained in the document."""
         if self.document_content_type is None:
             return []
-        elif self.document_content_type == CONTENT_TYPE_PDF:
+
+        if self.document_content_type == CONTENT_TYPE_PDF:
+            assert self.pdf_data is not None
             return self.pdf_data.text_blocks
-        elif self.document_content_type == CONTENT_TYPE_HTML:
+
+        if self.document_content_type == CONTENT_TYPE_HTML:
+            assert self.html_data is not None
             if not including_invalid_html and not self.html_data.has_valid_text:
                 return []
             else:
                 return self.html_data.text_blocks
+
+        # The following raise should never happen due to input validation
+        raise RuntimeError(f"Unexpected content type: {self.document_content_type}")
 
     @root_validator
     def check_html_pdf_metadata(cls, values):
@@ -187,9 +195,3 @@ class IndexerInput(BaseModel):
             )
 
         return values
-
-
-class Text2EmbeddingsInput(IndexerInput):
-    """Input to text2embeddings. Same as the input to the indexing process, but makes no assumptions about what's in document metadata."""
-
-    document_metadata: dict

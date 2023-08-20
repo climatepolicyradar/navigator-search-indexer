@@ -6,7 +6,7 @@ import tempfile
 import pandas as pd
 import click
 
-from cli.index_data import main as run_index_data
+from cli.index_data import main_opensearch as run_index_data
 from cli.text2embeddings import main as run_text2embeddings
 from src.base import (
     IndexerInput,

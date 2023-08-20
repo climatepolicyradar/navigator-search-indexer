@@ -1,4 +1,8 @@
-"""List of expected fields in OpenSearch and their types. Used to generate the index mapping and validate documents in the indexer."""
+"""
+List of expected fields in OpenSearch and their types.
+
+Used to generate the index mapping and validate documents in the indexer.
+"""
 from typing import List, Dict
 
 # Fields that should appear in every Opensearch document

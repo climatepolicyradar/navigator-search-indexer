@@ -1,17 +1,18 @@
 """Index data into a running Opensearch index."""
 
 import os
-from pathlib import Path
-from typing import Generator, Sequence, Tuple, Union, Optional
+import sys
 import logging
 import logging.config
+from pathlib import Path
+from typing import Generator, Optional, Sequence, Tuple, Union, cast
 
 import numpy as np
 import click
 from cloudpathlib import S3Path
 from tqdm.auto import tqdm
 
-from src.index import OpenSearchIndex
+from src.index.opensearch import populate_opensearch
 from src.base import IndexerInput, CONTENT_TYPE_HTML, CONTENT_TYPE_PDF
 from src.index_mapping import COMMON_FIELDS
 from src import config
@@ -36,7 +37,7 @@ DEFAULT_LOGGING = {
     "formatters": {"json": {"()": "pythonjsonlogger.jsonlogger.JsonFormatter"}},
 }
 
-logger = logging.getLogger(__name__)
+_LOGGER = logging.getLogger(__name__)
 logging.config.dictConfig(DEFAULT_LOGGING)
 
 
@@ -62,10 +63,14 @@ def get_core_document_generator(
     tasks: Sequence[IndexerInput], embedding_dir_as_path: Union[Path, S3Path]
 ) -> Generator[dict, None, None]:
     """
-    Generator for core documents to index: those with fields `for_search_document_name` and `for_search_document_description`.
+    Generator for core documents to index
+
+    Documents to index are those with fields `for_search_document_name` and
+    `for_search_document_description`.
 
     :param tasks: list of tasks from the document parser
-    :param embedding_dir_as_path: directory containing embeddings .npy files. These are named with IDs corresponding to the IDs in the tasks.
+    :param embedding_dir_as_path: directory containing embeddings .npy files.
+        These are named with IDs corresponding to the IDs in the tasks.
     :yield Generator[dict, None, None]: generator of Opensearch documents
     """
 
@@ -94,10 +99,15 @@ def get_text_document_generator(
     content_types: Optional[Sequence[str]] = None,
 ) -> Generator[dict, None, None]:
     """
-    Get generator for text documents to index: those containing text passages and their embeddings. Optionally filter by whether text passages have been translated and/or the document content type.
+    Get generator for text documents to index.
+
+    Documents to index are those containing text passages and their embeddings.
+    Optionally filter by whether text passages have been translated and/or the
+    document content type.
 
     :param tasks: list of tasks from the document parser
-    :param embedding_dir_as_path: directory containing embeddings .npy files. These are named with IDs corresponding to the IDs in the tasks.
+    :param embedding_dir_as_path: directory containing embeddings .npy files.
+        These are named with IDs corresponding to the IDs in the tasks.
     :param translated: optionally filter on whether text passages are translated
     :param content_types: optionally filter on content types
     :yield Generator[dict, None, None]: generator of Opensearch documents
@@ -109,11 +119,13 @@ def get_text_document_generator(
     if content_types is not None:
         tasks = [task for task in tasks if task.document_content_type in content_types]
 
-    logger.info(
+    _LOGGER.info(
         "Filtering unwanted text block types.",
-        extra={"props": {"BLOCKS_TO_FILTER": config.BLOCKS_TO_FILTER}}
+        extra={"props": {"BLOCKS_TO_FILTER": config.BLOCKS_TO_FILTER}},
     )
-    tasks = filter_on_block_type(inputs=tasks, remove_block_types=config.BLOCKS_TO_FILTER)
+    tasks = filter_on_block_type(
+        inputs=tasks, remove_block_types=config.BLOCKS_TO_FILTER
+    )
 
     for task in tasks:
         all_metadata = get_metadata_dict(task)
@@ -135,93 +147,18 @@ def get_text_document_generator(
             }
 
 
-def delete_index(index_name: str):
-    """
-    Deletes the index.
-
-    :param index_name: name of index to delete
-    """
-
-    logger.info(f"Deleting index {index_name}")
-
-    opensearch = OpenSearchIndex(
-        url=os.environ["OPENSEARCH_URL"],
-        username=os.environ["OPENSEARCH_USER"],
-        password=os.environ["OPENSEARCH_PASSWORD"],
-        index_name=index_name,
-        opensearch_connector_kwargs={
-            "use_ssl": config.OPENSEARCH_USE_SSL,
-            "verify_certs": config.OPENSEARCH_VERIFY_CERTS,
-            "ssl_show_warn": config.OPENSEARCH_SSL_SHOW_WARN,
-        },
-        embedding_dim=config.OPENSEARCH_INDEX_EMBEDDING_DIM,
-    )
-    opensearch.delete_index()
-
-
-def populate_and_warmup_index(
-    doc_generator: Generator[dict, None, None], index_name: str
-):
-    """
-    Load documents into an Opensearch index and load the KNN index into native memory (warmup).
-
-    :param doc_generator: generator of Opensearch documents to index
-    :param index_name: name of index to load documents into
-    """
-
-    logger.info(f"Loading documents into index {index_name}")
-
-    opensearch = OpenSearchIndex(
-        url=os.environ["OPENSEARCH_URL"],
-        username=os.environ["OPENSEARCH_USER"],
-        password=os.environ["OPENSEARCH_PASSWORD"],
-        index_name=index_name,
-        opensearch_connector_kwargs={
-            "use_ssl": config.OPENSEARCH_USE_SSL,
-            "verify_certs": config.OPENSEARCH_VERIFY_CERTS,
-            "ssl_show_warn": config.OPENSEARCH_SSL_SHOW_WARN,
-        },
-        embedding_dim=config.OPENSEARCH_INDEX_EMBEDDING_DIM,
-    )
-    # Disabling replicas during indexing means that the KNN index is copied to replicas after indexing is complete rather than multiple, potentially different KNN indices being created in parallel.
-    # It should also speed up indexing.
-    opensearch.create_index(n_replicas=0)
-
-    # We disable index refreshes during indexing to speed up the indexing process,
-    # and to ensure only 1 segment is created per shard. This also speeds up KNN
-    # queries and aggregations according to the Opensearch and Elasticsearch docs.
-    opensearch.set_index_refresh_interval(-1, timeout=60)
-    opensearch.bulk_index(actions=doc_generator)
-    opensearch.set_num_replicas(config.OPENSEARCH_INDEX_NUM_REPLICAS)
-
-    # TODO: we wrap this in a try/except block because for now because sometimes it times out, and we don't want the whole >1hr indexing process to fail if this happens. We should stop doing this if we ever care what the refresh interval is, i.e. when we plan on incrementally adding data to the index.
-    try:
-        # 1 second refresh interval is the Opensearch default
-        opensearch.set_index_refresh_interval(1, timeout=60)
-    except Exception as e:
-        logger.info(f"Failed to set index refresh interval after indexing: {e}")
-
-    opensearch.warmup_knn()
-
-
-def main(
+def _get_index_tasks(
     text2embedding_output_dir: str,
     s3: bool,
     files_to_index: Optional[str] = None,
     limit: Optional[int] = None,
-) -> None:
-    """
-    Index documents into Opensearch.
-
-    :param pdf_parser_output_dir: directory or S3 folder containing output JSON files from the PDF parser.
-    :param embedding_dir: directory or S3 folder containing embeddings from the text2embeddings CLI.
-    """
+) -> Tuple[Sequence[IndexerInput], Union[Path, S3Path]]:
     if s3:
-        embedding_dir_as_path = S3Path(text2embedding_output_dir)
+        embedding_dir_as_path = cast(S3Path, S3Path(text2embedding_output_dir))
     else:
         embedding_dir_as_path = Path(text2embedding_output_dir)
 
-    logger.info(f"Getting tasks from {'s3' if s3 else 'local'}")
+    _LOGGER.info(f"Getting tasks from {'s3' if s3 else 'local'}")
     tasks = [
         IndexerInput.parse_raw(path.read_text())
         for path in tqdm(list(embedding_dir_as_path.glob("*.json")))
@@ -235,29 +172,78 @@ def main(
         if missing_ids := set(files_to_index.split(",")) - set(
             [task.document_id for task in tasks]
         ):
-            logger.warning(
+            _LOGGER.warning(
                 f"Missing files in the input directory for {', '.join(missing_ids)}"
             )
 
     if limit is not None:
         tasks = tasks[:limit]
 
-    index_args: Tuple[Generator[dict, None, None], str] = [
-        (get_core_document_generator(tasks, embedding_dir_as_path), f"{config.OPENSEARCH_INDEX_PREFIX}_core" ),
-        (get_text_document_generator(tasks, embedding_dir_as_path, translated=False, content_types=[CONTENT_TYPE_PDF]), f"{config.OPENSEARCH_INDEX_PREFIX}_pdfs_non_translated"),
-        (get_text_document_generator(tasks, embedding_dir_as_path, translated=True, content_types=[CONTENT_TYPE_PDF], ), f"{config.OPENSEARCH_INDEX_PREFIX}_pdfs_translated"),
-        (get_text_document_generator(tasks, embedding_dir_as_path, translated=False, content_types=[CONTENT_TYPE_HTML]), f"{config.OPENSEARCH_INDEX_PREFIX}_htmls_non_translated"),
-        (get_text_document_generator(tasks, embedding_dir_as_path, translated=True, content_types=[CONTENT_TYPE_HTML]), f"{config.OPENSEARCH_INDEX_PREFIX}_htmls_translated"),
+    return tasks, embedding_dir_as_path
+
+
+def main_opensearch(
+    text2embedding_output_dir: str,
+    s3: bool,
+    files_to_index: Optional[str] = None,
+    limit: Optional[int] = None,
+) -> None:
+    """
+    Index documents into Opensearch.
+
+    :param pdf_parser_output_dir: directory or S3 folder containing output JSON
+        files from the PDF parser.
+    :param embedding_dir: directory or S3 folder containing embeddings from the
+        text2embeddings CLI.
+    """
+    tasks, embedding_dir_as_path = _get_index_tasks(
+        text2embedding_output_dir, s3, files_to_index, limit
+    )
+
+    indices_to_populate: Sequence[Tuple[str, Generator[dict, None, None]]] = [
+        (
+            f"{config.OPENSEARCH_INDEX_PREFIX}_core",
+            get_core_document_generator(tasks, embedding_dir_as_path),
+        ),
+        (
+            f"{config.OPENSEARCH_INDEX_PREFIX}_pdfs_non_translated",
+            get_text_document_generator(
+                tasks,
+                embedding_dir_as_path,
+                translated=False,
+                content_types=[CONTENT_TYPE_PDF],
+            ),
+        ),
+        (
+            f"{config.OPENSEARCH_INDEX_PREFIX}_pdfs_translated",
+            get_text_document_generator(
+                tasks,
+                embedding_dir_as_path,
+                translated=True,
+                content_types=[CONTENT_TYPE_PDF],
+            ),
+        ),
+        (
+            f"{config.OPENSEARCH_INDEX_PREFIX}_htmls_non_translated",
+            get_text_document_generator(
+                tasks,
+                embedding_dir_as_path,
+                translated=False,
+                content_types=[CONTENT_TYPE_HTML],
+            ),
+        ),
+        (
+            f"{config.OPENSEARCH_INDEX_PREFIX}_htmls_translated",
+            get_text_document_generator(
+                tasks,
+                embedding_dir_as_path,
+                translated=True,
+                content_types=[CONTENT_TYPE_HTML],
+            ),
+        ),
     ]
 
-    # First remove the indices
-    for _, index_name in index_args:
-        delete_index(index_name)
-    
-    # Now populate
-    for generator, index_name in index_args:
-        populate_and_warmup_index(generator, index_name)
-
+    populate_opensearch(indices_to_populate)
 
 
 @click.command()
@@ -280,13 +266,28 @@ def main(
     required=False,
     help="Optionally limit the number of documents to index.",
 )
+@click.option(
+    "--index-type",
+    "-i",
+    type=click.Choice(["opensearch", "vespa"]),
+    case_sensitive=False,
+)
 def run_as_cli(
     text2embedding_output_dir: str,
     s3: bool,
     files_to_index: Optional[str],
     limit: Optional[int],
+    index_type: str,
 ) -> None:
-    main(text2embedding_output_dir, s3, files_to_index, limit)
+    if index_type.lower() == "opensearch":
+        main_opensearch(text2embedding_output_dir, s3, files_to_index, limit)
+        sys.exit(0)
+    if index_type.lower() == "vespa":
+        # TODO: implement main_vespa(...)
+        _LOGGER.error("Vespa indexing not yet implemented")
+        sys.exit(1)
+    _LOGGER.error(f"Unknown index type: {index_type}")
+    sys.exit(1)
 
 
 if __name__ == "__main__":

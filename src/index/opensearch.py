@@ -1,6 +1,8 @@
-from time import sleep
-from typing import Optional, Iterable
 import logging
+import os
+from pathlib import Path
+from time import sleep
+from typing import Generator, Optional, Iterable, Sequence, Tuple
 
 from opensearchpy import ConnectionTimeout, OpenSearch, helpers
 from tqdm.auto import tqdm
@@ -9,11 +11,17 @@ import requests
 from src import config
 from src.index_mapping import ALL_FIELDS
 
-logger = logging.getLogger(__name__)
+_LOGGER = logging.getLogger(__name__)
 
 
 class OpenSearchIndex:
-    """Methods to connect to OpenSearch instance, define an index mapping, and load data into an index."""
+    """
+    Useful methods on an Opensearch index.
+
+    - Connect to OpenSearch instance
+    - Define an index mapping
+    - Load data into an index
+    """
 
     def __init__(
         self,
@@ -124,7 +132,8 @@ class OpenSearchIndex:
                             "preserve_original": True,
                         }
                     },
-                    # This analyser folds non-ASCII characters into ASCII equivalents, but preserves the original.
+                    # This analyser folds non-ASCII characters into ASCII equivalents,
+                    # but preserves the original.
                     # E.g. a search for "é" will return results for "e" and "é".
                     "analyzer": {
                         "folding": {
@@ -132,7 +141,8 @@ class OpenSearchIndex:
                             "filter": ["lowercase", "ascii_folding_preserve_original"],
                         }
                     },
-                    # This normalizer does the same as the folding analyser, but is used for keyword fields.
+                    # This normalizer does the same as the folding analyser, but is
+                    # used for keyword fields.
                     "normalizer": {
                         "folding": {
                             "type": "custom",
@@ -146,9 +156,7 @@ class OpenSearchIndex:
         }
 
     def delete_index(self):
-        """Create the index, deleting any existing index of the same name first.
-
-        """
+        """Delete the current index"""
         delete_attempt_count = 0
         delete_succeeded = False
         while delete_attempt_count < 5 and not delete_succeeded:
@@ -169,6 +177,7 @@ class OpenSearchIndex:
             )
 
     def create_index(self, n_replicas: int):
+        """Create the index this object is configured to interqact with"""
         create_attempt_count = 0
         create_succeeded = False
         while create_attempt_count < 5 and not create_succeeded:
@@ -189,7 +198,11 @@ class OpenSearchIndex:
             )
 
     def set_index_refresh_interval(self, interval: int, timeout: int = 10):
-        """Set the refresh interval (seconds) for the index. If interval=-1, refresh is disabled."""
+        """
+        Set the refresh interval (seconds) for the index.
+
+        If interval=-1, refresh is disabled.
+        """
 
         interval_seconds = interval if interval == -1 else f"{interval}s"
         timeout_seconds = f"{timeout}s"
@@ -203,7 +216,8 @@ class OpenSearchIndex:
     def bulk_index(self, actions: Iterable[dict]):
         """Bulk load data into the index.
 
-        # TODO: in future, we may want to expose `streaming_bulk` kwargs to allow for more control over the bulk load.
+        # TODO: in future, we may want to expose `streaming_bulk` kwargs to allow
+        for more control over the bulk load.
 
         Args:
             actions (Iterable[dict]): a list of documents or actions to be indexed.
@@ -227,10 +241,10 @@ class OpenSearchIndex:
                 batch_successes += 1
             else:
                 batch_failures += 1
-                logger.error(f"Failed to process batch: '{info}'")
+                _LOGGER.error(f"Failed to process batch: '{info}'")
 
-        logger.info(f"Processed {batch_successes} batch(es) successfully")
-        logger.info(f"Processed {batch_failures} batch(es) unsuccessfully")
+        _LOGGER.info(f"Processed {batch_successes} batch(es) successfully")
+        _LOGGER.info(f"Processed {batch_failures} batch(es) unsuccessfully")
 
         if batch_failures:
             raise RuntimeError(
@@ -240,7 +254,8 @@ class OpenSearchIndex:
     def warmup_knn(self) -> bool:
         """Load the KNN index into memory by calling the index warmup API.
 
-        Returns when the warmup is complete, or returns False and logs the error message if it fails.
+        Returns when the warmup is complete, or returns False and logs the error
+        message if it fails.
 
         Returns:
             bool: whether the warmup request succeeded
@@ -256,8 +271,9 @@ class OpenSearchIndex:
         if response.status_code == 200:
             return True
         else:
-            logger.warning(
-                f"KNN index warmup API call returned non-200 status code. Full response {response.json()}"
+            _LOGGER.warning(
+                "KNN index warmup API call returned non-200 status code. "
+                f"Full response {response.json()}"
             )
             return False
 
@@ -271,3 +287,92 @@ class OpenSearchIndex:
             index=self.index_name,
             body={"index.number_of_replicas": n_replicas},
         )
+
+
+def populate_and_warmup_index(
+    doc_generator: Generator[dict, None, None], index_name: str
+):
+    """
+    Load documents into an Opensearch index.
+
+    This function also loads the KNN index into native memory (warmup).
+
+    :param doc_generator: generator of Opensearch documents to index
+    :param index_name: name of index to load documents into
+    """
+
+    _LOGGER.info(f"Loading documents into index {index_name}")
+
+    opensearch = OpenSearchIndex(
+        url=os.environ["OPENSEARCH_URL"],
+        username=os.environ["OPENSEARCH_USER"],
+        password=os.environ["OPENSEARCH_PASSWORD"],
+        index_name=index_name,
+        opensearch_connector_kwargs={
+            "use_ssl": config.OPENSEARCH_USE_SSL,
+            "verify_certs": config.OPENSEARCH_VERIFY_CERTS,
+            "ssl_show_warn": config.OPENSEARCH_SSL_SHOW_WARN,
+        },
+        embedding_dim=config.OPENSEARCH_INDEX_EMBEDDING_DIM,
+    )
+
+    # Disabling replicas during indexing means that the KNN index is copied to
+    # replicas after indexing is complete rather than multiple, potentially
+    # different KNN indices being created in parallel.
+    # It should also speed up indexing.
+    opensearch.create_index(n_replicas=0)
+
+    # We disable index refreshes during indexing to speed up the indexing process,
+    # and to ensure only 1 segment is created per shard. This also speeds up KNN
+    # queries and aggregations according to the Opensearch and Elasticsearch docs.
+    opensearch.set_index_refresh_interval(-1, timeout=60)
+    opensearch.bulk_index(actions=doc_generator)
+    opensearch.set_num_replicas(config.OPENSEARCH_INDEX_NUM_REPLICAS)
+
+    # TODO: we wrap this in a try/except block because for now because sometimes
+    # it times out, and we don't want the whole >1hr indexing process to fail if
+    # this happens. We should stop doing this if we ever care what the refresh
+    # interval is, i.e. when we plan on incrementally adding data to the index.
+    try:
+        # 1 second refresh interval is the Opensearch default
+        opensearch.set_index_refresh_interval(1, timeout=60)
+    except Exception as e:
+        _LOGGER.info(f"Failed to set index refresh interval after indexing: {e}")
+
+    opensearch.warmup_knn()
+
+
+def delete_index(index_name: str):
+    """
+    Deletes the index.
+
+    :param index_name: name of index to delete
+    """
+
+    _LOGGER.info(f"Deleting index {index_name}")
+
+    opensearch = OpenSearchIndex(
+        url=os.environ["OPENSEARCH_URL"],
+        username=os.environ["OPENSEARCH_USER"],
+        password=os.environ["OPENSEARCH_PASSWORD"],
+        index_name=index_name,
+        opensearch_connector_kwargs={
+            "use_ssl": config.OPENSEARCH_USE_SSL,
+            "verify_certs": config.OPENSEARCH_VERIFY_CERTS,
+            "ssl_show_warn": config.OPENSEARCH_SSL_SHOW_WARN,
+        },
+        embedding_dim=config.OPENSEARCH_INDEX_EMBEDDING_DIM,
+    )
+    opensearch.delete_index()
+
+
+def populate_opensearch(
+    indices_to_populate: Sequence[Tuple[str, Generator[dict, None, None]]]
+):
+    """Populate all indices in the given list"""
+    # First remove the indices
+    for index_name, _ in indices_to_populate:
+        delete_index(index_name)
+
+    for index_name, doc_generator in indices_to_populate:
+        populate_and_warmup_index(doc_generator, index_name)
