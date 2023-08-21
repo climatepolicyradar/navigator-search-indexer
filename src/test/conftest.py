@@ -7,7 +7,7 @@ import botocore.client
 import pytest
 from moto import mock_s3
 
-from src.base import IndexerInput, DocumentMetadata, HTMLData
+from cpr_data_access.parser_models import ParserOutput, DocumentMetadata, HTMLData
 from cli.test.conftest import get_text_block
 
 
@@ -94,15 +94,15 @@ def pipeline_s3_client(s3_bucket_and_region, pipeline_s3_objects):
         yield s3_client
 
 
-def get_indexer_input(
+def get_parser_output(
     html_data: Union[HTMLData, None],
     source_url: Union[str, None],
     languages: Union[Sequence[str], None],
     content_type: Union[str, None],
     translated: bool
 ):
-    """Return a IndexerInput object with the given parameters."""
-    return IndexerInput(
+    """Return a ParserOutput object with the given parameters."""
+    return ParserOutput(
             document_id="test_id",
             document_metadata=DocumentMetadata(
                 publication_ts=datetime.datetime.now(),
@@ -128,10 +128,10 @@ def get_indexer_input(
 
 
 @pytest.fixture
-def test_indexer_input_array() -> List[IndexerInput]:
-    """Returns an array of indexer inputs with varying block types and non/valid text."""
+def test_parser_output_array() -> List[ParserOutput]:
+    """Returns an array of parser outputs with varying block types and non/valid text."""
     return [
-        get_indexer_input(
+        get_parser_output(
             html_data=HTMLData(
                 has_valid_text=True,
                 text_blocks=[
@@ -149,7 +149,7 @@ def test_indexer_input_array() -> List[IndexerInput]:
             content_type="text/html",
             translated=True,
         ),
-        get_indexer_input(
+        get_parser_output(
             html_data=HTMLData(
                 has_valid_text=False,
                 text_blocks=[
@@ -167,9 +167,9 @@ def test_indexer_input_array() -> List[IndexerInput]:
 
 
 @pytest.fixture
-def test_indexer_input_no_source_url_no_lang_no_data() -> List[IndexerInput]:
+def test_indexer_input_no_source_url_no_lang_no_data() -> List[ParserOutput]:
     return [
-        get_indexer_input(
+        get_parser_output(
             html_data=None,
             source_url=None,
             languages=None,
@@ -180,9 +180,9 @@ def test_indexer_input_no_source_url_no_lang_no_data() -> List[IndexerInput]:
 
 
 @pytest.fixture
-def test_indexer_input_source_url_no_lang_no_data() -> List[IndexerInput]:
+def test_parser_output_source_url_no_lang_no_data() -> List[ParserOutput]:
     return [
-        get_indexer_input(
+        get_parser_output(
             html_data=None,
             source_url="https://www.example.com/files/climate-document.pdf",
             languages=None,
@@ -193,9 +193,9 @@ def test_indexer_input_source_url_no_lang_no_data() -> List[IndexerInput]:
 
 
 @pytest.fixture
-def test_indexer_input_source_url_supported_lang_data() -> List[IndexerInput]:
+def test_parser_output_source_url_supported_lang_data() -> List[ParserOutput]:
     return [
-        get_indexer_input(
+        get_parser_output(
             html_data=HTMLData(
                 has_valid_text=True,
                 text_blocks=[
@@ -212,9 +212,9 @@ def test_indexer_input_source_url_supported_lang_data() -> List[IndexerInput]:
 
 
 @pytest.fixture
-def test_indexer_input_source_url_un_supported_lang_data() -> List[IndexerInput]:
+def test_parser_output_source_url_un_supported_lang_data() -> List[ParserOutput]:
     return [
-        get_indexer_input(
+        get_parser_output(
             html_data=HTMLData(
                 has_valid_text=True,
                 text_blocks=[

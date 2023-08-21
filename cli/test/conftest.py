@@ -6,7 +6,7 @@ import botocore.client
 import pytest
 from moto import mock_s3
 
-from src.base import TextBlock
+from cpr_data_access.parser_models import TextBlock
 
 
 class S3Client:
@@ -60,12 +60,25 @@ def test_pdf_file_json() -> dict:
         "document_name": "test_pdf",
         "document_description": "test_pdf_description",
         "document_source_url": "https://cdn.climatepolicyradar.org/EUR/2013/EUR-2013-01-01-Overview+of+CAP+Reform"
-        "+2014-2020_6237180d8c443d72c06c9167019ca177.pdf",
+                               "+2014-2020_6237180d8c443d72c06c9167019ca177.pdf",
         "document_cdn_object": "EUR/2013/EUR-2013-01-01-Overview+of+CAP+Reform+2014"
-        "-2020_6237180d8c443d72c06c9167019ca177.pdf",
+                               "-2020_6237180d8c443d72c06c9167019ca177.pdf",
         "document_md5_sum": "abcdefghijk",
         "languages": ["en"],
         "document_metadata": {
+            "name": "test_pdf",
+            "description": "test_pdf_description",
+            "import_id": "CCLW.executive.1003.0",
+            "family_import_id": "CCLW.executive.1003",
+            "slug": "test_pdf",
+            "source_url": "https://cdn.climatepolicyradar.org/EUR/2013/EUR-2013-01-01-Overview+of+CAP+Reform+2014-2020_6237180d8c443d72c06c9167019ca177.pdf",
+            "download_url": "https://cdn.climatepolicyradar.org/EUR/2013/EUR-2013-01-01-Overview+of+CAP+Reform+2014-2020_6237180d8c443d72c06c9167019ca177.pdf",
+            "languages": [
+                "en"
+            ],
+            "metadata": {
+                "test_key": "test_value"
+            },
             "publication_ts": "2022-10-25 12:43:00.869045",
             "geography": "test_geo",
             "category": "test_category",
@@ -685,6 +698,19 @@ def test_no_content_type_file_json() -> dict:
         "document_cdn_object": None,
         "document_md5_sum": None,
         "document_metadata": {
+            "name": "test_pdf",
+            "description": "test_pdf_description",
+            "import_id": "CCLW.executive.1003.0",
+            "family_import_id": "CCLW.executive.1003",
+            "slug": "test_pdf",
+            "source_url": "https://cdn.climatepolicyradar.org/EUR/2013/EUR-2013-01-01-Overview+of+CAP+Reform+2014-2020_6237180d8c443d72c06c9167019ca177.pdf",
+            "download_url": "https://cdn.climatepolicyradar.org/EUR/2013/EUR-2013-01-01-Overview+of+CAP+Reform+2014-2020_6237180d8c443d72c06c9167019ca177.pdf",
+            "languages": [
+                "en"
+            ],
+            "metadata": {
+                "test_key": "test_value"
+            },
             "publication_ts": "2022-10-25 12:45:00.869045",
             "geography": "test_geo",
             "category": "test_category",
@@ -712,6 +738,19 @@ def test_html_file_json() -> dict:
         "document_md5_sum": None,
         "languages": ["en"],
         "document_metadata": {
+            "name": "test_pdf",
+            "description": "test_pdf_description",
+            "import_id": "CCLW.executive.1003.0",
+            "family_import_id": "CCLW.executive.1003",
+            "slug": "test_pdf",
+            "source_url": "https://cdn.climatepolicyradar.org/EUR/2013/EUR-2013-01-01-Overview+of+CAP+Reform+2014-2020_6237180d8c443d72c06c9167019ca177.pdf",
+            "download_url": "https://cdn.climatepolicyradar.org/EUR/2013/EUR-2013-01-01-Overview+of+CAP+Reform+2014-2020_6237180d8c443d72c06c9167019ca177.pdf",
+            "languages": [
+                "en"
+            ],
+            "metadata": {
+                "test_key": "test_value"
+            },
             "publication_ts": "2022-10-25 12:43:00.869045",
             "geography": "test_geo",
             "category": "test_category",
@@ -1054,10 +1093,10 @@ def test_html_file_json() -> dict:
 
 @pytest.fixture
 def pipeline_s3_objects_main(
-    input_prefix,
-    test_html_file_json,
-    test_pdf_file_json,
-    test_no_content_type_file_json
+        input_prefix,
+        test_html_file_json,
+        test_pdf_file_json,
+        test_no_content_type_file_json
 ):
     """
     Return a dict of s3 objects to be used in the pipeline s3 client fixture.
@@ -1068,9 +1107,12 @@ def pipeline_s3_objects_main(
     Thus, we have a document that embeddings can be generated from in s3.
     """
     return {
-        f'{input_prefix}/CCLWTEST.executive.1000.1000.json': bytes(json.dumps(test_html_file_json).encode("UTF-8")),
-        f'{input_prefix}/CCLWTEST.executive.1001.1001.json': bytes(json.dumps(test_pdf_file_json).encode("UTF-8")),
-        f'{input_prefix}/CCLWTEST.executive.1002.1002.json': bytes(json.dumps(test_no_content_type_file_json).encode("UTF-8")),
+        f'{input_prefix}/CCLWTEST.executive.1000.1000.json': bytes(
+            json.dumps(test_html_file_json).encode("UTF-8")),
+        f'{input_prefix}/CCLWTEST.executive.1001.1001.json': bytes(
+            json.dumps(test_pdf_file_json).encode("UTF-8")),
+        f'{input_prefix}/CCLWTEST.executive.1002.1002.json': bytes(
+            json.dumps(test_no_content_type_file_json).encode("UTF-8")),
     }
 
 

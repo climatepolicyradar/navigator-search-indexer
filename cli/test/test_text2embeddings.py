@@ -8,7 +8,7 @@ import numpy as np
 from click.testing import CliRunner
 
 from cli.text2embeddings import run_as_cli
-from src.base import IndexerInput
+from cpr_data_access.parser_models import ParserOutput
 
 
 def test_run_encoder_local(
@@ -45,7 +45,7 @@ def test_run_encoder_local(
             }
 
             for path in Path(output_dir).glob("*.json"):
-                assert IndexerInput.parse_obj(json.loads(path.read_text()))
+                assert ParserOutput.parse_obj(json.loads(path.read_text()))
 
             for path in Path(output_dir).glob("*.npy"):
                 assert np.load(str(path)).shape[1] == 768
@@ -113,7 +113,7 @@ def test_run_encoder_s3(
         file_obj = pipeline_s3_client_main.client.get_object(Bucket=s3_bucket_and_region['bucket'], Key=file)
         file_text = file_obj["Body"].read().decode("utf-8")
         file_json = json.loads(file_text)
-        assert IndexerInput.parse_obj(file_json)
+        assert ParserOutput.parse_obj(file_json)
 
     for file in s3_files_npy:
         file_obj = pipeline_s3_client_main.client.get_object(Bucket=s3_bucket_and_region['bucket'], Key=file)

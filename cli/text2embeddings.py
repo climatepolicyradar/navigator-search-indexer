@@ -16,7 +16,7 @@ from src.ml import SBERTEncoder
 from src import config
 from src.utils import (
     filter_on_block_type,
-    encode_indexer_input,
+    encode_parser_output,
     get_files_to_process,
     get_Text2EmbeddingsInput_array,
 )
@@ -197,7 +197,7 @@ def run_as_cli(
             )
             continue
 
-        description_embedding, text_embeddings = encode_indexer_input(
+        description_embedding, text_embeddings = encode_parser_output(
             encoder, task, config.ENCODING_BATCH_SIZE, device=device
         )
 

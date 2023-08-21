@@ -7,15 +7,15 @@ import numpy as np
 
 from src import config
 
-from src.base import IndexerInput, TextBlock, BlockTypes, Text2EmbeddingsInput
+from cpr_data_access.parser_models import ParserOutput, TextBlock, BlockType
 from src.ml import SentenceEncoder
 from src.s3 import get_s3_keys_with_prefix, s3_object_read_text
 
 logger = logging.getLogger(__name__)
 
 
-def replace_text_blocks(block: IndexerInput, new_text_blocks: Sequence[TextBlock]):
-    """Updates the text blocks in the IndexerInput object."""
+def replace_text_blocks(block: ParserOutput, new_text_blocks: Sequence[TextBlock]):
+    """Updates the text blocks in the ParserOutput object."""
     if block.pdf_data is not None:
         block.pdf_data.text_blocks = new_text_blocks
     elif block.html_data is not None:
@@ -25,19 +25,23 @@ def replace_text_blocks(block: IndexerInput, new_text_blocks: Sequence[TextBlock
 
 
 def filter_blocks(
-    indexer_input: IndexerInput, remove_block_types: Sequence[str]
+    parser_output: ParserOutput, remove_block_types: Sequence[str]
 ) -> Sequence[TextBlock]:
-    """Given an Indexer Input filter the contained TextBlocks and return this as a list of TextBlocks."""
+    """
+    Given an ParserOutput filter the contained TextBlocks.
+
+    Return this as a list of TextBlocks.
+    """
     filtered_blocks = []
-    for block in indexer_input.get_text_blocks(including_invalid_html=True):
+    for block in parser_output.text_blocks:
         if block.type.title() not in remove_block_types:
             filtered_blocks.append(block)
         else:
             logger.info(
-                f"Filtered {block.type} block from {indexer_input.document_id}.",
+                f"Filtered {block.type} block from {parser_output.document_id}.",
                 extra={
                     "props": {
-                        "document_id": indexer_input.document_id,
+                        "document_id": parser_output.document_id,
                         "block_type": block.type,
                         "remove_block_types": remove_block_types,
                     }
@@ -47,16 +51,20 @@ def filter_blocks(
 
 
 def filter_on_block_type(
-    inputs: Sequence[IndexerInput], remove_block_types: List[str]
-) -> Sequence[IndexerInput]:
-    """Filter a sequence of IndexerInputs to remove the textblocks that are of the types declared in the remove
-    block types array."""
+    inputs: Sequence[ParserOutput], remove_block_types: List[str]
+) -> Sequence[ParserOutput]:
+    """
+    Filter a sequence of ParserOutputs.
+
+    Remove the text blocks that are of the types declared in the remove block types
+    array."""
     for _filter in remove_block_types:
         try:
-            BlockTypes(_filter)
+            BlockType(_filter)
         except NameError:
             logger.warning(
-                f"Blocks to filter should be of a known block type, removing {_filter} from the list."
+                f"Blocks to filter should be of a known block type, removing {_filter} "
+                f"from the list. "
             )
             remove_block_types.remove(_filter)
 
@@ -64,7 +72,7 @@ def filter_on_block_type(
         replace_text_blocks(
             block=_input,
             new_text_blocks=filter_blocks(
-                indexer_input=_input, remove_block_types=remove_block_types
+                parser_output=_input, remove_block_types=remove_block_types
             ),
         )
         for _input in inputs
@@ -77,17 +85,20 @@ def get_ids_with_suffix(files: Sequence[str], suffix: str) -> Set[str]:
     return set([os.path.splitext(os.path.basename(file))[0] for file in files])
 
 
-def encode_indexer_input(
+def encode_parser_output(
     encoder: SentenceEncoder,
-    input_obj: Text2EmbeddingsInput,
+    input_obj: ParserOutput,
     batch_size: int,
     device: Optional[str] = None,
 ) -> Tuple[np.ndarray, Optional[np.ndarray]]:
     """
-    Produce a numpy array of description embedding and a numpy array of text embeddings for an indexer input.
+    Encode a parser output object.
+
+    Produce a numpy array of description embedding and a numpy array of text
+    embeddings for a parser output.
 
     :param encoder: sentence encoder
-    :param input_obj: indexer input object
+    :param input_obj: parser output object
     :param batch_size: batch size for encoding text blocks
     :param device: device to use for encoding
     """
@@ -96,11 +107,9 @@ def encode_indexer_input(
         input_obj.document_description, device=device
     )
 
-    text_blocks = input_obj.get_text_blocks()
-
-    if text_blocks:
+    if input_obj.text_blocks:
         text_embeddings = encoder.encode_batch(
-            [block.to_string() for block in text_blocks],
+            [block.to_string() for block in input_obj.text_blocks],
             batch_size=batch_size,
             device=device,
         )
@@ -113,7 +122,11 @@ def encode_indexer_input(
 def get_files_to_process(
     s3: bool, input_dir: str, output_dir: str, redo: bool, limit: Union[None, int]
 ) -> Sequence[str]:
-    """Get the list of files to process, either from the config or from the input directory."""
+    """
+    Get the list of files to process.
+
+    Either from the config or from the input directory.
+    """
     if s3:
         document_paths_previously_parsed = get_s3_keys_with_prefix(output_dir)
     else:
@@ -135,8 +148,8 @@ def get_files_to_process(
 
     if not redo and document_ids_previously_parsed.intersection(files_to_process_ids):
         logger.warning(
-            f"Found {len(document_ids_previously_parsed.intersection(files_to_process_ids))} documents that have "
-            f"already been encoded. Skipping. "
+            f"{len(document_ids_previously_parsed.intersection(files_to_process_ids))} "
+            f"documents found that have already been encoded. Skipping. "
         )
         files_to_process_ids = [
             id_
@@ -150,7 +163,8 @@ def get_files_to_process(
 
     if limit:
         logger.info(
-            f"Limiting to {files_to_process_ids} documents as the --limit flag has been passed."
+            f"Limiting to {files_to_process_ids} documents as the --limit flag has "
+            f"been passed. "
         )
         files_to_process_ids = files_to_process_ids[:limit]
 
@@ -159,14 +173,14 @@ def get_files_to_process(
 
 def get_Text2EmbeddingsInput_array(
     input_dir: str, s3: bool, files_to_process_ids: Sequence[str]
-) -> List[Text2EmbeddingsInput]:
-    """Construct Text2EmbeddingsInput objects from parser output jsons.
+) -> List[ParserOutput]:
+    """Construct ParserOutput objects from parser output jsons.
 
-    These objects will be used to generate embeddings and are either read in from S3 or from the local file
-    system.
+    These objects will be used to generate embeddings and are either read in from S3
+    or from the local file system.
     """
     return [
-        Text2EmbeddingsInput.parse_raw(
+        ParserOutput.parse_raw(
             s3_object_read_text(os.path.join(input_dir, id_ + ".json"))
             if s3
             else Path(os.path.join(input_dir, id_ + ".json")).read_text()

@@ -5,7 +5,7 @@ description = ""
 authors = ["CPR Tech <tech@climatepolicyradar.org>"]
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = "^3.9"
 sentence-transformers = "2.2.0"
 huggingface_hub = "0.4.0"
 click = "^8.0.4"
@@ -16,6 +16,7 @@ awscli = "^1.27.8"
 boto3 = "^1.26.153"
 aws-error-utils = "^2.7.0"
 moto = "^4.1.11"
+cpr-data-access = {git = "https://github.com/climatepolicyradar/data-access.git", rev = "5f11857fcb1948866168bc19f6829b728a684fce"}
 
 [tool.poetry.dev-dependencies]
 black = "^22.1.0"

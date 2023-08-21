@@ -1,23 +1,24 @@
+from typing import Sequence
+
 import numpy as np
 
 from src import config
-from src.base import IndexerInput, TextBlock, Text2EmbeddingsInput
+from cpr_data_access.parser_models import ParserOutput, TextBlock
 from src.ml import SBERTEncoder
 from src.utils import (
     filter_on_block_type,
     replace_text_blocks,
     filter_blocks,
     get_ids_with_suffix,
-    encode_indexer_input,
+    encode_parser_output,
 )
-from cli.test.conftest import get_text_block, test_pdf_file_json
 
 
-def test_filter_on_block_type(test_indexer_input_array):
+def test_filter_on_block_type(test_parser_output_array):
     """Tests that the filter_on_block_type function removes the correct text blocks."""
 
     filtered_inputs = filter_on_block_type(
-        inputs=test_indexer_input_array, remove_block_types=["Text", "Figure"]
+        inputs=test_parser_output_array, remove_block_types=["Text", "Figure"]
     )
 
     assert len(filtered_inputs[0].html_data.text_blocks) == 3
@@ -41,24 +42,26 @@ def test_filter_on_block_type(test_indexer_input_array):
     assert filtered_inputs[1].html_data.text_blocks[1].text == ["test_text"]
 
 
-def test_has_valid_text_override(test_indexer_input_array):
-    """Test that the get_text_blocks method provides the right response when using the including_invalid_html
-    parameter."""
+def test_has_valid_text_override(test_parser_output_array: Sequence[ParserOutput]):
+    """
+    Test that the get_text_blocks method provides the right response.
 
-    assert test_indexer_input_array[1].get_text_blocks() == []
+    Particularly when using the including_invalid_html parameter."""
+
+    assert test_parser_output_array[1].get_text_blocks() == []
     assert (
-        test_indexer_input_array[1].get_text_blocks(including_invalid_html=True)
-        is not []
+            test_parser_output_array[1].get_text_blocks(including_invalid_html=True)
+            is not []
     )
     assert (
-        len(test_indexer_input_array[1].get_text_blocks(including_invalid_html=True))
+        len(test_parser_output_array[1].get_text_blocks(including_invalid_html=True))
         == 3
     )
 
 
 def test_replace_text_blocks(test_pdf_file_json):
     """Tests that the replace_text_blocks function replaces the correct text blocks."""
-    indexer_input = IndexerInput.parse_obj(test_pdf_file_json)
+    indexer_input = ParserOutput.parse_obj(test_pdf_file_json)
 
     updated_indexer_input = replace_text_blocks(
         block=indexer_input,
@@ -81,10 +84,10 @@ def test_replace_text_blocks(test_pdf_file_json):
 
 def test_filter_blocks(test_pdf_file_json):
     """Tests that the filter_blocks function removes the correct text blocks."""
-    indexer_input = IndexerInput.parse_obj(test_pdf_file_json)
+    indexer_input = ParserOutput.parse_obj(test_pdf_file_json)
 
     filtered_text_blocks = filter_blocks(
-        indexer_input=indexer_input, remove_block_types=["Text"]
+        parser_output=indexer_input, remove_block_types=["Text"]
     )
 
     for block in filtered_text_blocks:
@@ -115,9 +118,9 @@ def test_encode_indexer_input(test_pdf_file_json):
 
     test_pdf_file_json.update({"document_metadata": {"metadata_key": "metadata_value"}})
 
-    input_obj = Text2EmbeddingsInput.parse_obj(test_pdf_file_json)
+    input_obj = ParserOutput.parse_obj(test_pdf_file_json)
 
-    description_embeddings, text_embeddings = encode_indexer_input(
+    description_embeddings, text_embeddings = encode_parser_output(
         encoder=encoder_obj, input_obj=input_obj, batch_size=32
     )
 
