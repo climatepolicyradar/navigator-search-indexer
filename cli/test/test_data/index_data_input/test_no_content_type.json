@@ -1,1 +1,29 @@
-{"document_id": "test_no_content_type", "document_metadata": {"sectors": ["sector1", "sector2"], "publication_ts": "2022-10-25T12:45:00.869045", "geography": "test_geo", "category": "test_category", "source": "test_source", "type": "test_type"}, "document_name": "test_no_content_type", "document_description": "test_description", "document_source_url": null, "document_cdn_object": null, "document_md5_sum": null, "languages": ["en"], "translated": true, "document_slug": "YYY", "document_content_type": null, "html_data": null, "pdf_data": null}
+{
+  "document_id": "test_no_content_type",
+  "document_metadata": {
+    "publication_ts": "2022-10-25T12:45:00.869045",
+    "geography": "test_geo",
+    "category": "test_category",
+    "source": "test_source",
+    "type": "test_type",
+    "metadata": {
+      "sectors": [
+        "sector1",
+        "sector2"
+      ]
+    }
+  },
+  "document_name": "test_no_content_type",
+  "document_description": "test_description",
+  "document_source_url": null,
+  "document_cdn_object": null,
+  "document_md5_sum": null,
+  "languages": [
+    "en"
+  ],
+  "translated": true,
+  "document_slug": "YYY",
+  "document_content_type": null,
+  "html_data": null,
+  "pdf_data": null
+}
