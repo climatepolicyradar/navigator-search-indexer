@@ -270,7 +270,9 @@ def main_opensearch(
     "--index-type",
     "-i",
     type=click.Choice(["opensearch", "vespa"]),
-    case_sensitive=False,
+    default="opensearch",
+    required=False,
+    help="Which search database type to populate.",
 )
 def run_as_cli(
     text2embedding_output_dir: str,

@@ -21,7 +21,8 @@ def test_get_core_document_generator(test_input_dir: Path):
         for path in list(test_input_dir.glob("*.json"))
     ]
 
-    # checking that we've picked up some tasks, otherwise the test is pointless as the document generator will be empty
+    # checking that we've picked up some tasks, otherwise the test is pointless
+    # because the document generator will be empty
     assert len(tasks) > 0
 
     doc_generator = get_core_document_generator(tasks, test_input_dir)
