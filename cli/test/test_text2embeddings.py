@@ -50,8 +50,8 @@ def test_run_encoder_local(
             for path in Path(output_dir).glob("*.npy"):
                 assert np.load(str(path)).shape[1] == 768
 
-            # test_html has the `has_valid_text` flag set to false, so the numpy file should only contain a
-            # description embedding
+            # test_html has the `has_valid_text` flag set to false, so the numpy file
+            # should only contain a description embedding
             assert np.load(str(Path(output_dir) / "test_html.npy")).shape == (1, 768)
 
 

@@ -21,16 +21,13 @@ def test_filter_on_block_type(test_parser_output_array):
         inputs=test_parser_output_array, remove_block_types=["Text", "Figure"]
     )
 
-    assert len(filtered_inputs[0].html_data.text_blocks) == 3
+    assert len(filtered_inputs[0].html_data.text_blocks) == 2
 
     assert filtered_inputs[0].html_data.text_blocks[0].type == "Table"
     assert filtered_inputs[0].html_data.text_blocks[0].text == ["test_text"]
 
-    assert filtered_inputs[0].html_data.text_blocks[1].type == "Random"
+    assert filtered_inputs[0].html_data.text_blocks[1].type == "Google Text Block"
     assert filtered_inputs[0].html_data.text_blocks[1].text == ["test_text"]
-
-    assert filtered_inputs[0].html_data.text_blocks[2].type == "Google Text Block"
-    assert filtered_inputs[0].html_data.text_blocks[2].text == ["test_text"]
 
     # Assert that we can filter on IndexerInputs that don't have valid text
     assert len(filtered_inputs[1].html_data.text_blocks) == 2
@@ -84,10 +81,10 @@ def test_replace_text_blocks(test_pdf_file_json):
 
 def test_filter_blocks(test_pdf_file_json):
     """Tests that the filter_blocks function removes the correct text blocks."""
-    indexer_input = ParserOutput.parse_obj(test_pdf_file_json)
+    parser_output = ParserOutput.parse_obj(test_pdf_file_json)
 
     filtered_text_blocks = filter_blocks(
-        parser_output=indexer_input, remove_block_types=["Text"]
+        parser_output=parser_output, remove_block_types=["Text"]
     )
 
     for block in filtered_text_blocks:

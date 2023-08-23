@@ -1,13 +1,14 @@
-import datetime
-from typing import List, Sequence, Union
 import json
 import os
+from typing import List, Sequence, Union
+
 import boto3
 import botocore.client
 import pytest
+from cpr_data_access.parser_models import ParserOutput, HTMLData
+from cpr_data_access.pipeline_general_models import BackendDocument
 from moto import mock_s3
 
-from cpr_data_access.parser_models import ParserOutput, DocumentMetadata, HTMLData
 from cli.test.conftest import get_text_block
 
 
@@ -104,14 +105,42 @@ def get_parser_output(
     """Return a ParserOutput object with the given parameters."""
     return ParserOutput(
             document_id="test_id",
-            document_metadata=DocumentMetadata(
-                publication_ts=datetime.datetime.now(),
-                date="test_date",
-                geography="test_geography",
-                category="test_category",
-                source="test_source",
-                type="test_type",
-                sectors=["test_sector"],
+            document_metadata=BackendDocument.parse_obj(
+                {
+                    "publication_ts": "2013-01-01T00:00:00",
+                    "name": "Dummy Name",
+                    "description": "description",
+                    "source_url": "http://existing.com",
+                    "download_url": None,
+                    "url": None,
+                    "md5_sum": None,
+                    "type": "EU Decision",
+                    "source": "CCLW",
+                    "import_id": "TESTCCLW.executive.4.4",
+                    "family_import_id": "TESTCCLW.family.4.0",
+                    "category": "Law",
+                    "geography": "EUR",
+                    "languages": [
+                        "English"
+                    ],
+                    "metadata": {
+                        "hazards": [],
+                        "frameworks": [],
+                        "instruments": [
+                            "Capacity building|Governance"
+                        ],
+                        "keywords": [
+                            "Adaptation"
+                        ],
+                        "sectors": [
+                            "Economy-wide"
+                        ],
+                        "topics": [
+                            "Adaptation"
+                        ]
+                    },
+                    "slug": "dummy_slug"
+                }
             ),
             document_name="test_name",
             document_description="test_description",
@@ -140,7 +169,6 @@ def test_parser_output_array() -> List[ParserOutput]:
                     get_text_block("Text"),
                     get_text_block("Figure"),
                     get_text_block("Text"),
-                    get_text_block("Random"),
                     get_text_block("Google Text Block"),
                 ],
             ),
@@ -167,7 +195,7 @@ def test_parser_output_array() -> List[ParserOutput]:
 
 
 @pytest.fixture
-def test_indexer_input_no_source_url_no_lang_no_data() -> List[ParserOutput]:
+def test_parser_output_no_source_url_no_lang_no_data() -> List[ParserOutput]:
     return [
         get_parser_output(
             html_data=None,
