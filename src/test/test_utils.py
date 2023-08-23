@@ -47,8 +47,8 @@ def test_has_valid_text_override(test_parser_output_array: Sequence[ParserOutput
 
     assert test_parser_output_array[1].get_text_blocks() == []
     assert (
-            test_parser_output_array[1].get_text_blocks(including_invalid_html=True)
-            is not []
+        test_parser_output_array[1].get_text_blocks(including_invalid_html=True)
+        is not []
     )
     assert (
         len(test_parser_output_array[1].get_text_blocks(including_invalid_html=True))
@@ -58,10 +58,10 @@ def test_has_valid_text_override(test_parser_output_array: Sequence[ParserOutput
 
 def test_replace_text_blocks(test_pdf_file_json):
     """Tests that the replace_text_blocks function replaces the correct text blocks."""
-    indexer_input = ParserOutput.parse_obj(test_pdf_file_json)
+    parser_output = ParserOutput.parse_obj(test_pdf_file_json)
 
-    updated_indexer_input = replace_text_blocks(
-        block=indexer_input,
+    updated_parser_output = replace_text_blocks(
+        block=parser_output,
         new_text_blocks=[
             TextBlock(
                 text=["test_text_2"],
@@ -75,8 +75,8 @@ def test_replace_text_blocks(test_pdf_file_json):
         ],
     )
 
-    assert len(updated_indexer_input.pdf_data.text_blocks) == 1
-    assert updated_indexer_input.pdf_data.text_blocks[0].text == ["test_text_2"]
+    assert len(updated_parser_output.pdf_data.text_blocks) == 1
+    assert updated_parser_output.pdf_data.text_blocks[0].text == ["test_text_2"]
 
 
 def test_filter_blocks(test_pdf_file_json):

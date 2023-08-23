@@ -57,7 +57,8 @@ def filter_on_block_type(
     Filter a sequence of ParserOutputs.
 
     Remove the text blocks that are of the types declared in the remove block types
-    array."""
+    array.
+    """
     for _filter in remove_block_types:
         try:
             BlockType(_filter)
