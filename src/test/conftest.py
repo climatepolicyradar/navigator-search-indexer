@@ -5,9 +5,10 @@ from typing import List, Sequence, Union
 import boto3
 import botocore.client
 import pytest
+from moto import mock_s3
+
 from cpr_data_access.parser_models import ParserOutput, HTMLData
 from cpr_data_access.pipeline_general_models import BackendDocument
-from moto import mock_s3
 
 from cli.test.conftest import get_text_block
 
@@ -144,7 +145,7 @@ def get_parser_output(
             ),
             document_name="test_name",
             document_description="test_description",
-            document_source_url=source_url,
+            document_source_url=source_url,   # type: ignore
             document_cdn_object="test_cdn_object",
             document_md5_sum="test_md5_sum",
             languages=languages,
@@ -163,7 +164,7 @@ def test_parser_output_array() -> List[ParserOutput]:
         get_parser_output(
             html_data=HTMLData(
                 has_valid_text=True,
-                text_blocks=[
+                text_blocks=[  # type: ignore
                     get_text_block("Table"),
                     get_text_block("Text"),
                     get_text_block("Text"),
@@ -180,7 +181,7 @@ def test_parser_output_array() -> List[ParserOutput]:
         get_parser_output(
             html_data=HTMLData(
                 has_valid_text=False,
-                text_blocks=[
+                text_blocks=[  # type: ignore
                     get_text_block("Table"),
                     get_text_block("Text"),
                     get_text_block("Google Text Block"),
@@ -226,7 +227,7 @@ def test_parser_output_source_url_supported_lang_data() -> List[ParserOutput]:
         get_parser_output(
             html_data=HTMLData(
                 has_valid_text=True,
-                text_blocks=[
+                text_blocks=[  # type: ignore
                     get_text_block("Table"),
                     get_text_block("Google Text Block"),
                 ],
@@ -245,7 +246,7 @@ def test_parser_output_source_url_un_supported_lang_data() -> List[ParserOutput]
         get_parser_output(
             html_data=HTMLData(
                 has_valid_text=True,
-                text_blocks=[
+                text_blocks=[  # type: ignore
                     get_text_block("Table"),
                     get_text_block("Google Text Block"),
                 ],
@@ -256,4 +257,3 @@ def test_parser_output_source_url_un_supported_lang_data() -> List[ParserOutput]
             translated=False,
         )
     ]
-

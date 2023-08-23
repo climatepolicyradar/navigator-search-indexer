@@ -77,14 +77,14 @@ def test_pdf_file_json() -> dict:
                 "en"
             ],
             "metadata": {
-                "test_key": "test_value"
+                "test_key": "test_value",
+                "sectors": ["sector1", "sector2"],
             },
             "publication_ts": "2022-10-25 12:43:00.869045",
             "geography": "test_geo",
             "category": "test_category",
             "source": "test_source",
             "type": "test_type",
-            "sectors": ["sector1", "sector2"],
         },
         "translated": False,
         "document_slug": "XYX",

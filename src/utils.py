@@ -17,9 +17,9 @@ logger = logging.getLogger(__name__)
 def replace_text_blocks(block: ParserOutput, new_text_blocks: Sequence[TextBlock]):
     """Updates the text blocks in the ParserOutput object."""
     if block.pdf_data is not None:
-        block.pdf_data.text_blocks = new_text_blocks
+        block.pdf_data.text_blocks = new_text_blocks  # type: ignore
     elif block.html_data is not None:
-        block.html_data.text_blocks = new_text_blocks
+        block.html_data.text_blocks = new_text_blocks  # type: ignore
 
     return block
 
@@ -33,6 +33,7 @@ def filter_blocks(
     Return this as a list of TextBlocks.
     """
     filtered_blocks = []
+    # TODO: this denotes a bug in the data access library that should be fixed
     for block in parser_output.get_text_blocks(including_invalid_html=True):
         if block.type.title() not in remove_block_types:
             filtered_blocks.append(block)
@@ -133,7 +134,7 @@ def get_files_to_process(
     if s3:
         document_paths_previously_parsed = get_s3_keys_with_prefix(output_dir)
     else:
-        document_paths_previously_parsed = set(os.listdir(output_dir))
+        document_paths_previously_parsed = os.listdir(output_dir)
 
     document_ids_previously_parsed = get_ids_with_suffix(
         document_paths_previously_parsed, ".npy"
@@ -147,31 +148,31 @@ def get_files_to_process(
             files_to_process = get_s3_keys_with_prefix(input_dir)
         else:
             files_to_process = os.listdir(input_dir)
-    files_to_process_ids = get_ids_with_suffix(files_to_process, ".json")
 
-    if not redo and document_ids_previously_parsed.intersection(files_to_process_ids):
+    files_to_process_ids = get_ids_with_suffix(files_to_process, ".json")
+    files_already_processed = document_ids_previously_parsed.intersection(files_to_process_ids)
+    if not redo and files_already_processed:
         logger.warning(
-            f"{len(document_ids_previously_parsed.intersection(files_to_process_ids))} "
+            f"{len(files_already_processed)} "
             f"documents found that have already been encoded. Skipping. "
         )
-        files_to_process_ids = [
-            id_
-            for id_ in files_to_process_ids
-            if id_ not in document_ids_previously_parsed
-        ]
 
-        if not files_to_process_ids:
-            logger.warning("No more documents to encode. Exiting.")
-            return []
+    files_to_process_ids_sequence = [
+        id_
+        for id_ in files_to_process_ids
+        if id_ not in document_ids_previously_parsed
+    ]
+    if not files_to_process_ids_sequence:
+        logger.warning("No more documents to encode. Exiting.")
 
     if limit:
         logger.info(
             f"Limiting to {files_to_process_ids} documents as the --limit flag has "
             f"been passed. "
         )
-        files_to_process_ids = files_to_process_ids[:limit]
+        return files_to_process_ids_sequence[:limit]
 
-    return files_to_process_ids
+    return files_to_process_ids_sequence
 
 
 def get_Text2EmbeddingsInput_array(

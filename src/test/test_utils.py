@@ -1,9 +1,10 @@
 from typing import Sequence
 
 import numpy as np
+from cpr_data_access.parser_models import BlockType, ParserOutput, PDFTextBlock
 
+from cli.test.conftest import test_pdf_file_json  # noqa
 from src import config
-from cpr_data_access.parser_models import ParserOutput, TextBlock
 from src.ml import SBERTEncoder
 from src.utils import (
     filter_on_block_type,
@@ -21,6 +22,7 @@ def test_filter_on_block_type(test_parser_output_array):
         inputs=test_parser_output_array, remove_block_types=["Text", "Figure"]
     )
 
+    assert filtered_inputs[0].html_data is not None
     assert len(filtered_inputs[0].html_data.text_blocks) == 2
 
     assert filtered_inputs[0].html_data.text_blocks[0].type == "Table"
@@ -30,6 +32,7 @@ def test_filter_on_block_type(test_parser_output_array):
     assert filtered_inputs[0].html_data.text_blocks[1].text == ["test_text"]
 
     # Assert that we can filter on IndexerInputs that don't have valid text
+    assert filtered_inputs[1].html_data is not None
     assert len(filtered_inputs[1].html_data.text_blocks) == 2
 
     assert filtered_inputs[1].html_data.text_blocks[0].type == "Table"
@@ -45,15 +48,12 @@ def test_has_valid_text_override(test_parser_output_array: Sequence[ParserOutput
 
     Particularly when using the including_invalid_html parameter."""
 
-    assert test_parser_output_array[1].get_text_blocks() == []
-    assert (
-        test_parser_output_array[1].get_text_blocks(including_invalid_html=True)
-        is not []
-    )
-    assert (
-        len(test_parser_output_array[1].get_text_blocks(including_invalid_html=True))
-        == 3
-    )
+    output = test_parser_output_array[1]
+    assert output.get_text_blocks() == []
+
+    text_blocks_include_invalid = output.get_text_blocks(including_invalid_html=True)
+    assert text_blocks_include_invalid is not None
+    assert len(text_blocks_include_invalid) == 3
 
 
 def test_replace_text_blocks(test_pdf_file_json):
@@ -63,11 +63,11 @@ def test_replace_text_blocks(test_pdf_file_json):
     updated_parser_output = replace_text_blocks(
         block=parser_output,
         new_text_blocks=[
-            TextBlock(
+            PDFTextBlock(
                 text=["test_text_2"],
                 text_block_id="test_text_block_id_2",
                 language="test_language_2",
-                type="Text",
+                type=BlockType.TEXT,
                 type_confidence=1.0,
                 coords=[(0, 0), (0, 0), (0, 0), (0, 0)],
                 page_number=0,
@@ -75,6 +75,7 @@ def test_replace_text_blocks(test_pdf_file_json):
         ],
     )
 
+    assert updated_parser_output.pdf_data is not None
     assert len(updated_parser_output.pdf_data.text_blocks) == 1
     assert updated_parser_output.pdf_data.text_blocks[0].text == ["test_text_2"]
 
@@ -94,7 +95,7 @@ def test_filter_blocks(test_pdf_file_json):
 
 
 def test_get_ids_with_suffix():
-    """Tests that the get_ids_with_suffix function returns the correct ids after filtering."""
+    """Tests that get_ids_with_suffix function returns the correct filtered ids."""
     filtered_ids = get_ids_with_suffix(
         files=[
             "s3://bucket/prefix/test_id_1.json",
@@ -113,7 +114,31 @@ def test_encode_indexer_input(test_pdf_file_json):
     """Tests that the encode_indexer_input function returns the correct embeddings."""
     encoder_obj = SBERTEncoder(config.SBERT_MODEL)
 
-    test_pdf_file_json.update({"document_metadata": {"metadata_key": "metadata_value"}})
+    test_pdf_file_json.update(
+        {
+            "document_metadata": {
+                "name": "test_updated_pdf",
+                "description": "test_pdf_updated_description",
+                "import_id": "CCLW.executive.1003.0",
+                "family_import_id": "CCLW.executive.1003.0",
+                "slug": "test_pdf",
+                "source_url": "https://cdn.climatepolicyradar.org/EUR/2013/EUR-2013-01-01-Overview+of+CAP+Reform+2014-2020_6237180d8c443d72c06c9167019ca177.pdf",
+                "download_url": "https://cdn.climatepolicyradar.org/EUR/2013/EUR-2013-01-01-Overview+of+CAP+Reform+2014-2020_6237180d8c443d72c06c9167019ca177.pdf",
+                "languages": [
+                    "en"
+                ],
+                "metadata": {
+                    "test_key": "test_value",
+                    "sectors": ["sector1", "sector2"],
+                },
+                "publication_ts": "2022-10-25 12:43:00.869045",
+                "geography": "test_geo",
+                "category": "test_category",
+                "source": "test_source",
+                "type": "test_type",
+            },
+        }
+    )
 
     input_obj = ParserOutput.parse_obj(test_pdf_file_json)
 
