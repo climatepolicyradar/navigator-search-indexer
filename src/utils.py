@@ -33,7 +33,7 @@ def filter_blocks(
     Return this as a list of TextBlocks.
     """
     filtered_blocks = []
-    for block in parser_output.text_blocks:
+    for block in parser_output.get_text_blocks(including_invalid_html=True):
         if block.type.title() not in remove_block_types:
             filtered_blocks.append(block)
         else:
@@ -107,9 +107,11 @@ def encode_parser_output(
         input_obj.document_description, device=device
     )
 
-    if input_obj.text_blocks:
+    text_blocks = input_obj.get_text_blocks()
+
+    if text_blocks:
         text_embeddings = encoder.encode_batch(
-            [block.to_string() for block in input_obj.text_blocks],
+            [block.to_string() for block in text_blocks],
             batch_size=batch_size,
             device=device,
         )
