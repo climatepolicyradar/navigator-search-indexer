@@ -425,8 +425,8 @@ tqdm = "^4.64.1"
 [package.source]
 type = "git"
 url = "https://github.com/climatepolicyradar/data-access.git"
-reference = "5f11857fcb1948866168bc19f6829b728a684fce"
-resolved_reference = "5f11857fcb1948866168bc19f6829b728a684fce"
+reference = "v0.1.1"
+resolved_reference = "591171d9b08d30fb4fa01d7ef19764dfc6b65967"
 
 [[package]]
 name = "cryptography"
@@ -2455,4 +2455,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "95b5c223fe2e8b09a12486ac997e20302219bdf40e0e69d10045eb0ada2505ed"
+content-hash = "17005464ade48df160c8d651130f38cdf93e8e6a459af7a9c15ecbf83290e10b"
