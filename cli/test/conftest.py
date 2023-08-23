@@ -6,7 +6,7 @@ import botocore.client
 import pytest
 from moto import mock_s3
 
-from cpr_data_access.parser_models import TextBlock
+from cpr_data_access.parser_models import BlockType, PDFTextBlock, TextBlock
 
 
 class S3Client:
@@ -60,9 +60,9 @@ def test_pdf_file_json() -> dict:
         "document_name": "test_pdf",
         "document_description": "test_pdf_description",
         "document_source_url": "https://cdn.climatepolicyradar.org/EUR/2013/EUR-2013-01-01-Overview+of+CAP+Reform"
-                               "+2014-2020_6237180d8c443d72c06c9167019ca177.pdf",
+        "+2014-2020_6237180d8c443d72c06c9167019ca177.pdf",
         "document_cdn_object": "EUR/2013/EUR-2013-01-01-Overview+of+CAP+Reform+2014"
-                               "-2020_6237180d8c443d72c06c9167019ca177.pdf",
+        "-2020_6237180d8c443d72c06c9167019ca177.pdf",
         "document_md5_sum": "abcdefghijk",
         "languages": ["en"],
         "document_metadata": {
@@ -73,9 +73,7 @@ def test_pdf_file_json() -> dict:
             "slug": "test_pdf",
             "source_url": "https://cdn.climatepolicyradar.org/EUR/2013/EUR-2013-01-01-Overview+of+CAP+Reform+2014-2020_6237180d8c443d72c06c9167019ca177.pdf",
             "download_url": "https://cdn.climatepolicyradar.org/EUR/2013/EUR-2013-01-01-Overview+of+CAP+Reform+2014-2020_6237180d8c443d72c06c9167019ca177.pdf",
-            "languages": [
-                "en"
-            ],
+            "languages": ["en"],
             "metadata": {
                 "test_key": "test_value",
                 "sectors": ["sector1", "sector2"],
@@ -705,12 +703,8 @@ def test_no_content_type_file_json() -> dict:
             "slug": "test_pdf",
             "source_url": "https://cdn.climatepolicyradar.org/EUR/2013/EUR-2013-01-01-Overview+of+CAP+Reform+2014-2020_6237180d8c443d72c06c9167019ca177.pdf",
             "download_url": "https://cdn.climatepolicyradar.org/EUR/2013/EUR-2013-01-01-Overview+of+CAP+Reform+2014-2020_6237180d8c443d72c06c9167019ca177.pdf",
-            "languages": [
-                "en"
-            ],
-            "metadata": {
-                "test_key": "test_value"
-            },
+            "languages": ["en"],
+            "metadata": {"test_key": "test_value"},
             "publication_ts": "2022-10-25 12:45:00.869045",
             "geography": "test_geo",
             "category": "test_category",
@@ -745,12 +739,8 @@ def test_html_file_json() -> dict:
             "slug": "test_pdf",
             "source_url": "https://cdn.climatepolicyradar.org/EUR/2013/EUR-2013-01-01-Overview+of+CAP+Reform+2014-2020_6237180d8c443d72c06c9167019ca177.pdf",
             "download_url": "https://cdn.climatepolicyradar.org/EUR/2013/EUR-2013-01-01-Overview+of+CAP+Reform+2014-2020_6237180d8c443d72c06c9167019ca177.pdf",
-            "languages": [
-                "en"
-            ],
-            "metadata": {
-                "test_key": "test_value"
-            },
+            "languages": ["en"],
+            "metadata": {"test_key": "test_value"},
             "publication_ts": "2022-10-25 12:43:00.869045",
             "geography": "test_geo",
             "category": "test_category",
@@ -1093,10 +1083,10 @@ def test_html_file_json() -> dict:
 
 @pytest.fixture
 def pipeline_s3_objects_main(
-        input_prefix,
-        test_html_file_json,
-        test_pdf_file_json,
-        test_no_content_type_file_json
+    input_prefix,
+    test_html_file_json,
+    test_pdf_file_json,
+    test_no_content_type_file_json,
 ):
     """
     Return a dict of s3 objects to be used in the pipeline s3 client fixture.
@@ -1107,12 +1097,15 @@ def pipeline_s3_objects_main(
     Thus, we have a document that embeddings can be generated from in s3.
     """
     return {
-        f'{input_prefix}/CCLWTEST.executive.1000.1000.json': bytes(
-            json.dumps(test_html_file_json).encode("UTF-8")),
-        f'{input_prefix}/CCLWTEST.executive.1001.1001.json': bytes(
-            json.dumps(test_pdf_file_json).encode("UTF-8")),
-        f'{input_prefix}/CCLWTEST.executive.1002.1002.json': bytes(
-            json.dumps(test_no_content_type_file_json).encode("UTF-8")),
+        f"{input_prefix}/CCLWTEST.executive.1000.1000.json": bytes(
+            json.dumps(test_html_file_json).encode("UTF-8")
+        ),
+        f"{input_prefix}/CCLWTEST.executive.1001.1001.json": bytes(
+            json.dumps(test_pdf_file_json).encode("UTF-8")
+        ),
+        f"{input_prefix}/CCLWTEST.executive.1002.1002.json": bytes(
+            json.dumps(test_no_content_type_file_json).encode("UTF-8")
+        ),
     }
 
 
@@ -1140,11 +1133,11 @@ def pipeline_s3_client_main(s3_bucket_and_region, pipeline_s3_objects_main):
 
 def get_text_block(text_block_type: str) -> TextBlock:
     """Returns a TextBlock object with the given type."""
-    return TextBlock(
+    return PDFTextBlock(
         text=["test_text"],
         text_block_id="test_text_block_id",
         language="test_language",
-        type=text_block_type,
+        type=BlockType(text_block_type),
         type_confidence=1.0,
         coords=[(0, 0), (0, 0), (0, 0), (0, 0)],
         page_number=0,

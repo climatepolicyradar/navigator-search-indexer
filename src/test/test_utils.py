@@ -124,9 +124,7 @@ def test_encode_indexer_input(test_pdf_file_json):
                 "slug": "test_pdf",
                 "source_url": "https://cdn.climatepolicyradar.org/EUR/2013/EUR-2013-01-01-Overview+of+CAP+Reform+2014-2020_6237180d8c443d72c06c9167019ca177.pdf",
                 "download_url": "https://cdn.climatepolicyradar.org/EUR/2013/EUR-2013-01-01-Overview+of+CAP+Reform+2014-2020_6237180d8c443d72c06c9167019ca177.pdf",
-                "languages": [
-                    "en"
-                ],
+                "languages": ["en"],
                 "metadata": {
                     "test_key": "test_value",
                     "sectors": ["sector1", "sector2"],
