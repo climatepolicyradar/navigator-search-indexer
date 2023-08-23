@@ -158,7 +158,7 @@ def test_run_parser_skip_already_done(
                 all_messages = all_messages + i
 
             assert (
-                "Found 3 documents that have already been encoded. Skipping."
+                "3 documents found that have already been encoded. Skipping."
                 in all_messages
             )
 
