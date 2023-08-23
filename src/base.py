@@ -97,8 +97,8 @@ class PDFData(BaseModel):
 class HTMLData(BaseModel):
     """Set of metadata specific to HTML documents."""
 
-    detected_title: Optional[str]
-    detected_date: Optional[datetime.date]
+    detected_title: Optional[str] = None
+    detected_date: Optional[datetime.date] = None
     has_valid_text: bool
     text_blocks: Sequence[TextBlock]
 

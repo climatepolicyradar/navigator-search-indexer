@@ -96,6 +96,7 @@ def test_filter_on_block_type(test_indexer_input_array):
     filtered_inputs = filter_on_block_type(
         inputs=test_indexer_input_array, remove_block_types=["Text", "Figure"]
     )
+    assert filtered_inputs[0].html_data is not None
 
     assert len(filtered_inputs[0].html_data.text_blocks) == 3
 
@@ -109,6 +110,7 @@ def test_filter_on_block_type(test_indexer_input_array):
     assert filtered_inputs[0].html_data.text_blocks[2].text == ["test_text"]
 
     # Assert that we can filter on IndexerInputs that don't have valid text
+    assert filtered_inputs[1].html_data is not None
     assert len(filtered_inputs[1].html_data.text_blocks) == 2
 
     assert filtered_inputs[1].html_data.text_blocks[0].type == "Table"
