@@ -1,9 +1,8 @@
 # Opensearch Indexer
 
-The code in this folder contains multiple CLIs used to index data into the Navigator search index:
+The code in this folder contain a CLI tool used to index data into the Navigator search index:
 
-* `text2embeddings.py`: loads JSON data produced by the `pdf2text` pipeline and converts it to embeddings (.memmap) and text and IDs (.json) files.
-* `index_data.py`: loads document metadata from the Navigator database and the prototype *processed_policies.csv** file and indexes this data alongside the text and embeddings created using `text2embeddings` into the search index.
+* `index_data.py`: loads document metadata from the Navigator database and indexes this data alongside the text and embeddings created from embeddings generation into the search index.
 
 There is also an `opensearch-query-example.ipynb` notebook that demonstrates running a query on the index. This is to be developed further and integrated into the Navigator APIs.
 
@@ -17,23 +16,11 @@ See `make opensearch_test_dump` and `cli/test/create_test_index.py`.
 
 `make build`
 
-### 2. Creating embeddings
-
-Use the following command to run the pdf2text cli using model `msmarco-distilbert-dot-v5` with the default batch size and no limit. Run `docker run navigator-search-indexer python /app/text2embeddings.py --help` for a full set of options.
-
-> WARNING: this command currently fails with a memory error in docker-compose, but works fine when run on Python directly on the host machine. To get this running you can `poetry install` this folder and pass the database URL directly to python.
-> e.g. `DATABASE_URL=postgres://<db_url> poetry run python /app/text2embeddings.py --args`
-> This has been raised as a [bug issue](https://github.com/climatepolicyradar/navigator/issues/438).
-
-```
-docker run --net=host --env-file .env -v /path/to/pdf2text/outputs:/dir-in -v /path/to/output/directory:/dir-out navigator-search-indexer python /app/text2embeddings.py -i /dir-in -o /dir-out -m "msmarco-distilbert-dot-v5"
-```
-
-### 3. Loading data into Opensearch (in docker-compose)
+### 2. Loading data into Opensearch (in docker-compose)
 
 Note: this command will wipe and repopulate the index specified in `.env` if it's already populated.
 
-```
+```shell
 docker run --net=host --env-file .env -v /path/to/text-ids-file:/text-ids-path -v /path/to/embeddings-file:/embeddings-path navigator-search-indexer python /app/index_data.py --text-ids-path /text-ids-path --embeddings-path /embeddings-path -d 768
 ```
 
@@ -181,13 +168,13 @@ Note the `for_search_document_description` field and the `document_description` 
 }
 ```
 
-# Common issues
+## Common issues
 
-## Virtual memory
+### Virtual memory
 
 Error in docker logs:
 
-```
+```shell
 opensearch-node1          | ERROR: [2] bootstrap checks failed
 opensearch-node1          | [1]: max virtual memory areas vm.max_map_count [65530] is too low, increase to at least [262144]
 opensearch-node1          | [2]: the default discovery settings are unsuitable for production use; at least one of [discovery.seed_hosts, discovery.seed_providers, cluster.initial_master_nodes] must be configured
@@ -203,6 +190,6 @@ opensearch-node1          | Performance analyzer exited with code 143
 
 Run [this command](https://www.elastic.co/guide/en/elasticsearch/reference/current/vm-max-map-count.html) on the host machine:
 
-``` 
+```shell
 sysctl -w vm.max_map_count=262144
 ```
