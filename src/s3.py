@@ -21,7 +21,8 @@ def validate_s3_pattern(s3_path: str):
     return bucket, key, s3client
 
 
-# TODO do we want to instantiate one client object and pass that through rather than instantiating each time?
+# TODO do we want to instantiate one client object and pass that through rather than
+#  instantiating each time?
 def check_file_exists_in_s3(s3_path: str) -> bool:
     """Checks whether a file exists in an S3 bucket."""
     bucket, key, s3client = validate_s3_pattern(s3_path)
@@ -40,8 +41,9 @@ def check_file_exists_in_s3(s3_path: str) -> bool:
 
 def get_s3_keys_with_prefix(s3_prefix: str) -> Sequence[str]:
     """
-    Get a list of keys in an S3 bucket with a given prefix. Returns an empty list if the prefix does not exist
-    or is empty.
+    Get a list of keys in an S3 bucket with a given prefix.
+
+    Returns an empty list if the prefix does not exist or is empty.
 
     We use this instead of cloudpathlib's glob because it's much faster. Relevant issue:
     https://github.com/drivendataorg/cloudpathlib/issues/274.

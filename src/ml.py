@@ -34,7 +34,8 @@ class SentenceEncoder(ABC):
 class SBERTEncoder(SentenceEncoder):
     """Encoder which uses the sentence-transformers library.
 
-    A list of pretrained models is available at https://www.sbert.net/docs/pretrained_models.html.
+    A list of pretrained models is available at
+    https://www.sbert.net/docs/pretrained_models.html.
     """
 
     def __init__(self, model_name: str):

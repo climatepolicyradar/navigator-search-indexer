@@ -1,13 +1,15 @@
-import datetime
-from typing import List, Sequence, Union
 import json
 import os
+from typing import List, Sequence, Union
+
 import boto3
 import botocore.client
 import pytest
 from moto import mock_s3
 
-from src.base import IndexerInput, DocumentMetadata, HTMLData
+from cpr_data_access.parser_models import ParserOutput, HTMLData
+from cpr_data_access.pipeline_general_models import BackendDocument
+
 from cli.test.conftest import get_text_block
 
 
@@ -94,53 +96,70 @@ def pipeline_s3_client(s3_bucket_and_region, pipeline_s3_objects):
         yield s3_client
 
 
-def get_indexer_input(
+def get_parser_output(
     html_data: Union[HTMLData, None],
     source_url: Union[str, None],
     languages: Union[Sequence[str], None],
     content_type: Union[str, None],
-    translated: bool
+    translated: bool,
 ):
-    """Return a IndexerInput object with the given parameters."""
-    return IndexerInput(
-            document_id="test_id",
-            document_metadata=DocumentMetadata(
-                publication_ts=datetime.datetime.now(),
-                date="test_date",
-                geography="test_geography",
-                category="test_category",
-                source="test_source",
-                type="test_type",
-                sectors=["test_sector"],
-            ),
-            document_name="test_name",
-            document_description="test_description",
-            document_source_url=source_url,
-            document_cdn_object="test_cdn_object",
-            document_md5_sum="test_md5_sum",
-            languages=languages,
-            translated=translated,
-            document_slug="test_slug",
-            document_content_type=content_type,
-            html_data=html_data,
-            pdf_data=None,
-        )
+    """Return a ParserOutput object with the given parameters."""
+    return ParserOutput(
+        document_id="test_id",
+        document_metadata=BackendDocument.parse_obj(
+            {
+                "publication_ts": "2013-01-01T00:00:00",
+                "name": "Dummy Name",
+                "description": "description",
+                "source_url": "http://existing.com",
+                "download_url": None,
+                "url": None,
+                "md5_sum": None,
+                "type": "EU Decision",
+                "source": "CCLW",
+                "import_id": "TESTCCLW.executive.4.4",
+                "family_import_id": "TESTCCLW.family.4.0",
+                "category": "Law",
+                "geography": "EUR",
+                "languages": ["English"],
+                "metadata": {
+                    "hazards": [],
+                    "frameworks": [],
+                    "instruments": ["Capacity building|Governance"],
+                    "keywords": ["Adaptation"],
+                    "sectors": ["Economy-wide"],
+                    "topics": ["Adaptation"],
+                },
+                "slug": "dummy_slug",
+            }
+        ),
+        document_name="test_name",
+        document_description="test_description",
+        document_source_url=source_url,  # type: ignore
+        document_cdn_object="test_cdn_object",
+        document_md5_sum="test_md5_sum",
+        languages=languages,
+        translated=translated,
+        document_slug="test_slug",
+        document_content_type=content_type,
+        html_data=html_data,
+        pdf_data=None,
+    )
 
 
 @pytest.fixture
-def test_indexer_input_array() -> List[IndexerInput]:
-    """Returns an array of indexer inputs with varying block types and non/valid text."""
+def test_parser_output_array() -> List[ParserOutput]:
+    """Returns an array of parser outputs with varying block types and non/valid text."""
     return [
-        get_indexer_input(
+        get_parser_output(
             html_data=HTMLData(
                 has_valid_text=True,
-                text_blocks=[
+                text_blocks=[  # type: ignore
                     get_text_block("Table"),
                     get_text_block("Text"),
                     get_text_block("Text"),
                     get_text_block("Figure"),
                     get_text_block("Text"),
-                    get_text_block("Random"),
                     get_text_block("Google Text Block"),
                 ],
             ),
@@ -149,10 +168,10 @@ def test_indexer_input_array() -> List[IndexerInput]:
             content_type="text/html",
             translated=True,
         ),
-        get_indexer_input(
+        get_parser_output(
             html_data=HTMLData(
                 has_valid_text=False,
-                text_blocks=[
+                text_blocks=[  # type: ignore
                     get_text_block("Table"),
                     get_text_block("Text"),
                     get_text_block("Google Text Block"),
@@ -167,9 +186,9 @@ def test_indexer_input_array() -> List[IndexerInput]:
 
 
 @pytest.fixture
-def test_indexer_input_no_source_url_no_lang_no_data() -> List[IndexerInput]:
+def test_parser_output_no_source_url_no_lang_no_data() -> List[ParserOutput]:
     return [
-        get_indexer_input(
+        get_parser_output(
             html_data=None,
             source_url=None,
             languages=None,
@@ -180,25 +199,25 @@ def test_indexer_input_no_source_url_no_lang_no_data() -> List[IndexerInput]:
 
 
 @pytest.fixture
-def test_indexer_input_source_url_no_lang_no_data() -> List[IndexerInput]:
+def test_parser_output_source_url_no_lang_no_data() -> List[ParserOutput]:
     return [
-        get_indexer_input(
+        get_parser_output(
             html_data=None,
             source_url="https://www.example.com/files/climate-document.pdf",
             languages=None,
             content_type=None,
-            translated=False
+            translated=False,
         )
     ]
 
 
 @pytest.fixture
-def test_indexer_input_source_url_supported_lang_data() -> List[IndexerInput]:
+def test_parser_output_source_url_supported_lang_data() -> List[ParserOutput]:
     return [
-        get_indexer_input(
+        get_parser_output(
             html_data=HTMLData(
                 has_valid_text=True,
-                text_blocks=[
+                text_blocks=[  # type: ignore
                     get_text_block("Table"),
                     get_text_block("Google Text Block"),
                 ],
@@ -212,12 +231,12 @@ def test_indexer_input_source_url_supported_lang_data() -> List[IndexerInput]:
 
 
 @pytest.fixture
-def test_indexer_input_source_url_un_supported_lang_data() -> List[IndexerInput]:
+def test_parser_output_source_url_un_supported_lang_data() -> List[ParserOutput]:
     return [
-        get_indexer_input(
+        get_parser_output(
             html_data=HTMLData(
                 has_valid_text=True,
-                text_blocks=[
+                text_blocks=[  # type: ignore
                     get_text_block("Table"),
                     get_text_block("Google Text Block"),
                 ],
@@ -228,4 +247,3 @@ def test_indexer_input_source_url_un_supported_lang_data() -> List[IndexerInput]
             translated=False,
         )
     ]
-

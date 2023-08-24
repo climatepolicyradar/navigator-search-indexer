@@ -8,7 +8,7 @@ import numpy as np
 from click.testing import CliRunner
 
 from cli.text2embeddings import run_as_cli
-from src.base import IndexerInput
+from cpr_data_access.parser_models import ParserOutput
 
 
 def test_run_encoder_local(
@@ -45,13 +45,13 @@ def test_run_encoder_local(
             }
 
             for path in Path(output_dir).glob("*.json"):
-                assert IndexerInput.parse_obj(json.loads(path.read_text()))
+                assert ParserOutput.parse_obj(json.loads(path.read_text()))
 
             for path in Path(output_dir).glob("*.npy"):
                 assert np.load(str(path)).shape[1] == 768
 
-            # test_html has the `has_valid_text` flag set to false, so the numpy file should only contain a
-            # description embedding
+            # test_html has the `has_valid_text` flag set to false, so the numpy file
+            # should only contain a description embedding
             assert np.load(str(Path(output_dir) / "test_html.npy")).shape == (1, 768)
 
 
@@ -63,9 +63,9 @@ def test_s3_client(
 ):
     """Prior to running the embeddings generation tests assert that the mock s3 bucket is in the required state."""
     list_response = pipeline_s3_client_main.client.list_objects_v2(
-        Bucket=s3_bucket_and_region['bucket'], Prefix=input_prefix
+        Bucket=s3_bucket_and_region["bucket"], Prefix=input_prefix
     )
-    assert list_response['KeyCount'] == len(pipeline_s3_objects_main)
+    assert list_response["KeyCount"] == len(pipeline_s3_objects_main)
 
 
 def test_run_encoder_s3(
@@ -84,39 +84,44 @@ def test_run_encoder_s3(
     assert result.exit_code == 0
 
     list_response = pipeline_s3_client_main.client.list_objects_v2(
-        Bucket=s3_bucket_and_region['bucket'],
-        Prefix=output_prefix
+        Bucket=s3_bucket_and_region["bucket"], Prefix=output_prefix
     )
 
-    assert list_response['KeyCount'] == len(pipeline_s3_objects_main) * 2
+    assert list_response["KeyCount"] == len(pipeline_s3_objects_main) * 2
 
-    files = [o["Key"] for o in list_response.get("Contents", []) if o["Key"] != output_prefix]
+    files = [
+        o["Key"] for o in list_response.get("Contents", []) if o["Key"] != output_prefix
+    ]
 
     assert len(files) == len(pipeline_s3_objects_main) * 2
 
     assert set(files) == {
-        f'{output_prefix}/test_html.json',
-        f'{output_prefix}/test_html.npy',
-        f'{output_prefix}/test_no_content_type.json',
-        f'{output_prefix}/test_no_content_type.npy',
-        f'{output_prefix}/test_pdf.json',
-        f'{output_prefix}/test_pdf.npy',
+        f"{output_prefix}/test_html.json",
+        f"{output_prefix}/test_html.npy",
+        f"{output_prefix}/test_no_content_type.json",
+        f"{output_prefix}/test_no_content_type.npy",
+        f"{output_prefix}/test_pdf.json",
+        f"{output_prefix}/test_pdf.npy",
     }
 
-    s3_files_json = [file for file in files if file.endswith('.json')]
-    s3_files_npy = [file for file in files if file.endswith('.npy')]
+    s3_files_json = [file for file in files if file.endswith(".json")]
+    s3_files_npy = [file for file in files if file.endswith(".npy")]
 
     assert len(s3_files_json) == len(pipeline_s3_objects_main)
     assert len(s3_files_npy) == len(pipeline_s3_objects_main)
 
     for file in s3_files_json:
-        file_obj = pipeline_s3_client_main.client.get_object(Bucket=s3_bucket_and_region['bucket'], Key=file)
+        file_obj = pipeline_s3_client_main.client.get_object(
+            Bucket=s3_bucket_and_region["bucket"], Key=file
+        )
         file_text = file_obj["Body"].read().decode("utf-8")
         file_json = json.loads(file_text)
-        assert IndexerInput.parse_obj(file_json)
+        assert ParserOutput.parse_obj(file_json)
 
     for file in s3_files_npy:
-        file_obj = pipeline_s3_client_main.client.get_object(Bucket=s3_bucket_and_region['bucket'], Key=file)
+        file_obj = pipeline_s3_client_main.client.get_object(
+            Bucket=s3_bucket_and_region["bucket"], Key=file
+        )
         file_text = file_obj["Body"]
         file_bytes = io.BytesIO(file_text.read())
         assert np.load(file_bytes).shape[1] == 768
@@ -158,7 +163,7 @@ def test_run_parser_skip_already_done(
                 all_messages = all_messages + i
 
             assert (
-                "Found 3 documents that have already been encoded. Skipping."
+                "3 documents found that have already been encoded. Skipping."
                 in all_messages
             )
 
