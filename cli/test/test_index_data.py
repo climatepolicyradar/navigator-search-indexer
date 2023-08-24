@@ -2,8 +2,8 @@ from pathlib import Path
 from typing import Optional, Sequence
 
 import pytest
+from cpr_data_access.parser_models import ParserOutput, CONTENT_TYPE_HTML, CONTENT_TYPE_PDF
 
-from src.base import IndexerInput, CONTENT_TYPE_HTML, CONTENT_TYPE_PDF
 from src.index_mapping import ALL_FIELDS
 from cli.index_data import get_core_document_generator, get_text_document_generator
 
@@ -17,7 +17,7 @@ def test_get_core_document_generator(test_input_dir: Path):
     """Test that the document generator returns documents in the correct format."""
 
     tasks = [
-        IndexerInput.parse_raw(path.read_text())
+        ParserOutput.parse_raw(path.read_text())
         for path in list(test_input_dir.glob("*.json"))
     ]
 
@@ -98,7 +98,7 @@ def test_get_text_document_generator(
     """Test that the document generator returns documents in the correct format."""
 
     tasks = [
-        IndexerInput.parse_raw(path.read_text())
+        ParserOutput.parse_raw(path.read_text())
         for path in list(test_input_dir.glob("*.json"))
     ]
 
@@ -173,7 +173,7 @@ def test_document_generator_mapping_alignment(test_input_dir: Path):
     """
 
     tasks = [
-        IndexerInput.parse_raw(path.read_text())
+        ParserOutput.parse_raw(path.read_text())
         for path in list(test_input_dir.glob("*.json"))
     ]
 

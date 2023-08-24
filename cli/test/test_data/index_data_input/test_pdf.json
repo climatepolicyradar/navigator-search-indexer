@@ -1,7 +1,16 @@
 {
   "document_id": "test_pdf",
   "document_metadata": {
+    "name": "test_name",
+    "description": "test_description",
+    "import_id": "test_id",
+    "source_url": null,
+    "download_url": null,
+    "family_import_id": "test_family_id",
+    "languages": [],
+    "slug": "test_name_slug",
     "publication_ts": "2022-10-25T12:43:00.869045",
+    "date": "25/10/2022",
     "geography": "test_geo",
     "category": "test_category",
     "source": "test_source",

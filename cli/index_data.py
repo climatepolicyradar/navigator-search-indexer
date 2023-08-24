@@ -11,9 +11,9 @@ import numpy as np
 import click
 from cloudpathlib import S3Path
 from tqdm.auto import tqdm
+from cpr_data_access.parser_models import ParserOutput, PDFTextBlock, CONTENT_TYPE_HTML, CONTENT_TYPE_PDF
 
 from src.index.opensearch import populate_opensearch
-from src.base import IndexerInput, CONTENT_TYPE_HTML, CONTENT_TYPE_PDF
 from src.index_mapping import COMMON_FIELDS
 from src import config
 from src.utils import filter_on_block_type
@@ -41,7 +41,7 @@ _LOGGER = logging.getLogger(__name__)
 logging.config.dictConfig(DEFAULT_LOGGING)
 
 
-def get_metadata_dict(task: IndexerInput) -> dict:
+def get_metadata_dict(task: ParserOutput) -> dict:
     """
     Get key-value pairs for metadata fields: fields which are not required for search.
 
@@ -60,7 +60,7 @@ def get_metadata_dict(task: IndexerInput) -> dict:
 
 
 def get_core_document_generator(
-    tasks: Sequence[IndexerInput], embedding_dir_as_path: Union[Path, S3Path]
+    tasks: Sequence[ParserOutput], embedding_dir_as_path: Union[Path, S3Path]
 ) -> Generator[dict, None, None]:
     """
     Generator for core documents to index
@@ -93,7 +93,7 @@ def get_core_document_generator(
 
 
 def get_text_document_generator(
-    tasks: Sequence[IndexerInput],
+    tasks: Sequence[ParserOutput],
     embedding_dir_as_path: Union[Path, S3Path],
     translated: Optional[bool] = None,
     content_types: Optional[Sequence[str]] = None,
@@ -135,16 +135,24 @@ def get_text_document_generator(
         text_blocks = task.vertically_flip_text_block_coords().get_text_blocks()
 
         for text_block, embedding in zip(text_blocks, embeddings[1:, :]):
-            yield {
+            block_dict = {
                 **{
                     "text_block_id": text_block.text_block_id,
                     "text": text_block.to_string(),
                     "text_embedding": embedding.tolist(),
-                    "text_block_coords": text_block.coords,
-                    "text_block_page": text_block.page_number,
                 },
                 **all_metadata,
             }
+            if isinstance(text_block, PDFTextBlock):
+                block_dict = {
+                    **block_dict,
+                    **{
+                        "text_block_coords": text_block.coords,
+                        "text_block_page": text_block.page_number,
+                    }
+                }
+            yield block_dict
+
 
 
 def _get_index_tasks(
@@ -152,7 +160,7 @@ def _get_index_tasks(
     s3: bool,
     files_to_index: Optional[str] = None,
     limit: Optional[int] = None,
-) -> Tuple[Sequence[IndexerInput], Union[Path, S3Path]]:
+) -> Tuple[Sequence[ParserOutput], Union[Path, S3Path]]:
     if s3:
         embedding_dir_as_path = cast(S3Path, S3Path(text2embedding_output_dir))
     else:
@@ -160,7 +168,7 @@ def _get_index_tasks(
 
     _LOGGER.info(f"Getting tasks from {'s3' if s3 else 'local'}")
     tasks = [
-        IndexerInput.parse_raw(path.read_text())
+        ParserOutput.parse_raw(path.read_text())
         for path in tqdm(list(embedding_dir_as_path.glob("*.json")))
     ]
 

@@ -1,23 +1,23 @@
 import logging
 from typing import Sequence
 
-from src.base import IndexerInput, TextBlock, BlockTypes
+from cpr_data_access.parser_models import BlockType, ParserOutput, TextBlock
 
 _LOGGER = logging.getLogger(__name__)
 
 
-def replace_text_blocks(block: IndexerInput, new_text_blocks: list[TextBlock]):
+def replace_text_blocks(block: ParserOutput, new_text_blocks: list[TextBlock]):
     """Updates the text blocks in the IndexerInput object."""
     if block.pdf_data is not None:
-        block.pdf_data.text_blocks = new_text_blocks
+        block.pdf_data.text_blocks = new_text_blocks  # type: ignore
     elif block.html_data is not None:
-        block.html_data.text_blocks = new_text_blocks
+        block.html_data.text_blocks = new_text_blocks  # type: ignore
 
     return block
 
 
 def filter_blocks(
-    indexer_input: IndexerInput, remove_block_types: list[str]
+    indexer_input: ParserOutput, remove_block_types: list[str]
 ) -> list[TextBlock]:
     """Filter the contained TextBlocks and return this as a list of TextBlocks."""
     filtered_blocks = []
@@ -39,8 +39,8 @@ def filter_blocks(
 
 
 def filter_on_block_type(
-    inputs: Sequence[IndexerInput], remove_block_types: list[str]
-) -> Sequence[IndexerInput]:
+    inputs: Sequence[ParserOutput], remove_block_types: list[str]
+) -> Sequence[ParserOutput]:
     """
     Filter a sequence of IndexerInputs to remove unwanted TextBlocks.
 
@@ -48,7 +48,7 @@ def filter_on_block_type(
     """
     for _filter in remove_block_types:
         try:
-            BlockTypes(_filter)
+            BlockType(_filter)
         except NameError:
             _LOGGER.warning(
                 "Blocks to filter should be of a known block type, "
