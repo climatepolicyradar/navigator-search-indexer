@@ -485,8 +485,8 @@ tqdm = "^4.64.1"
 [package.source]
 type = "git"
 url = "https://github.com/climatepolicyradar/data-access.git"
-reference = "v0.1.2"
-resolved_reference = "8c168ee9c73254b02db3b55f35c5ed7a0b5a5489"
+reference = "v0.1.3"
+resolved_reference = "60973a50817c8bc4b89b33fd0e51b109cecf681d"
 
 [[package]]
 name = "cryptography"
@@ -1545,7 +1545,7 @@ name = "pycparser"
 version = "2.21"
 description = "C parser in Python"
 optional = false
-python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
+python-versions = "*"
 files = [
     {file = "pycparser-2.21-py2.py3-none-any.whl", hash = "sha256:8ee45429555515e1f6b185e78100aea234072576aa43ab53aefcae078162fca9"},
     {file = "pycparser-2.21.tar.gz", hash = "sha256:e644fdec12f7872f86c58ff790da456218b10f863970249516d60a5eaca77206"},
@@ -2603,4 +2603,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "~3.9"
-content-hash = "5d800dbf35e91f3108cdf85c9d33743d87f0d07de128e28b21e4231658a63530"
+content-hash = "c47c0d11a9ce7d8322e807a7836757e17f6f7530087f2141172b88c51465ff07"
