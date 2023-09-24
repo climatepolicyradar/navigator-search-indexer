@@ -2,8 +2,8 @@ from pathlib import Path
 from typing import Optional, Sequence
 
 import pytest
+from cpr_data_access.parser_models import ParserOutput, CONTENT_TYPE_HTML, CONTENT_TYPE_PDF
 
-from src.base import IndexerInput, CONTENT_TYPE_HTML, CONTENT_TYPE_PDF
 from src.index_mapping import ALL_FIELDS
 from cli.index_data import get_core_document_generator, get_text_document_generator
 
@@ -17,11 +17,12 @@ def test_get_core_document_generator(test_input_dir: Path):
     """Test that the document generator returns documents in the correct format."""
 
     tasks = [
-        IndexerInput.parse_raw(path.read_text())
+        ParserOutput.parse_raw(path.read_text())
         for path in list(test_input_dir.glob("*.json"))
     ]
 
-    # checking that we've picked up some tasks, otherwise the test is pointless as the document generator will be empty
+    # checking that we've picked up some tasks, otherwise the test is pointless
+    # because the document generator will be empty
     assert len(tasks) > 0
 
     doc_generator = get_core_document_generator(tasks, test_input_dir)
@@ -45,7 +46,7 @@ def test_get_core_document_generator(test_input_dir: Path):
             "document_category",
             "document_source",
             "document_type",
-            "document_sectors",
+            "document_metadata",
             "document_date",
         ]:
             assert field in doc, f"{field} not found in {doc}"
@@ -97,7 +98,7 @@ def test_get_text_document_generator(
     """Test that the document generator returns documents in the correct format."""
 
     tasks = [
-        IndexerInput.parse_raw(path.read_text())
+        ParserOutput.parse_raw(path.read_text())
         for path in list(test_input_dir.glob("*.json"))
     ]
 
@@ -120,7 +121,7 @@ def test_get_text_document_generator(
             "document_slug",
             "document_name_and_slug",
             "document_content_type",
-            "document_sectors",
+            "document_metadata",
             "document_geography",
             "document_category",
             "document_source",
@@ -172,7 +173,7 @@ def test_document_generator_mapping_alignment(test_input_dir: Path):
     """
 
     tasks = [
-        IndexerInput.parse_raw(path.read_text())
+        ParserOutput.parse_raw(path.read_text())
         for path in list(test_input_dir.glob("*.json"))
     ]
 

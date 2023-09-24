@@ -1,4 +1,4 @@
 #!/bin/bash
 set -e
 
-python -m cli.text2embeddings --s3 --device=cpu "${EMBEDDINGS_INPUT_PREFIX}" "${INDEXER_INPUT_PREFIX}"
+python -m cli.index_data --s3 "${INDEXER_INPUT_PREFIX}"

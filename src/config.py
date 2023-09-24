@@ -3,8 +3,6 @@
 import os
 from typing import Set
 
-from src.base import BlockTypes
-
 
 def _convert_to_bool(x: str) -> bool:
     if x.lower() == "true":
@@ -22,7 +20,7 @@ ENCODING_BATCH_SIZE: int = int(os.getenv("ENCODING_BATCH_SIZE", "32"))
 CDN_URL: str = os.getenv("CDN_URL", "https://cdn.climatepolicyradar.org")
 KNN_PARAM_EF_SEARCH: int = int(
     os.getenv("KNN_PARAM_EF_SEARCH", "100")
-)  # TODO: tune me. see https://opensearch.org/docs/latest/search-plugins/knn/knn-index#index-settings
+)
 OPENSEARCH_INDEX_NUM_SHARDS: int = int(os.getenv("OPENSEARCH_INDEX_NUM_SHARDS", "1"))
 OPENSEARCH_INDEX_NUM_REPLICAS: int = int(
     os.getenv("OPENSEARCH_INDEX_NUM_REPLICAS", "2")

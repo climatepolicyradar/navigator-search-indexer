@@ -1,4 +1,8 @@
-"""List of expected fields in OpenSearch and their types. Used to generate the index mapping and validate documents in the indexer."""
+"""
+List of expected fields in OpenSearch and their types.
+
+Used to generate the index mapping and validate documents in the indexer.
+"""
 from typing import List, Dict
 
 # Fields that should appear in every Opensearch document
@@ -19,7 +23,7 @@ COMMON_FIELDS: Dict[str, List[str]] = {
         "document_category",
         "document_source",
         "document_type",
-        "document_sectors",
+        "document_metadata",
     ],
 }
 
