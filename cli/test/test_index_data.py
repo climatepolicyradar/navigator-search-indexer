@@ -4,7 +4,7 @@ from typing import Optional, Sequence
 import pytest
 from cpr_data_access.parser_models import ParserOutput, CONTENT_TYPE_HTML, CONTENT_TYPE_PDF
 
-from src.index_mapping import ALL_FIELDS
+from src.index_mapping import ALL_OPENSEARCH_FIELDS
 from cli.index_data import get_core_document_generator, get_text_document_generator
 
 
@@ -181,7 +181,7 @@ def test_document_generator_mapping_alignment(test_input_dir: Path):
 
     doc_generator = get_core_document_generator(tasks, test_input_dir)
 
-    all_fields_flat = [field for fields in ALL_FIELDS.values() for field in fields]
+    all_fields_flat = [field for fields in ALL_OPENSEARCH_FIELDS.values() for field in fields]
 
     for doc in doc_generator:
         fields_not_in_mapping = set(doc.keys()) - set(all_fields_flat)
