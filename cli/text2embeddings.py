@@ -2,7 +2,6 @@
 
 import logging
 import logging.config
-import json
 import os
 from pathlib import Path
 from typing import Optional
@@ -61,8 +60,8 @@ logging.config.dictConfig(DEFAULT_LOGGING)
 @click.option(
     "--redo",
     "-r",
-    help="Redo encoding for files that have already been parsed. By default, files with IDs that already exist "
-    "in the output directory are skipped.",
+    help="Redo encoding for files that have already been parsed. By default, "
+    "files with IDs that already exist in the output directory are skipped.",
     is_flag=True,
     default=False,
 )
@@ -88,25 +87,30 @@ def run_as_cli(
     limit: Optional[int],
 ):
     """
-    Run CLI to produce embeddings from document parser JSON outputs. Each embeddings file is called {id}.json
-    where {id} is the document ID of the input. Its first line is the description embedding and all other lines
-    are embeddings of each of the text blocks in the document in order. Encoding will automatically run on the
-    GPU if one is available.
+    Run CLI to produce embeddings from document parser JSON outputs.
 
-    Args: input_dir: Directory containing JSON files output_dir: Directory to save embeddings to s3: Whether we
-    are reading from and writing to S3. redo: Redo encoding for files that have already been parsed. By default,
-    files with IDs that already exist in the output directory are skipped. limit (Optional[int]): Optionally
-    limit the number of text samples to process. Useful for debugging. device (str): Device to use for
-    embeddings generation. Must be either "cuda" or "cpu".
+    Each embeddings file is called {id}.json where {id} is the document ID of the
+    input. Its first line is the description embedding and all other lines are
+    embeddings of each of the text blocks in the document in order. Encoding will
+    automatically run on the GPU if one is available.
+
+    Args: input_dir: Directory containing JSON files output_dir: Directory to save
+    embeddings to s3: Whether we are reading from and writing to S3. redo: Redo
+    encoding for files that have already been parsed. By default, files with IDs that
+    already exist in the output directory are skipped. limit (Optional[int]):
+    Optionally limit the number of text samples to process. Useful for debugging.
+    device (str): Device to use for embeddings generation. Must be either "cuda" or
+    "cpu".
     """
-    # FIXME: This solution assumes that we have a json document with language = en (supported target language)
-    #  for every document in the parser output. This isn't very robust. This solution also requires passing
-    #  every document into the embeddings stage so we are declaring tasks that are immediately dropped due to
-    #  content. Filter only to tasks that have one language and where the language is supported. These could
-    #  either be translated or in the original language.
+    # FIXME: This solution assumes that we have a json document with language = en (
+    #  supported target language) for every document in the parser output. This isn't
+    #  very robust. This solution also requires passing every document into the
+    #  embeddings stage so we are declaring tasks that are immediately dropped due to
+    #  content. Filter only to tasks that have one language and where the language is
+    #  supported. These could either be translated or in the original language.
 
     logger.info(
-        f"Running embeddings generation...",
+        "Running embeddings generation...",
         extra={
             "props": {
                 "input_dir": input_dir,

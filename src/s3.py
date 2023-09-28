@@ -1,11 +1,10 @@
-import json
 import tempfile
 from typing import Any, Sequence
 
 import boto3
 import numpy as np
-from botocore.exceptions import ClientError
 from aws_error_utils import errors
+from botocore.exceptions import ClientError
 
 from src.config import S3_PATTERN
 

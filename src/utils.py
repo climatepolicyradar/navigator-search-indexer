@@ -150,7 +150,9 @@ def get_files_to_process(
             files_to_process = os.listdir(input_dir)
 
     files_to_process_ids = get_ids_with_suffix(files_to_process, ".json")
-    files_already_processed = document_ids_previously_parsed.intersection(files_to_process_ids)
+    files_already_processed = document_ids_previously_parsed.intersection(
+        files_to_process_ids
+    )
     if not redo and files_already_processed:
         logger.warning(
             f"{len(files_already_processed)} "
@@ -158,9 +160,7 @@ def get_files_to_process(
         )
 
     files_to_process_ids_sequence = [
-        id_
-        for id_ in files_to_process_ids
-        if id_ not in document_ids_previously_parsed
+        id_ for id_ in files_to_process_ids if id_ not in document_ids_previously_parsed
     ]
     if not files_to_process_ids_sequence:
         logger.warning("No more documents to encode. Exiting.")
