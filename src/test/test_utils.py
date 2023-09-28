@@ -46,7 +46,8 @@ def test_has_valid_text_override(test_parser_output_array: Sequence[ParserOutput
     """
     Test that the get_text_blocks method provides the right response.
 
-    Particularly when using the including_invalid_html parameter."""
+    Particularly when using the including_invalid_html parameter.
+    """
 
     output = test_parser_output_array[1]
     assert output.get_text_blocks() == []
