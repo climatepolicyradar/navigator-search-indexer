@@ -2,11 +2,12 @@ import logging
 from collections import defaultdict
 from datetime import datetime
 from pathlib import Path
-from typing import Generator, NewType, Sequence, Tuple, Union
+from typing import Any, Generator, Mapping, NewType, Sequence, Tuple, Union
 
 from cloudpathlib import S3Path
 from cpr_data_access.parser_models import ParserOutput
 from vespa.application import Vespa
+from vespa.io import VespaResponse
 import numpy as np
 
 from src import config
@@ -19,9 +20,18 @@ DocumentID = NewType("DocumentID", str)
 SEARCH_WEIGHTS_SCHEMA = SchemaName("search_weights")
 FAMILY_DOCUMENT_SCHEMA = SchemaName("family_document")
 DOCUMENT_PASSAGE_SCHEMA = SchemaName("document_passage")
+_SCHEMAS_TO_PROCESS = [
+    SEARCH_WEIGHTS_SCHEMA,
+    FAMILY_DOCUMENT_SCHEMA,
+    DOCUMENT_PASSAGE_SCHEMA,
+]
 
 
 class VespaConfigError(config.ConfigError):
+    pass
+
+
+class VespaIndexError(config.ConfigError):
     pass
 
 
@@ -38,7 +48,9 @@ class VespaIndex:
         self._namespace = namespace
         self._app = Vespa(url=url, key=str(key), cert=str(cert))
 
-        raise NotImplementedError("Vespa Indexing not yet implemented")
+    @property
+    def app(self):
+        return self._app
 
 
 def get_document_generator(
@@ -47,18 +59,16 @@ def get_document_generator(
     embedding_dir_as_path: Union[Path, S3Path],
 ) -> Generator[Tuple[SchemaName, DocumentID, dict], None, None]:
     """
-    Get generator for text documents to index.
+    Get generator for documents to index.
 
     Documents to index are those containing text passages and their embeddings.
-    Optionally filter by whether text passages have been translated and/or the
-    document content type.
 
-    :param tasks: list of tasks from the document parser
+    :param namespace: the Vespa namespace into which these documents should be placed
+    :param tasks: list of tasks from the embeddings generator
     :param embedding_dir_as_path: directory containing embeddings .npy files.
         These are named with IDs corresponding to the IDs in the tasks.
-    :param translated: optionally filter on whether text passages are translated
-    :param content_types: optionally filter on content types
-    :yield Generator[dict, None, None]: generator of Vespa documents
+    :yield Generator[Tuple[SchemaName, DocumentID, dict], None, None]: generator of
+        Vespa documents along with their schema and ID.
     """
 
     search_weights_id = DocumentID("default_weights")
@@ -77,6 +87,7 @@ def get_document_generator(
         inputs=tasks, remove_block_types=config.BLOCKS_TO_FILTER
     )
 
+    physical_document_count = 0
     for task in tasks:
         embeddings = np.load(str(embedding_dir_as_path / f"{task.document_id}.npy"))
 
@@ -99,6 +110,12 @@ def get_document_generator(
             "description_embedding": {"values": embeddings[0, :].tolist()},
         }
         yield FAMILY_DOCUMENT_SCHEMA, family_document_id, family_document_fields
+        physical_document_count += 1
+        if (physical_document_count % 50) == 0:
+            _LOGGER.info(
+                f"Document generator processing {physical_document_count} "
+                "physical documents"
+            )
 
         text_blocks = task.vertically_flip_text_block_coords().get_text_blocks()
         for document_passage_idx, (text_block, embedding) in enumerate(
@@ -114,6 +131,10 @@ def get_document_generator(
             }
             document_psg_id = DocumentID(f"{task.document_id}.{document_passage_idx}")
             yield DOCUMENT_PASSAGE_SCHEMA, document_psg_id, document_passage_fields
+
+    _LOGGER.info(
+        f"Document generator processed {physical_document_count} physical documents"
+    )
 
 
 def _get_vespa_instance(namespace: str) -> VespaIndex:
@@ -164,8 +185,25 @@ def _get_vespa_instance(namespace: str) -> VespaIndex:
     )
 
 
-def _batch_ingest(vespa: VespaIndex, to_process: dict):
+def _batch_ingest(vespa: VespaIndex, to_process: Mapping[SchemaName, list]):
+    responses: list[VespaResponse] = []
+    for schema in _SCHEMAS_TO_PROCESS:
+        if documents := to_process[schema]:
+            responses.extend(vespa.app.feed_batch(
+                batch=list(documents),
+                schema=str(schema),
+                asynchronous=True,
+                connections=10,
+                batch_size=100,
+            ))
 
+    errors = [r for r in responses if r.status_code >= 300]
+    _LOGGER.error(
+        "Indexing Failed",
+        extra={"props": {"error_responses": errors}},
+    )
+    if errors:
+        raise VespaIndexError("Indexing Failed")
 
 
 def populate_vespa(
@@ -192,7 +230,7 @@ def populate_vespa(
 
     # Process documents into Vespa in sized groups (bulk ingest operates on documents
     # of a single schema)
-    to_process = defaultdict(list)
+    to_process: dict[SchemaName, list] = defaultdict(list)
 
     for schema, doc_id, fields in document_generator:
         to_process[schema].append({

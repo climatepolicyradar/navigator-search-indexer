@@ -2,10 +2,17 @@ from pathlib import Path
 from typing import Optional, Sequence
 
 import pytest
-from cpr_data_access.parser_models import ParserOutput, CONTENT_TYPE_HTML, CONTENT_TYPE_PDF
+from cpr_data_access.parser_models import (
+    ParserOutput,
+    CONTENT_TYPE_HTML,
+    CONTENT_TYPE_PDF,
+)
 
-from src.index_mapping import ALL_OPENSEARCH_FIELDS
-from cli.index_data import get_core_document_generator, get_text_document_generator
+from src.index.opensearch import ALL_OPENSEARCH_FIELDS
+from src.index.opensearch import (
+    get_core_document_generator,
+    get_text_document_generator,
+)
 
 
 @pytest.fixture()
@@ -13,7 +20,18 @@ def test_input_dir() -> Path:
     return (Path(__file__).parent / "test_data" / "index_data_input").resolve()
 
 
-def test_get_core_document_generator(test_input_dir: Path):
+def test_vespa_get_document_generator(test_input_dir: Path):
+    """Test that the vespa document generator returns expected documents."""
+
+    tasks = [
+        ParserOutput.parse_raw(path.read_text())
+        for path in list(test_input_dir.glob("*.json"))
+    ]
+
+    # TODO: complete
+
+
+def test_opensearch_get_core_document_generator(test_input_dir: Path):
     """Test that the document generator returns documents in the correct format."""
 
     tasks = [
@@ -90,7 +108,7 @@ def test_get_core_document_generator(test_input_dir: Path):
 @pytest.mark.parametrize(
     "content_types", [[CONTENT_TYPE_PDF], [CONTENT_TYPE_HTML], None]
 )
-def test_get_text_document_generator(
+def test_opensearch_get_text_document_generator(
     test_input_dir: Path,
     translated: Optional[bool],
     content_types: Optional[Sequence[str]],
@@ -102,7 +120,8 @@ def test_get_text_document_generator(
         for path in list(test_input_dir.glob("*.json"))
     ]
 
-    # checking that we've picked up some tasks, otherwise the test is pointless as the document generator will be empty
+    # checking that we've picked up some tasks, otherwise the test is pointless
+    # because the document generator will be empty
     assert len(tasks) > 0
 
     doc_generator = get_text_document_generator(
@@ -167,9 +186,14 @@ def test_get_text_document_generator(
 
 def test_document_generator_mapping_alignment(test_input_dir: Path):
     """
-    Test that the document generator only returns fields which are in the set of constants used to create the index mapping.
+    Test that the document generator only returns supported fields.
 
-    This means that the document generator will not produce any fields which we're not expecting, so there will be no unpredictable type or analyzer behaviours in OpenSearch.
+    The document generator should only return fields that are in the set of
+    constants used to create the index mapping.
+
+    This means that the document generator will not produce any fields which
+    we're not expecting, so there will be no unpredictable type or analyzer
+    behaviours in OpenSearch.
     """
 
     tasks = [
@@ -181,7 +205,9 @@ def test_document_generator_mapping_alignment(test_input_dir: Path):
 
     doc_generator = get_core_document_generator(tasks, test_input_dir)
 
-    all_fields_flat = [field for fields in ALL_OPENSEARCH_FIELDS.values() for field in fields]
+    all_fields_flat = [
+        field for fields in ALL_OPENSEARCH_FIELDS.values() for field in fields
+    ]
 
     for doc in doc_generator:
         fields_not_in_mapping = set(doc.keys()) - set(all_fields_flat)
