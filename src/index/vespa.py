@@ -1,3 +1,4 @@
+import asyncio
 import logging
 from collections import defaultdict
 from datetime import datetime
@@ -96,10 +97,11 @@ def get_document_generator(
             "search_weights_ref": f"id:{namespace}:search_weights::{search_weights_id}",
             "name": task.document_name,
             "family_import_id": task.document_metadata.family_import_id,
-            "publication_ts": task.document_metadata.publication_ts,
-            "last_updated_ts": task.document_metadata.publication_ts,  # TODO: more data
+            "publication_ts": int(task.document_metadata.publication_ts.timestamp()),
+            # TODO: last updated time will requir more information rom the db
+            "last_updated_ts": int( task.document_metadata.publication_ts.timestamp()),
             "document_import_id": task.document_id,
-            "document_metadata": task.document_metadata,
+            "category": task.document_metadata.category,
             "languages": task.document_metadata.languages,
             "geography": task.document_metadata.geography,
             "md5_sum": task.document_md5_sum,
@@ -126,8 +128,8 @@ def get_document_generator(
             document_passage_fields = {
                 "family_document_ref": fam_doc_ref,
                 "search_weights_ref": search_weights_ref,
-                "text": text_block.text,
-                "text_embedding": embedding,
+                "text": "\n".join(text_block.text),
+                "text_embedding": embedding.tolist(),
             }
             document_psg_id = DocumentID(f"{task.document_id}.{document_passage_idx}")
             yield DOCUMENT_PASSAGE_SCHEMA, document_psg_id, document_passage_fields
@@ -185,7 +187,7 @@ def _get_vespa_instance(namespace: str) -> VespaIndex:
     )
 
 
-def _batch_ingest(vespa: VespaIndex, to_process: Mapping[SchemaName, list]):
+async def _batch_ingest(vespa: VespaIndex, to_process: Mapping[SchemaName, list]):
     responses: list[VespaResponse] = []
     for schema in _SCHEMAS_TO_PROCESS:
         if documents := to_process[schema]:
@@ -197,12 +199,12 @@ def _batch_ingest(vespa: VespaIndex, to_process: Mapping[SchemaName, list]):
                 batch_size=100,
             ))
 
-    errors = [r for r in responses if r.status_code >= 300]
-    _LOGGER.error(
-        "Indexing Failed",
-        extra={"props": {"error_responses": errors}},
-    )
+    errors = [(r.status_code, r.json) for r in responses if r.status_code >= 300]
     if errors:
+        _LOGGER.error(
+            "Indexing Failed",
+            extra={"props": {"error_responses": errors}},
+        )
         raise VespaIndexError("Indexing Failed")
 
 
@@ -220,6 +222,7 @@ def populate_vespa(
     """
     formatted_date = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
     namespace = f"{config.VESPA_NAMESPACE_PREFIX}_{formatted_date}"
+    _LOGGER.info(f"Populating namespace: {namespace}")
     vespa = _get_vespa_instance(namespace)
 
     document_generator = get_document_generator(
@@ -239,7 +242,7 @@ def populate_vespa(
         })
 
         if len(to_process[FAMILY_DOCUMENT_SCHEMA]) >= config.VESPA_DOCUMENT_BATCH_SIZE:
-            _batch_ingest(vespa, to_process)
+            asyncio.run(_batch_ingest(vespa, to_process))
             to_process.clear()
 
-    _batch_ingest(vespa, to_process)
+    asyncio.run(_batch_ingest(vespa, to_process))

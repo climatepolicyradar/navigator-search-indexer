@@ -115,13 +115,13 @@ def run_as_cli(
         )
         populate_opensearch(tasks=tasks, embedding_dir_as_path=embedding_dir_as_path)
         sys.exit(0)
-    if index_type.lower() == "vespa":
-        _LOGGER.error("Vespa indexing not yet implemented")
-        sys.exit(1)
+    elif index_type.lower() == "vespa":
+        _LOGGER.error("Vespa indexing still experimental")
         tasks, embedding_dir_as_path = _get_index_tasks(
             text2embedding_output_dir, s3, files_to_index, limit
         )
         populate_vespa(tasks=tasks, embedding_dir_as_path=embedding_dir_as_path)
+        sys.exit(0)
     _LOGGER.error(f"Unknown index type: {index_type}")
     sys.exit(1)
 
