@@ -97,9 +97,9 @@ def get_document_generator(
             "search_weights_ref": f"id:{namespace}:search_weights::{search_weights_id}",
             "name": task.document_name,
             "family_import_id": task.document_metadata.family_import_id,
-            "publication_ts": int(task.document_metadata.publication_ts.timestamp()),
+            "publication_ts": task.document_metadata.publication_ts.isoformat(),
             # TODO: last updated time will require more information from the db
-            "last_updated_ts": int( task.document_metadata.publication_ts.timestamp()),
+            "last_updated_ts": task.document_metadata.publication_ts.isoformat(),
             "document_import_id": task.document_id,
             "category": task.document_metadata.category,
             "languages": task.document_metadata.languages,
