@@ -61,7 +61,7 @@ OPENSEARCH_BULK_REQUEST_TIMEOUT: int = int(
 
 
 # Vespa config
-VESPA_DOCUMENT_BATCH_SIZE: int = int(os.getenv("VESPA_BATCH_SIZE", "50"))
+VESPA_DOCUMENT_BATCH_SIZE: int = int(os.getenv("VESPA_BATCH_SIZE", "500"))
 VESPA_INSTANCE_URL: str = os.getenv("VESPA_INSTANCE_URL", "")
 VESPA_CERT_LOCATION: str = os.getenv("VESPA_CERT_LOCATION", "")
 VESPA_KEY_LOCATION: str = os.getenv("VESPA_KEY_LOCATION", "")

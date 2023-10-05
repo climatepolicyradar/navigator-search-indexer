@@ -9,7 +9,7 @@ python = "~3.9"
 awscli = "^1.27.8"
 click = "^8.0.4"
 cloudpathlib = {version = "^0.7.0", extras = ["s3"]}
-cpr-data-access = {git = "https://github.com/climatepolicyradar/data-access.git", tag = "v0.1.4"}
+cpr-data-access = {git = "https://github.com/climatepolicyradar/data-access.git", tag = "v0.1.7"}
 huggingface_hub = "^0.4.0"
 opensearch-py = "^1.1.0"
 pydantic = "^1.10.2"

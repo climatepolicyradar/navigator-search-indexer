@@ -98,7 +98,7 @@ def get_document_generator(
             "name": task.document_name,
             "family_import_id": task.document_metadata.family_import_id,
             "publication_ts": int(task.document_metadata.publication_ts.timestamp()),
-            # TODO: last updated time will requir more information rom the db
+            # TODO: last updated time will require more information from the db
             "last_updated_ts": int( task.document_metadata.publication_ts.timestamp()),
             "document_import_id": task.document_id,
             "category": task.document_metadata.category,
@@ -119,7 +119,12 @@ def get_document_generator(
                 "physical documents"
             )
 
-        text_blocks = task.vertically_flip_text_block_coords().get_text_blocks()
+        try:
+            text_blocks = task.vertically_flip_text_block_coords().get_text_blocks()
+        except KeyError:
+            _LOGGER.exception(f"Error flipping text blocks for {task.document_id}")
+            continue
+
         for document_passage_idx, (text_block, embedding) in enumerate(
             zip(text_blocks, embeddings[1:, :])
         ):
@@ -195,8 +200,8 @@ async def _batch_ingest(vespa: VespaIndex, to_process: Mapping[SchemaName, list]
                 batch=list(documents),
                 schema=str(schema),
                 asynchronous=True,
-                connections=10,
-                batch_size=100,
+                connections=50,
+                batch_size=1000,
             ))
 
     errors = [(r.status_code, r.json) for r in responses if r.status_code >= 300]
