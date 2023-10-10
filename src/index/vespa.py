@@ -2,11 +2,20 @@ import asyncio
 import logging
 from collections import defaultdict
 from pathlib import Path
-from typing import Generator, Mapping, NewType, Optional, Sequence, Tuple, Union
+from typing import (
+    Annotated,
+    Generator,
+    Mapping,
+    NewType,
+    Optional,
+    Sequence,
+    Tuple,
+    Union,
+)
 
 from cloudpathlib import S3Path
-from cpr_data_access.parser_models import ParserOutput
-from pydantic import BaseModel, ConstrainedList
+from cpr_data_access.parser_models import ParserOutput, PDFTextBlock
+from pydantic import BaseModel, Field
 from vespa.application import Vespa
 from vespa.io import VespaResponse
 import numpy as np
@@ -18,6 +27,8 @@ from src.utils import filter_on_block_type
 _LOGGER = logging.getLogger(__name__)
 SchemaName = NewType("SchemaName", str)
 DocumentID = NewType("DocumentID", str)
+Coord = tuple[float, float]
+TextCoords = Sequence[Coord]  # Could do better - look at data access change
 SEARCH_WEIGHTS_SCHEMA = SchemaName("search_weights")
 FAMILY_DOCUMENT_SCHEMA = SchemaName("family_document")
 DOCUMENT_PASSAGE_SCHEMA = SchemaName("document_passage")
@@ -26,6 +37,7 @@ _SCHEMAS_TO_PROCESS = [
     FAMILY_DOCUMENT_SCHEMA,
     DOCUMENT_PASSAGE_SCHEMA,
 ]
+_NAMESPACE = "doc_search"  # no need to parameterise
 
 
 class VespaConfigError(config.ConfigError):
@@ -42,17 +54,15 @@ class VespaSearchWeights(BaseModel):
     passage_weight: float
 
 
-class VespaTextEmbedding(ConstrainedList):
-    item_type = float
-    min_items = 768
-    max_items = 768
-
-
 class VespaDocumentPassage(BaseModel):
     search_weights_ref: str
     family_document_ref: str
     text: str
-    text_embedding: VespaTextEmbedding
+    text_block_id: str
+    text_block_type: str
+    text_block_page: Optional[Annotated[int, Field(ge=0)]]
+    text_block_coords: Optional[TextCoords]
+    text_embedding: Annotated[list[float], 768]
 
 
 class VespaFamilyDocument(BaseModel):
@@ -72,7 +82,7 @@ class VespaFamilyDocument(BaseModel):
     cdn_object: Optional[str]
     source_url: Optional[str]
     family_metadata: Mapping[str, Sequence[str]]
-    description_embedding: VespaTextEmbedding
+    description_embedding: Annotated[list[float], 768]  # not enforced by pydantic
 
 
 def get_document_generator(
@@ -94,9 +104,9 @@ def get_document_generator(
 
     search_weights_id = DocumentID("default_weights")
     search_weights = VespaSearchWeights(
-        name_weight = 2.5,
-        description_weight = 2.0,
-        passage_weight = 1.0,
+        name_weight=2.5,
+        description_weight=2.0,
+        passage_weight=1.0,
     )
     yield SEARCH_WEIGHTS_SCHEMA, search_weights_id, search_weights.dict()
 
@@ -114,23 +124,23 @@ def get_document_generator(
 
         family_document_id = DocumentID(task.document_metadata.family_import_id)
         family_document = VespaFamilyDocument(
-            search_weights_ref = f"id:documents:search_weights::{search_weights_id}",
-            name = task.document_name,
-            description = task.document_description,
-            family_import_id = task.document_metadata.family_import_id,
-            family_slug = task.document_metadata.family_slug,
-            publication_ts = task.document_metadata.publication_ts.isoformat(),
-            document_import_id = task.document_id,
-            document_slug = task.document_slug,
-            category = task.document_metadata.category,
-            languages = task.document_metadata.languages,
-            geography = task.document_metadata.geography,
-            md5_sum = task.document_md5_sum,
-            content_type = task.document_content_type,
-            cdn_object = task.document_cdn_object,
-            source_url = task.document_metadata.source_url,
-            family_metadata = task.document_metadata.metadata,
-            description_embedding = embeddings[0].tolist(),
+            search_weights_ref=f"id:{_NAMESPACE}:search_weights::{search_weights_id}",
+            name=task.document_name,
+            description=task.document_description,
+            family_import_id=task.document_metadata.family_import_id,
+            family_slug=task.document_metadata.family_slug,
+            publication_ts=task.document_metadata.publication_ts.isoformat(),
+            document_import_id=task.document_id,
+            document_slug=task.document_slug,
+            category=task.document_metadata.category,
+            languages=task.document_metadata.languages,
+            geography=task.document_metadata.geography,
+            md5_sum=task.document_md5_sum,
+            content_type=task.document_content_type,
+            cdn_object=task.document_cdn_object,
+            source_url=task.document_metadata.source_url,
+            family_metadata=task.document_metadata.metadata,
+            description_embedding=embeddings[0].tolist(),
         )
         yield FAMILY_DOCUMENT_SCHEMA, family_document_id, family_document.dict()
         physical_document_count += 1
@@ -149,13 +159,23 @@ def get_document_generator(
         for document_passage_idx, (text_block, embedding) in enumerate(
             zip(text_blocks, embeddings[1:, :])
         ):
-            fam_doc_ref = f"id:documents:family_document::{family_document_id}"
-            search_weights_ref = f"id:documents:search_weights::{search_weights_id}"
+            fam_doc_ref = f"id:{_NAMESPACE}:family_document::{family_document_id}"
+            search_weights_ref = f"id:{_NAMESPACE}:search_weights::{search_weights_id}"
             document_passage = VespaDocumentPassage(
-                family_document_ref = fam_doc_ref,
-                search_weights_ref = search_weights_ref,
-                text = "\n".join(text_block.text),
-                text_embedding = embedding.tolist(),
+                family_document_ref=fam_doc_ref,
+                search_weights_ref=search_weights_ref,
+                text="\n".join(text_block.text),
+                text_block_id=text_block.text_block_id,
+                text_block_type=str(text_block.type),
+                text_block_page=(
+                    text_block.page_number
+                    if isinstance(text_block, PDFTextBlock)
+                    else None
+                ),
+                text_block_coords=(
+                    text_block.coords if isinstance(text_block, PDFTextBlock) else None
+                ),
+                text_embedding=embedding.tolist(),
             )
             document_psg_id = DocumentID(f"{task.document_id}.{document_passage_idx}")
             yield DOCUMENT_PASSAGE_SCHEMA, document_psg_id, document_passage.dict()
@@ -216,13 +236,16 @@ async def _batch_ingest(vespa: Vespa, to_process: Mapping[SchemaName, list]):
     responses: list[VespaResponse] = []
     for schema in _SCHEMAS_TO_PROCESS:
         if documents := to_process[schema]:
-            responses.extend(vespa.app.feed_batch(
-                batch=list(documents),
-                schema=str(schema),
-                asynchronous=True,
-                connections=50,
-                batch_size=1000,
-            ))
+            responses.extend(
+                vespa.feed_batch(
+                    batch=list(documents),
+                    schema=str(schema),
+                    namespace=_NAMESPACE,
+                    asynchronous=True,
+                    connections=50,
+                    batch_size=1000,
+                )
+            )
 
     errors = [(r.status_code, r.json) for r in responses if r.status_code >= 300]
     if errors:
@@ -257,10 +280,12 @@ def populate_vespa(
     to_process: dict[SchemaName, list] = defaultdict(list)
 
     for schema, doc_id, fields in document_generator:
-        to_process[schema].append({
-            "id": doc_id,
-            "fields": fields,
-        })
+        to_process[schema].append(
+            {
+                "id": doc_id,
+                "fields": fields,
+            }
+        )
 
         if len(to_process[FAMILY_DOCUMENT_SCHEMA]) >= config.VESPA_DOCUMENT_BATCH_SIZE:
             asyncio.run(_batch_ingest(vespa, to_process))

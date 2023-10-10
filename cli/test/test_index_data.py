@@ -13,7 +13,13 @@ from src.index.opensearch import (
     get_core_document_generator,
     get_text_document_generator,
 )
-from src.index.vespa import get_document_generator
+from src.index.vespa import (
+    _NAMESPACE,
+    DOCUMENT_PASSAGE_SCHEMA,
+    FAMILY_DOCUMENT_SCHEMA,
+    SEARCH_WEIGHTS_SCHEMA,
+    get_document_generator,
+)
 
 
 @pytest.fixture()
@@ -217,8 +223,6 @@ def test_opensearch_document_generator_mapping_alignment(test_input_dir: Path):
 
 def test_vespa_document_generator(
     test_input_dir: Path,
-    translated: Optional[bool],
-    content_types: Optional[Sequence[str]],
 ):
     """Test that the document generator returns documents in the correct format."""
 
@@ -236,29 +240,35 @@ def test_vespa_document_generator(
         embedding_dir_as_path=test_input_dir,
     )
 
-    for doc in doc_generator:
-        for field in [
-            "document_id",
-            "document_name",
-            "document_description",
-            "document_source_url",
-            "document_cdn_object",
-            "document_md5_sum",
-            "translated",
-            "document_slug",
-            "document_name_and_slug",
-            "document_content_type",
-            "document_metadata",
-            "document_geography",
-            "document_category",
-            "document_source",
-            "document_type",
-            "document_date",
-        ]:
-            assert field in doc, f"{field} not found in {doc}"
+    id_start_string = f"id:{_NAMESPACE}"
+    search_weights_ref = None
+    last_family_ref = None
+    last_passage_ref = None
+    for schema_type, idx, doc in doc_generator:
+        if schema_type == SEARCH_WEIGHTS_SCHEMA:
+            assert idx is not None
+            assert search_weights_ref is None  # we should only get one of these
+            search_weights_ref = f"{id_start_string}:{schema_type}::{idx}"
+            continue
 
-        if "text_block_id" in doc:
-            assert "text" in doc
-            assert "text_embedding" in doc
-            assert "text_block_coords" in doc
-            assert "text_block_page" in doc
+        if schema_type == FAMILY_DOCUMENT_SCHEMA:
+            assert doc.get("search_weights_ref") is not None
+            assert doc.get("search_weights_ref") == search_weights_ref
+            last_family_ref = f"{id_start_string}:{schema_type}::{idx}"
+            continue
+
+        if schema_type == DOCUMENT_PASSAGE_SCHEMA:
+            assert doc.get("search_weights_ref") is not None
+            assert doc.get("search_weights_ref") == search_weights_ref
+            assert last_family_ref is not None
+            assert doc.get("family_document_ref") is not None
+            assert doc.get("family_document_ref") == last_family_ref
+            last_passage_ref = f"{id_start_string}:{schema_type}::{idx}"
+            continue
+
+        assert False, "Unknown schema type"
+
+    # Make sure we've seen every type of doc expected
+    assert search_weights_ref is not None
+    assert last_family_ref is not None
+    assert last_passage_ref is not None

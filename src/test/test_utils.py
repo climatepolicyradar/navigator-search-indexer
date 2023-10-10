@@ -32,7 +32,7 @@ def test_indexer_input_array() -> list[ParserOutput]:
                 import_id="test_id",
                 slug="test_name_slug",
                 family_import_id="test_family_id",
-                # TODO: family_slug="test_family_slug"
+                family_slug="test_family_slug",
                 publication_ts=datetime.datetime.now(),
                 date="test_date",
                 source_url=None,
@@ -75,7 +75,7 @@ def test_indexer_input_array() -> list[ParserOutput]:
                 import_id="test_id",
                 slug="test_name_slug",
                 family_import_id="test_family_id",
-                # TODO: family_slug="test_family_slug",
+                family_slug="test_family_slug",
                 publication_ts=datetime.datetime.now(),
                 date="test_date",
                 source_url=None,
