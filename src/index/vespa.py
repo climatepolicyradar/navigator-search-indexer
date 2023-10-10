@@ -1,12 +1,12 @@
 import asyncio
 import logging
 from collections import defaultdict
-from datetime import datetime
 from pathlib import Path
-from typing import Any, Generator, Mapping, NewType, Sequence, Tuple, Union
+from typing import Generator, Mapping, NewType, Optional, Sequence, Tuple, Union
 
 from cloudpathlib import S3Path
 from cpr_data_access.parser_models import ParserOutput
+from pydantic import BaseModel, ConstrainedList
 from vespa.application import Vespa
 from vespa.io import VespaResponse
 import numpy as np
@@ -36,26 +36,46 @@ class VespaIndexError(config.ConfigError):
     pass
 
 
-class VespaIndex:
-    """Load data into a Vespa index."""
+class VespaSearchWeights(BaseModel):
+    name_weight: float
+    description_weight: float
+    passage_weight: float
 
-    def __init__(
-        self,
-        url: str,
-        key: Path,
-        cert: Path,
-        namespace: str,
-    ):
-        self._namespace = namespace
-        self._app = Vespa(url=url, key=str(key), cert=str(cert))
 
-    @property
-    def app(self):
-        return self._app
+class VespaTextEmbedding(ConstrainedList):
+    item_type = float
+    min_items = 768
+    max_items = 768
+
+
+class VespaDocumentPassage(BaseModel):
+    search_weights_ref: str
+    family_document_ref: str
+    text: str
+    text_embedding: VespaTextEmbedding
+
+
+class VespaFamilyDocument(BaseModel):
+    search_weights_ref: str
+    name: str
+    description: str
+    family_import_id: str
+    family_slug: str
+    document_import_id: str
+    document_slug: str
+    publication_ts: str
+    category: str
+    languages: Sequence[str]
+    geography: str
+    md5_sum: Optional[str]
+    content_type: Optional[str]
+    cdn_object: Optional[str]
+    source_url: Optional[str]
+    family_metadata: Mapping[str, Sequence[str]]
+    description_embedding: VespaTextEmbedding
 
 
 def get_document_generator(
-    namespace: str,
     tasks: Sequence[ParserOutput],
     embedding_dir_as_path: Union[Path, S3Path],
 ) -> Generator[Tuple[SchemaName, DocumentID, dict], None, None]:
@@ -73,12 +93,12 @@ def get_document_generator(
     """
 
     search_weights_id = DocumentID("default_weights")
-    search_weights_fields = {
-        "name_weight": 2.5,
-        "description_weight": 2.0,
-        "passage_weight": 1.0,
-    }
-    yield SEARCH_WEIGHTS_SCHEMA, search_weights_id, search_weights_fields
+    search_weights = VespaSearchWeights(
+        name_weight = 2.5,
+        description_weight = 2.0,
+        passage_weight = 1.0,
+    )
+    yield SEARCH_WEIGHTS_SCHEMA, search_weights_id, search_weights.dict()
 
     _LOGGER.info(
         "Filtering unwanted text block types.",
@@ -93,25 +113,26 @@ def get_document_generator(
         embeddings = np.load(str(embedding_dir_as_path / f"{task.document_id}.npy"))
 
         family_document_id = DocumentID(task.document_metadata.family_import_id)
-        family_document_fields = {
-            "search_weights_ref": f"id:{namespace}:search_weights::{search_weights_id}",
-            "name": task.document_name,
-            "family_import_id": task.document_metadata.family_import_id,
-            "publication_ts": task.document_metadata.publication_ts.isoformat(),
-            # TODO: last updated time will require more information from the db
-            "last_updated_ts": task.document_metadata.publication_ts.isoformat(),
-            "document_import_id": task.document_id,
-            "category": task.document_metadata.category,
-            "languages": task.document_metadata.languages,
-            "geography": task.document_metadata.geography,
-            "md5_sum": task.document_md5_sum,
-            "cdn_object": task.document_cdn_object,
-            "source_url": task.document_metadata.source_url,
-            "content_type": task.document_content_type,
-            "description": task.document_description,
-            "description_embedding": {"values": embeddings[0, :].tolist()},
-        }
-        yield FAMILY_DOCUMENT_SCHEMA, family_document_id, family_document_fields
+        family_document = VespaFamilyDocument(
+            search_weights_ref = f"id:documents:search_weights::{search_weights_id}",
+            name = task.document_name,
+            description = task.document_description,
+            family_import_id = task.document_metadata.family_import_id,
+            family_slug = task.document_metadata.family_slug,
+            publication_ts = task.document_metadata.publication_ts.isoformat(),
+            document_import_id = task.document_id,
+            document_slug = task.document_slug,
+            category = task.document_metadata.category,
+            languages = task.document_metadata.languages,
+            geography = task.document_metadata.geography,
+            md5_sum = task.document_md5_sum,
+            content_type = task.document_content_type,
+            cdn_object = task.document_cdn_object,
+            source_url = task.document_metadata.source_url,
+            family_metadata = task.document_metadata.metadata,
+            description_embedding = embeddings[0].tolist(),
+        )
+        yield FAMILY_DOCUMENT_SCHEMA, family_document_id, family_document.dict()
         physical_document_count += 1
         if (physical_document_count % 50) == 0:
             _LOGGER.info(
@@ -128,23 +149,23 @@ def get_document_generator(
         for document_passage_idx, (text_block, embedding) in enumerate(
             zip(text_blocks, embeddings[1:, :])
         ):
-            fam_doc_ref = f"id:{namespace}:family_document::{family_document_id}"
-            search_weights_ref = f"id:{namespace}:search_weights::{search_weights_id}"
-            document_passage_fields = {
-                "family_document_ref": fam_doc_ref,
-                "search_weights_ref": search_weights_ref,
-                "text": "\n".join(text_block.text),
-                "text_embedding": embedding.tolist(),
-            }
+            fam_doc_ref = f"id:documents:family_document::{family_document_id}"
+            search_weights_ref = f"id:documents:search_weights::{search_weights_id}"
+            document_passage = VespaDocumentPassage(
+                family_document_ref = fam_doc_ref,
+                search_weights_ref = search_weights_ref,
+                text = "\n".join(text_block.text),
+                text_embedding = embedding.tolist(),
+            )
             document_psg_id = DocumentID(f"{task.document_id}.{document_passage_idx}")
-            yield DOCUMENT_PASSAGE_SCHEMA, document_psg_id, document_passage_fields
+            yield DOCUMENT_PASSAGE_SCHEMA, document_psg_id, document_passage.dict()
 
     _LOGGER.info(
         f"Document generator processed {physical_document_count} physical documents"
     )
 
 
-def _get_vespa_instance(namespace: str) -> VespaIndex:
+def _get_vespa_instance() -> Vespa:
     """
     Creates a Vespa instance based on validated config values.
 
@@ -184,15 +205,14 @@ def _get_vespa_instance(namespace: str) -> VespaIndex:
     if config_issues:
         raise VespaConfigError(f"Vespa configuration issues found: {config_issues}")
 
-    return VespaIndex(
+    return Vespa(
         url=config.VESPA_INSTANCE_URL,
-        key=key_location,
-        cert=cert_location,
-        namespace=namespace,
+        key=str(key_location),
+        cert=str(cert_location),
     )
 
 
-async def _batch_ingest(vespa: VespaIndex, to_process: Mapping[SchemaName, list]):
+async def _batch_ingest(vespa: Vespa, to_process: Mapping[SchemaName, list]):
     responses: list[VespaResponse] = []
     for schema in _SCHEMAS_TO_PROCESS:
         if documents := to_process[schema]:
@@ -225,13 +245,9 @@ def populate_vespa(
     :param embedding_dir: directory or S3 folder containing embeddings from the
         text2embeddings CLI.
     """
-    formatted_date = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
-    namespace = f"{config.VESPA_NAMESPACE_PREFIX}_{formatted_date}"
-    _LOGGER.info(f"Populating namespace: {namespace}")
-    vespa = _get_vespa_instance(namespace)
+    vespa = _get_vespa_instance()
 
     document_generator = get_document_generator(
-        namespace=namespace,
         tasks=tasks,
         embedding_dir_as_path=embedding_dir_as_path,
     )

@@ -13,6 +13,7 @@ from src.index.opensearch import (
     get_core_document_generator,
     get_text_document_generator,
 )
+from src.index.vespa import get_document_generator
 
 
 @pytest.fixture()
@@ -184,7 +185,7 @@ def test_opensearch_get_text_document_generator(
             assert doc["document_content_type"] == content_types[0]
 
 
-def test_document_generator_mapping_alignment(test_input_dir: Path):
+def test_opensearch_document_generator_mapping_alignment(test_input_dir: Path):
     """
     Test that the document generator only returns supported fields.
 
@@ -212,3 +213,52 @@ def test_document_generator_mapping_alignment(test_input_dir: Path):
     for doc in doc_generator:
         fields_not_in_mapping = set(doc.keys()) - set(all_fields_flat)
         assert len(fields_not_in_mapping) == 0
+
+
+def test_vespa_document_generator(
+    test_input_dir: Path,
+    translated: Optional[bool],
+    content_types: Optional[Sequence[str]],
+):
+    """Test that the document generator returns documents in the correct format."""
+
+    tasks = [
+        ParserOutput.parse_raw(path.read_text())
+        for path in list(test_input_dir.glob("*.json"))
+    ]
+
+    # checking that we've picked up some tasks, otherwise the test is pointless
+    # because the document generator will be empty
+    assert len(tasks) > 0
+
+    doc_generator = get_document_generator(
+        tasks=tasks,
+        embedding_dir_as_path=test_input_dir,
+    )
+
+    for doc in doc_generator:
+        for field in [
+            "document_id",
+            "document_name",
+            "document_description",
+            "document_source_url",
+            "document_cdn_object",
+            "document_md5_sum",
+            "translated",
+            "document_slug",
+            "document_name_and_slug",
+            "document_content_type",
+            "document_metadata",
+            "document_geography",
+            "document_category",
+            "document_source",
+            "document_type",
+            "document_date",
+        ]:
+            assert field in doc, f"{field} not found in {doc}"
+
+        if "text_block_id" in doc:
+            assert "text" in doc
+            assert "text_embedding" in doc
+            assert "text_block_coords" in doc
+            assert "text_block_page" in doc
