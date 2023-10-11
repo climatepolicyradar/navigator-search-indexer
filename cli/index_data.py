@@ -75,13 +75,7 @@ def _get_index_tasks(
 
 
 @click.command()
-@click.argument(
-    "indexer_input_dir",
-    help=(
-        "the directory from which to read files to index (pairs of "
-        "corresponding json & npy files)"
-    ),
-)
+@click.argument("indexer_input_dir")
 @click.option(
     "--s3",
     is_flag=True,
