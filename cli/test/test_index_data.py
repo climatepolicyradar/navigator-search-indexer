@@ -27,17 +27,6 @@ def test_input_dir() -> Path:
     return (Path(__file__).parent / "test_data" / "index_data_input").resolve()
 
 
-def test_vespa_get_document_generator(test_input_dir: Path):
-    """Test that the vespa document generator returns expected documents."""
-
-    tasks = [
-        ParserOutput.parse_raw(path.read_text())
-        for path in list(test_input_dir.glob("*.json"))
-    ]
-
-    # TODO: complete
-
-
 def test_opensearch_get_core_document_generator(test_input_dir: Path):
     """Test that the document generator returns documents in the correct format."""
 

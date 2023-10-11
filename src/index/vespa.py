@@ -14,7 +14,7 @@ from typing import (
 )
 
 from cloudpathlib import S3Path
-from cpr_data_access.parser_models import ParserOutput, PDFTextBlock
+from cpr_data_access.parser_models import ParserOutput, PDFTextBlock, VerticalFlipError
 from pydantic import BaseModel, Field
 from vespa.application import Vespa
 from vespa.io import VespaResponse
@@ -28,7 +28,7 @@ _LOGGER = logging.getLogger(__name__)
 SchemaName = NewType("SchemaName", str)
 DocumentID = NewType("DocumentID", str)
 Coord = tuple[float, float]
-TextCoords = Sequence[Coord]  # Could do better - look at data access change
+TextCoords = Sequence[Coord]  # TODO: Could do better - look at data access change
 SEARCH_WEIGHTS_SCHEMA = SchemaName("search_weights")
 FAMILY_DOCUMENT_SCHEMA = SchemaName("family_document")
 DOCUMENT_PASSAGE_SCHEMA = SchemaName("document_passage")
@@ -37,7 +37,9 @@ _SCHEMAS_TO_PROCESS = [
     FAMILY_DOCUMENT_SCHEMA,
     DOCUMENT_PASSAGE_SCHEMA,
 ]
-_NAMESPACE = "doc_search"  # no need to parameterise
+# TODO: no need to parameterise now, but namespaces
+# may be useful for some data separation labels later
+_NAMESPACE = "doc_search"
 
 
 class VespaConfigError(config.ConfigError):
@@ -49,12 +51,16 @@ class VespaIndexError(config.ConfigError):
 
 
 class VespaSearchWeights(BaseModel):
+    """Weights to be applied to each ranking element in searches"""
+
     name_weight: float
     description_weight: float
     passage_weight: float
 
 
 class VespaDocumentPassage(BaseModel):
+    """Document passage representation for search"""
+
     search_weights_ref: str
     family_document_ref: str
     text: str
@@ -66,6 +72,8 @@ class VespaDocumentPassage(BaseModel):
 
 
 class VespaFamilyDocument(BaseModel):
+    """Family-Document combined data useful for search"""
+
     search_weights_ref: str
     name: str
     description: str
@@ -82,7 +90,9 @@ class VespaFamilyDocument(BaseModel):
     cdn_object: Optional[str]
     source_url: Optional[str]
     family_metadata: Mapping[str, Sequence[str]]
-    description_embedding: Annotated[list[float], 768]  # not enforced by pydantic
+    description_embedding: Annotated[
+        list[float], 768
+    ]  # TODO: not yet enforced by pydantic
 
 
 def get_document_generator(
@@ -152,9 +162,12 @@ def get_document_generator(
 
         try:
             text_blocks = task.vertically_flip_text_block_coords().get_text_blocks()
-        except KeyError:
-            _LOGGER.exception(f"Error flipping text blocks for {task.document_id}")
-            continue
+        except VerticalFlipError:
+            _LOGGER.exception(
+                f"Error flipping text blocks for {task.document_id}, coordinates "
+                "will be incorrect for displayed passages"
+            )
+            text_blocks = task.get_text_blocks()
 
         for document_passage_idx, (text_block, embedding) in enumerate(
             zip(text_blocks, embeddings[1:, :])
@@ -191,6 +204,9 @@ def _get_vespa_instance() -> Vespa:
 
     :return Vespa: a Vespa instance to use for populating a new namespace.
     """
+    # TODO: consider creating a pydantic config objects & allowing pydantic to
+    # validate the config values we have/throw validation errors
+
     config_issues = []
     if not config.VESPA_INSTANCE_URL:
         config_issues.append(

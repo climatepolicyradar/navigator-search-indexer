@@ -6,7 +6,6 @@ authors = ["CPR Tech <tech@climatepolicyradar.org>"]
 
 [tool.poetry.dependencies]
 python = "~3.9"
-awscli = "^1.27.8"
 click = "^8.0.4"
 cloudpathlib = {version = "^0.7.0", extras = ["s3"]}
 cpr-data-access = {git = "https://github.com/climatepolicyradar/data-access.git", tag = "v0.1.9"}

@@ -75,7 +75,13 @@ def _get_index_tasks(
 
 
 @click.command()
-@click.argument("text2embedding-output-dir")
+@click.argument(
+    "indexer_input_dir",
+    help=(
+        "the directory from which to read files to index (pairs of "
+        "corresponding json & npy files)"
+    ),
+)
 @click.option(
     "--s3",
     is_flag=True,
@@ -103,7 +109,7 @@ def _get_index_tasks(
     help="Which search database type to populate.",
 )
 def run_as_cli(
-    text2embedding_output_dir: str,
+    indexer_input_dir: str,
     s3: bool,
     files_to_index: Optional[str],
     limit: Optional[int],
@@ -111,14 +117,14 @@ def run_as_cli(
 ) -> None:
     if index_type.lower() == "opensearch":
         tasks, embedding_dir_as_path = _get_index_tasks(
-            text2embedding_output_dir, s3, files_to_index, limit
+            indexer_input_dir, s3, files_to_index, limit
         )
         populate_opensearch(tasks=tasks, embedding_dir_as_path=embedding_dir_as_path)
         sys.exit(0)
     elif index_type.lower() == "vespa":
-        _LOGGER.error("Vespa indexing still experimental")
+        _LOGGER.warning("Vespa indexing still experimental")
         tasks, embedding_dir_as_path = _get_index_tasks(
-            text2embedding_output_dir, s3, files_to_index, limit
+            indexer_input_dir, s3, files_to_index, limit
         )
         populate_vespa(tasks=tasks, embedding_dir_as_path=embedding_dir_as_path)
         sys.exit(0)
