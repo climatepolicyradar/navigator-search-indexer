@@ -1,7 +1,11 @@
 """In-app config. Set by environment variables."""
 
 import os
-from typing import Set
+from typing import Optional, Set
+
+
+class ConfigError(Exception):
+    pass
 
 
 def _convert_to_bool(x: str) -> bool:
@@ -13,11 +17,21 @@ def _convert_to_bool(x: str) -> bool:
     raise ValueError(f"Cannot convert {x} to bool. Input must be 'True' or 'False'.")
 
 
-OPENSEARCH_INDEX_PREFIX: str = os.getenv("OPENSEARCH_INDEX_PREFIX", "navigator")
-SBERT_MODEL: str = os.getenv("SBERT_MODEL", "msmarco-distilbert-dot-v5")
+# General config
 INDEX_ENCODER_CACHE_FOLDER: str = os.getenv("INDEX_ENCODER_CACHE_FOLDER", "/models")
 ENCODING_BATCH_SIZE: int = int(os.getenv("ENCODING_BATCH_SIZE", "32"))
 CDN_URL: str = os.getenv("CDN_URL", "https://cdn.climatepolicyradar.org")
+TARGET_LANGUAGES: Set[str] = set(
+    os.getenv("TARGET_LANGUAGES", "en").lower().split(",")
+)  # comma-separated 2-letter ISO codes
+FILES_TO_PROCESS = os.getenv("FILES_TO_PROCESS")
+BLOCKS_TO_FILTER = os.getenv("BLOCKS_TO_FILTER", "Table,Figure").split(",")
+ENCODER_SUPPORTED_LANGUAGES: Set[str] = {"en"}
+
+
+# Opensearch Config
+OPENSEARCH_INDEX_PREFIX: str = os.getenv("OPENSEARCH_INDEX_PREFIX", "navigator")
+SBERT_MODEL: str = os.getenv("SBERT_MODEL", "msmarco-distilbert-dot-v5")
 KNN_PARAM_EF_SEARCH: int = int(
     os.getenv("KNN_PARAM_EF_SEARCH", "100")
 )
@@ -34,7 +48,6 @@ NMSLIB_EF_CONSTRUCTION: int = int(
 NMSLIB_M: int = int(
     os.getenv("NMSLIB_M", "16")
 )  # TODO: tune me. 16 is Opensearch default
-
 OPENSEARCH_USE_SSL: bool = _convert_to_bool(os.getenv("OPENSEARCH_USE_SSL", "True"))
 OPENSEARCH_VERIFY_CERTS: bool = _convert_to_bool(
     os.getenv("OPENSEARCH_VERIFY_CERTS", "True")
@@ -45,9 +58,11 @@ OPENSEARCH_SSL_SHOW_WARN: bool = _convert_to_bool(
 OPENSEARCH_BULK_REQUEST_TIMEOUT: int = int(
     os.getenv("OPENSEARCH_BULK_REQUEST_TIMEOUT", "60")
 )
-TARGET_LANGUAGES: Set[str] = set(
-    os.getenv("TARGET_LANGUAGES", "en").lower().split(",")
-)  # comma-separated 2-letter ISO codes
-ENCODER_SUPPORTED_LANGUAGES: Set[str] = {"en"}
-FILES_TO_PROCESS = os.getenv("FILES_TO_PROCESS")
-BLOCKS_TO_FILTER = os.getenv("BLOCKS_TO_FILTER", "Table,Figure").split(",")
+
+
+# Vespa config
+VESPA_DOCUMENT_BATCH_SIZE: int = int(os.getenv("VESPA_BATCH_SIZE", "500"))
+VESPA_INSTANCE_URL: str = os.getenv("VESPA_INSTANCE_URL", "")
+VESPA_CERT_LOCATION: str = os.getenv("VESPA_CERT_LOCATION", "")
+VESPA_KEY_LOCATION: str = os.getenv("VESPA_KEY_LOCATION", "")
+VESPA_NAMESPACE_PREFIX: str = os.getenv("VESPA_NAMESPACE_PREFIX", "navigator")

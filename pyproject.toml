@@ -6,25 +6,25 @@ authors = ["CPR Tech <tech@climatepolicyradar.org>"]
 
 [tool.poetry.dependencies]
 python = "~3.9"
-opensearch-py = "^1.1.0"
-cloudpathlib = {version = "^0.7.0", extras = ["s3"]}
-sentence-transformers = "^2.2.0"
-huggingface_hub = "^0.4.0"
 click = "^8.0.4"
-pytest = "^7.1.1"
+cloudpathlib = {version = "^0.7.0", extras = ["s3"]}
+cpr-data-access = {git = "https://github.com/climatepolicyradar/data-access.git", tag = "v0.1.9"}
+huggingface_hub = "^0.4.0"
+opensearch-py = "^1.1.0"
 pydantic = "^1.10.2"
 python-json-logger = "^2.0.4"
-awscli = "^1.27.8"
+pyvespa = "^0.37.1"
+sentence-transformers = "^2.2.0"
 torch = "^1.10.0"
-cpr-data-access = {git = "https://github.com/climatepolicyradar/data-access.git", tag = "v0.1.4"}
 
 [tool.poetry.dev-dependencies]
 black = "^22.1.0"
 flake8 = "^4.0.1"
 mypy = "^0.941"
-pre-commit = "^2.17.0"
-types-requests = "^2.28.11"
 pandas = "^1.5.1"
+pre-commit = "^2.17.0"
+pytest = "^7.1.1"
+types-requests = "^2.28.11"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

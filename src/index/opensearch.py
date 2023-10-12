@@ -2,16 +2,67 @@ import logging
 import os
 from pathlib import Path
 from time import sleep
-from typing import Generator, Optional, Iterable, Sequence, Tuple
+from typing import Generator, Mapping, Optional, Iterable, Sequence, Tuple, Union
 
+from cloudpathlib import S3Path
+from cpr_data_access.parser_models import (
+    ParserOutput,
+    PDFTextBlock,
+    CONTENT_TYPE_HTML,
+    CONTENT_TYPE_PDF,
+)
 from opensearchpy import ConnectionTimeout, OpenSearch, helpers
 from tqdm.auto import tqdm
+import numpy as np
 import requests
 
 from src import config
-from src.index_mapping import ALL_FIELDS
+from src.utils import filter_on_block_type
+
 
 _LOGGER = logging.getLogger(__name__)
+
+
+# Fields that should appear in every Opensearch document
+COMMON_OPENSEARCH_FIELDS: Mapping[str, Sequence[str]] = {
+    "id": ["document_name_and_slug"],  # eagerly loads inverted index for fast grouping
+    "sortable": ["document_id", "document_name", "document_description"],
+    "date": [
+        "document_date",
+    ],
+    "boolean": ["translated"],
+    "categorical": [
+        "document_slug",
+        "document_cdn_object",
+        "document_content_type",
+        "document_md5_sum",
+        "document_source_url",
+        "document_geography",
+        "document_category",
+        "document_source",
+        "document_type",
+        "document_metadata",
+    ],
+}
+
+# Fields that appear only in some Opensearch documents
+OPTIONAL_OPENSEARCH_FIELDS: Mapping[str, Sequence[str]] = {
+    "integer": ["text_block_page"],
+    "searchable": [
+        "for_search_document_name",
+        "for_search_document_description",
+        "text",
+    ],
+    "embedding": ["text_embedding", "document_description_embedding"],
+    "boolean": [],
+    "categorical": ["text_block_coords", "text_block_id"],
+}
+
+# All fields - used to generate the index mapping
+ALL_OPENSEARCH_FIELDS: Mapping[str, Sequence[str]] = {
+    x: COMMON_OPENSEARCH_FIELDS.get(x, []) + OPTIONAL_OPENSEARCH_FIELDS.get(x, [])
+    for x in set(COMMON_OPENSEARCH_FIELDS).union(OPTIONAL_OPENSEARCH_FIELDS)
+}
 
 
 class OpenSearchIndex:
@@ -66,32 +117,32 @@ class OpenSearchIndex:
     def _generate_mapping_properties(self) -> dict:
         mapping = dict()
 
-        mapping[ALL_FIELDS["id"][0]] = {
+        mapping[ALL_OPENSEARCH_FIELDS["id"][0]] = {
             "type": "keyword",
             "normalizer": "folding",
             # Load ordinals on indexing for this field for faster aggregations.
             "eager_global_ordinals": True,
         }
 
-        for field in ALL_FIELDS["sortable"]:
+        for field in ALL_OPENSEARCH_FIELDS["sortable"]:
             mapping[field] = {
                 "type": "keyword",
                 "normalizer": "folding",
             }
 
-        for field in ALL_FIELDS["date"]:
+        for field in ALL_OPENSEARCH_FIELDS["date"]:
             mapping[field] = {"type": "date", "format": "dd/MM/yyyy"}
 
-        for field in ALL_FIELDS["integer"]:
+        for field in ALL_OPENSEARCH_FIELDS["integer"]:
             mapping[field] = {"type": "integer"}
 
-        for field in ALL_FIELDS["searchable"]:
+        for field in ALL_OPENSEARCH_FIELDS["searchable"]:
             mapping[field] = {
                 "type": "text",
                 "analyzer": "folding",
             }
 
-        for field in ALL_FIELDS["embedding"]:
+        for field in ALL_OPENSEARCH_FIELDS["embedding"]:
             mapping[field] = {
                 "type": "knn_vector",
                 "dimension": config.OPENSEARCH_INDEX_EMBEDDING_DIM,
@@ -106,10 +157,10 @@ class OpenSearchIndex:
                 },
             }
 
-        for field in ALL_FIELDS["boolean"]:
+        for field in ALL_OPENSEARCH_FIELDS["boolean"]:
             mapping[field] = {"type": "boolean"}
 
-        for field in ALL_FIELDS["categorical"]:
+        for field in ALL_OPENSEARCH_FIELDS["categorical"]:
             mapping[field] = {"type": "keyword"}
 
         return mapping
@@ -366,10 +417,176 @@ def delete_index(index_name: str):
     opensearch.delete_index()
 
 
+def get_core_document_generator(
+    tasks: Sequence[ParserOutput], embedding_dir_as_path: Union[Path, S3Path]
+) -> Generator[dict, None, None]:
+    """
+    Generator for core documents to index
+
+    Documents to index are those with fields `for_search_document_name` and
+    `for_search_document_description`.
+
+    :param tasks: list of tasks from the document parser
+    :param embedding_dir_as_path: directory containing embeddings .npy files.
+        These are named with IDs corresponding to the IDs in the tasks.
+    :yield Generator[dict, None, None]: generator of Opensearch documents
+    """
+
+    for task in tasks:
+        all_metadata = get_metadata_dict(task)
+        embeddings = np.load(str(embedding_dir_as_path / f"{task.document_id}.npy"))
+
+        # Generate document name doc
+        yield {
+            **{"for_search_document_name": task.document_name},
+            **all_metadata,
+        }
+
+        # Generate document description doc
+        yield {
+            **{"for_search_document_description": task.document_description},
+            **all_metadata,
+            **{"document_description_embedding": embeddings[0, :].tolist()},
+        }
+
+
+def get_metadata_dict(task: ParserOutput) -> dict:
+    """
+    Get key-value pairs for metadata fields: fields which are not required for search.
+
+    :param task: task from the document parser
+    :return dict: key-value pairs for metadata fields
+    """
+
+    task_dict = {
+        **{k: v for k, v in task.dict().items() if k != "document_metadata"},
+        **{f"document_{k}": v for k, v in task.document_metadata.dict().items()},
+    }
+    task_dict["document_name_and_slug"] = f"{task.document_name} {task.document_slug}"
+    required_fields = [
+        field for fields in COMMON_OPENSEARCH_FIELDS.values() for field in fields
+    ]
+
+    return {k: v for k, v in task_dict.items() if k in required_fields}
+
+
+def get_text_document_generator(
+    tasks: Sequence[ParserOutput],
+    embedding_dir_as_path: Union[Path, S3Path],
+    translated: Optional[bool] = None,
+    content_types: Optional[Sequence[str]] = None,
+) -> Generator[dict, None, None]:
+    """
+    Get generator for text documents to index.
+
+    Documents to index are those containing text passages and their embeddings.
+    Optionally filter by whether text passages have been translated and/or the
+    document content type.
+
+    :param tasks: list of tasks from the document parser
+    :param embedding_dir_as_path: directory containing embeddings .npy files.
+        These are named with IDs corresponding to the IDs in the tasks.
+    :param translated: optionally filter on whether text passages are translated
+    :param content_types: optionally filter on content types
+    :yield Generator[dict, None, None]: generator of Opensearch documents
+    """
+
+    if translated is not None:
+        tasks = [task for task in tasks if task.translated is translated]
+
+    if content_types is not None:
+        tasks = [task for task in tasks if task.document_content_type in content_types]
+
+    _LOGGER.info(
+        "Filtering unwanted text block types.",
+        extra={"props": {"BLOCKS_TO_FILTER": config.BLOCKS_TO_FILTER}},
+    )
+    tasks = filter_on_block_type(
+        inputs=tasks, remove_block_types=config.BLOCKS_TO_FILTER
+    )
+
+    for task in tasks:
+        all_metadata = get_metadata_dict(task)
+        embeddings = np.load(str(embedding_dir_as_path / f"{task.document_id}.npy"))
+
+        # Generate text block docs
+        text_blocks = task.vertically_flip_text_block_coords().get_text_blocks()
+
+        for text_block, embedding in zip(text_blocks, embeddings[1:, :]):
+            block_dict = {
+                **{
+                    "text_block_id": text_block.text_block_id,
+                    "text": text_block.to_string(),
+                    "text_embedding": embedding.tolist(),
+                },
+                **all_metadata,
+            }
+            if isinstance(text_block, PDFTextBlock):
+                block_dict = {
+                    **block_dict,
+                    **{
+                        "text_block_coords": text_block.coords,
+                        "text_block_page": text_block.page_number,
+                    },
+                }
+            yield block_dict
+
+
 def populate_opensearch(
-    indices_to_populate: Sequence[Tuple[str, Generator[dict, None, None]]]
-):
-    """Populate all indices in the given list"""
+    tasks: Sequence[ParserOutput],
+    embedding_dir_as_path: Union[Path, S3Path],
+) -> None:
+    """
+    Index documents into Opensearch.
+
+    :param pdf_parser_output_dir: directory or S3 folder containing output JSON
+        files from the PDF parser.
+    :param embedding_dir: directory or S3 folder containing embeddings from the
+        text2embeddings CLI.
+    """
+    indices_to_populate: Sequence[Tuple[str, Generator[dict, None, None]]] = [
+        (
+            f"{config.OPENSEARCH_INDEX_PREFIX}_core",
+            get_core_document_generator(tasks, embedding_dir_as_path),
+        ),
+        (
+            f"{config.OPENSEARCH_INDEX_PREFIX}_pdfs_non_translated",
+            get_text_document_generator(
+                tasks,
+                embedding_dir_as_path,
+                translated=False,
+                content_types=[CONTENT_TYPE_PDF],
+            ),
+        ),
+        (
+            f"{config.OPENSEARCH_INDEX_PREFIX}_pdfs_translated",
+            get_text_document_generator(
+                tasks,
+                embedding_dir_as_path,
+                translated=True,
+                content_types=[CONTENT_TYPE_PDF],
+            ),
+        ),
+        (
+            f"{config.OPENSEARCH_INDEX_PREFIX}_htmls_non_translated",
+            get_text_document_generator(
+                tasks,
+                embedding_dir_as_path,
+                translated=False,
+                content_types=[CONTENT_TYPE_HTML],
+            ),
+        ),
+        (
+            f"{config.OPENSEARCH_INDEX_PREFIX}_htmls_translated",
+            get_text_document_generator(
+                tasks,
+                embedding_dir_as_path,
+                translated=True,
+                content_types=[CONTENT_TYPE_HTML],
+            ),
+        ),
+    ]
+
     # First remove the indices
     for index_name, _ in indices_to_populate:
         delete_index(index_name)
