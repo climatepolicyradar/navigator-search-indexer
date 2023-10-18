@@ -63,7 +63,7 @@ class VespaDocumentPassage(BaseModel):
 
     search_weights_ref: str
     family_document_ref: str
-    text: str
+    text_block: str
     text_block_id: str
     text_block_type: str
     text_block_page: Optional[Annotated[int, Field(ge=0)]]
@@ -75,24 +75,26 @@ class VespaFamilyDocument(BaseModel):
     """Family-Document combined data useful for search"""
 
     search_weights_ref: str
-    name: str
-    description: str
-    family_import_id: str
-    family_slug: str
-    document_import_id: str
-    document_slug: str
-    publication_ts: str
-    category: str
-    languages: Sequence[str]
-    geography: str
-    md5_sum: Optional[str]
-    content_type: Optional[str]
-    cdn_object: Optional[str]
-    source_url: Optional[str]
-    family_metadata: Mapping[str, Sequence[str]]
-    description_embedding: Annotated[
+    family_name: str
+    family_name_index: str
+    family_description: str
+    family_description_index: str
+    family_description_embedding: Annotated[
         list[float], 768
     ]  # TODO: not yet enforced by pydantic
+    family_import_id: str
+    family_slug: str
+    family_publication_ts: str
+    family_publication_year: int
+    family_category: str
+    family_geography: str
+    document_import_id: str
+    document_slug: str
+    document_languages: Sequence[str]
+    document_md5_sum: Optional[str]
+    document_content_type: Optional[str]
+    document_cdn_object: Optional[str]
+    document_source_url: Optional[str]
 
 
 def get_document_generator(
@@ -135,22 +137,24 @@ def get_document_generator(
         family_document_id = DocumentID(task.document_metadata.family_import_id)
         family_document = VespaFamilyDocument(
             search_weights_ref=f"id:{_NAMESPACE}:search_weights::{search_weights_id}",
-            name=task.document_name,
-            description=task.document_description,
+            family_name=task.document_name,
+            family_name_index=task.document_name,
+            family_description=task.document_description,
+            family_description_index=task.document_description,
+            family_description_embedding=embeddings[0].tolist(),
             family_import_id=task.document_metadata.family_import_id,
             family_slug=task.document_metadata.family_slug,
-            publication_ts=task.document_metadata.publication_ts.isoformat(),
+            family_publication_ts=task.document_metadata.publication_ts.isoformat(),
+            family_publication_year=task.document_metadata.publication_ts.year,
+            family_category=task.document_metadata.category,
+            family_geography=task.document_metadata.geography,
             document_import_id=task.document_id,
             document_slug=task.document_slug,
-            category=task.document_metadata.category,
-            languages=task.document_metadata.languages,
-            geography=task.document_metadata.geography,
-            md5_sum=task.document_md5_sum,
-            content_type=task.document_content_type,
-            cdn_object=task.document_cdn_object,
-            source_url=task.document_metadata.source_url,
-            family_metadata=task.document_metadata.metadata,
-            description_embedding=embeddings[0].tolist(),
+            document_languages=task.document_metadata.languages,
+            document_md5_sum=task.document_md5_sum,
+            document_content_type=task.document_content_type,
+            document_cdn_object=task.document_cdn_object,
+            document_source_url=task.document_metadata.source_url,
         )
         yield FAMILY_DOCUMENT_SCHEMA, family_document_id, family_document.dict()
         physical_document_count += 1
@@ -177,7 +181,7 @@ def get_document_generator(
             document_passage = VespaDocumentPassage(
                 family_document_ref=fam_doc_ref,
                 search_weights_ref=search_weights_ref,
-                text="\n".join(text_block.text),
+                text_block="\n".join(text_block.text),
                 text_block_id=text_block.text_block_id,
                 text_block_type=str(text_block.type),
                 text_block_page=(
