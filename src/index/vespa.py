@@ -88,6 +88,7 @@ class VespaFamilyDocument(BaseModel):
     family_publication_year: int
     family_category: str
     family_geography: str
+    family_source: str
     document_import_id: str
     document_slug: str
     document_languages: Sequence[str]
@@ -148,6 +149,7 @@ def get_document_generator(
             family_publication_year=task.document_metadata.publication_ts.year,
             family_category=task.document_metadata.category,
             family_geography=task.document_metadata.geography,
+            family_source=task.document_metadata.source,
             document_import_id=task.document_id,
             document_slug=task.document_slug,
             document_languages=task.document_metadata.languages,
