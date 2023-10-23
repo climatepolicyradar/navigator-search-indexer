@@ -14,7 +14,6 @@ opensearch-py = "^1.1.0"
 pydantic = "^1.10.2"
 python-json-logger = "^2.0.4"
 pyvespa = "^0.37.1"
-torch = "^1.10.0"
 
 [tool.poetry.dev-dependencies]
 black = "^22.1.0"
