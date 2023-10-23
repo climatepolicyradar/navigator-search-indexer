@@ -1,11 +1,12 @@
 #!/bin/bash
 set -e
 
-if [[ -z ${VESPA_KEY_LOCATION} ]]; then
-    echo "VESPA_KEY_LOCATION not found"
-else
-    mkdir -p $(dirname $VESPA_KEY_LOCATION)
-    echo ${VESPA_PRIVATE_KEY} > ${VESPA_KEY_LOCATION}
-fi
+echo Setting up for vespa
 
-python -m cli.index_data --s3 "${INDEXER_INPUT_PREFIX}"
+mkdir -p $(dirname $VESPA_KEY_LOCATION)
+echo ${VESPA_PRIVATE_KEY} > ${VESPA_KEY_LOCATION}
+
+mkdir -p $(dirname $VESPA_PUBLIC_CERT_LOCATION)
+echo ${VESPA_PUBLIC_CERT} > ${VESPA_PUBLIC_CERT_LOCATION}
+
+python -m cli.index_data --s3 "${INDEXER_INPUT_PREFIX}" --index-type vespa
