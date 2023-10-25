@@ -1,6 +1,7 @@
 import asyncio
 import logging
 from collections import defaultdict
+from io import BytesIO
 from pathlib import Path
 from typing import (
     Annotated,
@@ -11,6 +12,7 @@ from typing import (
     Sequence,
     Tuple,
     Union,
+    cast,
 )
 
 from cloudpathlib import S3Path
@@ -133,7 +135,9 @@ def get_document_generator(
 
     physical_document_count = 0
     for task in tasks:
-        embeddings = np.load(str(embedding_dir_as_path / f"{task.document_id}.npy"))
+        task_array_file_path = cast(Path, embedding_dir_as_path / f"{task.document_id}.npy")
+        with open(task_array_file_path, "rb") as task_array_file_like:
+            embeddings = np.load(BytesIO(task_array_file_like.read()))
 
         family_document_id = DocumentID(task.document_metadata.family_import_id)
         family_document = VespaFamilyDocument(
