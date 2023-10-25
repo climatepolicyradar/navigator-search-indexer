@@ -215,7 +215,7 @@ def _get_vespa_instance() -> Vespa:
     :return Vespa: a Vespa instance to use for populating a new namespace.
     """
     # TODO: consider creating a pydantic config objects & allowing pydantic to
-    # validate the config values we have/throw validation errors
+    #   validate the config values we have/throw validation errors
 
     config_issues = []
     if not config.VESPA_INSTANCE_URL:

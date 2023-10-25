@@ -14,7 +14,7 @@ from tqdm.auto import tqdm
 from cpr_data_access.parser_models import ParserOutput
 
 from src.index.opensearch import populate_opensearch
-from src.index.vespa import populate_vespa
+from src.index.vespa_ import populate_vespa
 
 LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO").upper()
 DEFAULT_LOGGING = {
