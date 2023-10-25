@@ -136,10 +136,9 @@ def get_document_generator(
     physical_document_count = 0
     for task in tasks:
         task_array_file_path = cast(Path, embedding_dir_as_path / f"{task.document_id}.npy")
-        task_array_file_like = task_array_file_path.open('rb')
-        task_array_file_like.seek(0)
-        embeddings = np.load(BytesIO(task_array_file_like.read()))
-        task_array_file_like = None
+        with open(task_array_file_path, "rb") as task_array_file_like:
+            task_array_file_like.seek(0)
+            embeddings = np.load(BytesIO(task_array_file_like.read()))
 
         family_document_id = DocumentID(task.document_metadata.family_import_id)
         family_document = VespaFamilyDocument(
