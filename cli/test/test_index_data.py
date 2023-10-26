@@ -13,7 +13,7 @@ from src.index.opensearch import (
     get_core_document_generator,
     get_text_document_generator,
 )
-from src.index.vespa import (
+from src.index.vespa_ import (
     _NAMESPACE,
     DOCUMENT_PASSAGE_SCHEMA,
     FAMILY_DOCUMENT_SCHEMA,
