@@ -31,7 +31,7 @@ def test_opensearch_get_core_document_generator(test_input_dir: Path):
     """Test that the document generator returns documents in the correct format."""
 
     tasks = [
-        ParserOutput.parse_raw(path.read_text())
+        ParserOutput.model_validate_json(path.read_text())
         for path in list(test_input_dir.glob("*.json"))
     ]
 
@@ -112,7 +112,7 @@ def test_opensearch_get_text_document_generator(
     """Test that the document generator returns documents in the correct format."""
 
     tasks = [
-        ParserOutput.parse_raw(path.read_text())
+        ParserOutput.model_validate_json(path.read_text())
         for path in list(test_input_dir.glob("*.json"))
     ]
 
@@ -193,7 +193,7 @@ def test_opensearch_document_generator_mapping_alignment(test_input_dir: Path):
     """
 
     tasks = [
-        ParserOutput.parse_raw(path.read_text())
+        ParserOutput.model_validate_json(path.read_text())
         for path in list(test_input_dir.glob("*.json"))
     ]
 
@@ -216,7 +216,7 @@ def test_vespa_document_generator(
     """Test that the document generator returns documents in the correct format."""
 
     tasks = [
-        ParserOutput.parse_raw(path.read_text())
+        ParserOutput.model_validate_json(path.read_text())
         for path in list(test_input_dir.glob("*.json"))
     ]
 

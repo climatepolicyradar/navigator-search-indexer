@@ -459,8 +459,8 @@ def get_metadata_dict(task: ParserOutput) -> dict:
     """
 
     task_dict = {
-        **{k: v for k, v in task.dict().items() if k != "document_metadata"},
-        **{f"document_{k}": v for k, v in task.document_metadata.dict().items()},
+        **{k: v for k, v in task.model_dump().items() if k != "document_metadata"},
+        **{f"document_{k}": v for k, v in task.document_metadata.model_dump().items()},
     }
     task_dict["document_name_and_slug"] = f"{task.document_name} {task.document_slug}"
     required_fields = [

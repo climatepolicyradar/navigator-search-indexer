@@ -1,10 +1,12 @@
 """In-app config. Set by environment variables."""
 
 import os
-from typing import Optional, Set
+from typing import Set
 
 
 class ConfigError(Exception):
+    """Configuration Error."""
+
     pass
 
 
@@ -32,9 +34,7 @@ ENCODER_SUPPORTED_LANGUAGES: Set[str] = {"en"}
 # Opensearch Config
 OPENSEARCH_INDEX_PREFIX: str = os.getenv("OPENSEARCH_INDEX_PREFIX", "navigator")
 SBERT_MODEL: str = os.getenv("SBERT_MODEL", "msmarco-distilbert-dot-v5")
-KNN_PARAM_EF_SEARCH: int = int(
-    os.getenv("KNN_PARAM_EF_SEARCH", "100")
-)
+KNN_PARAM_EF_SEARCH: int = int(os.getenv("KNN_PARAM_EF_SEARCH", "100"))
 OPENSEARCH_INDEX_NUM_SHARDS: int = int(os.getenv("OPENSEARCH_INDEX_NUM_SHARDS", "1"))
 OPENSEARCH_INDEX_NUM_REPLICAS: int = int(
     os.getenv("OPENSEARCH_INDEX_NUM_REPLICAS", "2")

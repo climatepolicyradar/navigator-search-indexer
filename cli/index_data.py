@@ -8,7 +8,6 @@ from pathlib import Path
 from typing import Optional, Sequence, Tuple, Union, cast
 
 import click
-import numpy as np
 from cloudpathlib import S3Path
 from tqdm.auto import tqdm
 from cpr_data_access.parser_models import ParserOutput
@@ -52,7 +51,7 @@ def _get_index_tasks(
 
     _LOGGER.info(f"Getting tasks from {'s3' if s3 else 'local'}")
     tasks = [
-        ParserOutput.parse_raw(path.read_text())
+        ParserOutput.model_validate_json(path.read_text())
         for path in tqdm(list(embedding_dir_as_path.glob("*.json")))
     ]
 
