@@ -6,7 +6,7 @@ import botocore.client
 import pytest
 from moto import mock_s3
 
-from cpr_data_access.parser_models import BlockType, PDFTextBlock, TextBlock
+from cpr_data_access.parser_models import BlockType, HTMLTextBlock
 
 
 class S3Client:
@@ -1134,14 +1134,12 @@ def pipeline_s3_client_main(s3_bucket_and_region, pipeline_s3_objects_main):
         yield s3_client
 
 
-def get_text_block(text_block_type: str) -> TextBlock:
-    """Returns a TextBlock object with the given type."""
-    return PDFTextBlock(
+def get_html_text_block(text_block_type: str) -> HTMLTextBlock:
+    """Returns a HTMLTextBlock object with the given type."""
+    return HTMLTextBlock(
         text=["test_text"],
         text_block_id="test_text_block_id",
         language="test_language",
         type=BlockType(text_block_type),
         type_confidence=1.0,
-        coords=[(0, 0), (0, 0), (0, 0), (0, 0)],
-        page_number=0,
     )

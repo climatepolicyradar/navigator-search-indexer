@@ -10,7 +10,7 @@ from moto import mock_s3
 from cpr_data_access.parser_models import ParserOutput, HTMLData
 from cpr_data_access.pipeline_general_models import BackendDocument
 
-from cli.test.conftest import get_text_block
+from cli.test.conftest import get_html_text_block
 
 
 class S3Client:
@@ -155,13 +155,13 @@ def test_parser_output_array() -> List[ParserOutput]:
         get_parser_output(
             html_data=HTMLData(
                 has_valid_text=True,
-                text_blocks=[  # type: ignore
-                    get_text_block("Table"),
-                    get_text_block("Text"),
-                    get_text_block("Text"),
-                    get_text_block("Figure"),
-                    get_text_block("Text"),
-                    get_text_block("Google Text Block"),
+                text_blocks=[
+                    get_html_text_block("Table"),
+                    get_html_text_block("Text"),
+                    get_html_text_block("Text"),
+                    get_html_text_block("Figure"),
+                    get_html_text_block("Text"),
+                    get_html_text_block("Google Text Block"),
                 ],
             ),
             source_url="https://www.google.com/path.html",
@@ -173,9 +173,9 @@ def test_parser_output_array() -> List[ParserOutput]:
             html_data=HTMLData(
                 has_valid_text=False,
                 text_blocks=[  # type: ignore
-                    get_text_block("Table"),
-                    get_text_block("Text"),
-                    get_text_block("Google Text Block"),
+                    get_html_text_block("Table"),
+                    get_html_text_block("Text"),
+                    get_html_text_block("Google Text Block"),
                 ],
             ),
             source_url="https://www.google.com/path.html",
@@ -218,9 +218,9 @@ def test_parser_output_source_url_supported_lang_data() -> List[ParserOutput]:
         get_parser_output(
             html_data=HTMLData(
                 has_valid_text=True,
-                text_blocks=[  # type: ignore
-                    get_text_block("Table"),
-                    get_text_block("Google Text Block"),
+                text_blocks=[
+                    get_html_text_block("Table"),
+                    get_html_text_block("Google Text Block"),
                 ],
             ),
             source_url="https://www.example.com/files/climate-document.pdf",
@@ -237,9 +237,9 @@ def test_parser_output_source_url_un_supported_lang_data() -> List[ParserOutput]
         get_parser_output(
             html_data=HTMLData(
                 has_valid_text=True,
-                text_blocks=[  # type: ignore
-                    get_text_block("Table"),
-                    get_text_block("Google Text Block"),
+                text_blocks=[
+                    get_html_text_block("Table"),
+                    get_html_text_block("Google Text Block"),
                 ],
             ),
             source_url="https://www.example.com/files/climate-document.pdf",
