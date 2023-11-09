@@ -3,7 +3,6 @@ from typing import Sequence
 import numpy as np
 from cpr_data_access.parser_models import BlockType, ParserOutput, PDFTextBlock
 
-from cli.test.conftest import test_pdf_file_json  # noqa: F811, F401
 from src import config
 from src.ml import SBERTEncoder
 from src.utils import (
@@ -57,7 +56,7 @@ def test_has_valid_text_override(test_parser_output_array: Sequence[ParserOutput
     assert len(text_blocks_include_invalid) == 3
 
 
-def test_replace_text_blocks(test_pdf_file_json):  # noqa: F811
+def test_replace_text_blocks(test_pdf_file_json):
     """Tests that the replace_text_blocks function replaces the correct text blocks."""
     parser_output = ParserOutput.model_validate(test_pdf_file_json)
 
@@ -81,7 +80,7 @@ def test_replace_text_blocks(test_pdf_file_json):  # noqa: F811
     assert updated_parser_output.pdf_data.text_blocks[0].text == ["test_text_2"]
 
 
-def test_filter_blocks(test_pdf_file_json):  # noqa: F811
+def test_filter_blocks(test_pdf_file_json):
     """Tests that the filter_blocks function removes the correct text blocks."""
     parser_output = ParserOutput.model_validate(test_pdf_file_json)
 
@@ -111,7 +110,7 @@ def test_get_ids_with_suffix():
     assert set(filtered_ids) == {"test_id_1", "test_id_4"}
 
 
-def test_encode_indexer_input(test_pdf_file_json):  # noqa: F811
+def test_encode_indexer_input(test_pdf_file_json):
     """Tests that the encode_indexer_input function returns the correct embeddings."""
     encoder_obj = SBERTEncoder(config.SBERT_MODEL)
 

@@ -12,6 +12,11 @@ from cpr_data_access.pipeline_general_models import BackendDocument
 
 from cli.test.conftest import get_html_text_block
 
+pytest_plugins = [
+    "cli.test.conftest.fixtures.get_html_text_block",
+    "cli.test.conftest.fixtures.test_pdf_file_json",
+]
+
 
 class S3Client:
     """Helper class to connect to S3 and perform actions on buckets and documents."""
