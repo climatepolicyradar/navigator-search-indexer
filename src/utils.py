@@ -16,9 +16,9 @@ logger = logging.getLogger(__name__)
 
 def replace_text_blocks(block: ParserOutput, new_text_blocks: Sequence[TextBlock]):
     """Updates the text blocks in the ParserOutput object."""
-    if block.pdf_data is not None:
+    if block.pdf_data:
         block.pdf_data.text_blocks = new_text_blocks  # type: ignore
-    elif block.html_data is not None:
+    elif block.html_data:
         block.html_data.text_blocks = new_text_blocks  # type: ignore
 
     return block
@@ -184,7 +184,7 @@ def get_Text2EmbeddingsInput_array(
     or from the local file system.
     """
     return [
-        ParserOutput.parse_raw(
+        ParserOutput.model_validate_json(
             s3_object_read_text(os.path.join(input_dir, id_ + ".json"))
             if s3
             else Path(os.path.join(input_dir, id_ + ".json")).read_text()

@@ -106,7 +106,7 @@ def get_parser_output(
     """Return a ParserOutput object with the given parameters."""
     return ParserOutput(
         document_id="test_id",
-        document_metadata=BackendDocument.parse_obj(
+        document_metadata=BackendDocument.model_validate(
             {
                 "publication_ts": "2013-01-01T00:00:00",
                 "name": "Dummy Name",

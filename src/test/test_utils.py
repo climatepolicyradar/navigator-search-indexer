@@ -59,7 +59,7 @@ def test_has_valid_text_override(test_parser_output_array: Sequence[ParserOutput
 
 def test_replace_text_blocks(test_pdf_file_json):
     """Tests that the replace_text_blocks function replaces the correct text blocks."""
-    parser_output = ParserOutput.parse_obj(test_pdf_file_json)
+    parser_output = ParserOutput.model_validate(test_pdf_file_json)
 
     updated_parser_output = replace_text_blocks(
         block=parser_output,
@@ -83,7 +83,7 @@ def test_replace_text_blocks(test_pdf_file_json):
 
 def test_filter_blocks(test_pdf_file_json):
     """Tests that the filter_blocks function removes the correct text blocks."""
-    parser_output = ParserOutput.parse_obj(test_pdf_file_json)
+    parser_output = ParserOutput.model_validate(test_pdf_file_json)
 
     filtered_text_blocks = filter_blocks(
         parser_output=parser_output, remove_block_types=["Text"]
@@ -139,7 +139,7 @@ def test_encode_indexer_input(test_pdf_file_json):
         }
     )
 
-    input_obj = ParserOutput.parse_obj(test_pdf_file_json)
+    input_obj = ParserOutput.model_validate(test_pdf_file_json)
 
     description_embeddings, text_embeddings = encode_parser_output(
         encoder=encoder_obj, input_obj=input_obj, batch_size=32

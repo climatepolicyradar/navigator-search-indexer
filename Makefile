@@ -7,6 +7,7 @@ run_embeddings_generation:
 	docker run --entrypoint python -v ${PWD}/data:/app/data navigator-embeddings-generation -m cli.text2embeddings ./data/embeddings_input ./data/indexer_input
 
 test:
+	make build
 	docker run --entrypoint python navigator-embeddings-generation -m pytest -vvv
 
 dev_install:

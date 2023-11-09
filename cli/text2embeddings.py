@@ -178,9 +178,9 @@ def run_as_cli(
         task_output_path = os.path.join(output_dir, task.document_id + ".json")
 
         try:
-            write_json_to_s3(task.json(), task_output_path) if s3 else Path(
+            write_json_to_s3(task.model_dump_json(), task_output_path) if s3 else Path(
                 task_output_path
-            ).write_text(task.json())
+            ).write_text(task.model_dump_json())
         except Exception as e:
             logger.info(
                 "Failed to write embeddings data to s3.",

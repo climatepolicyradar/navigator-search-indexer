@@ -45,7 +45,7 @@ def test_run_encoder_local(
             }
 
             for path in Path(output_dir).glob("*.json"):
-                assert ParserOutput.parse_obj(json.loads(path.read_text()))
+                assert ParserOutput.model_validate(json.loads(path.read_text()))
 
             for path in Path(output_dir).glob("*.npy"):
                 assert np.load(str(path)).shape[1] == 768
@@ -116,7 +116,7 @@ def test_run_encoder_s3(
         )
         file_text = file_obj["Body"].read().decode("utf-8")
         file_json = json.loads(file_text)
-        assert ParserOutput.parse_obj(file_json)
+        assert ParserOutput.model_validate(file_json)
 
     for file in s3_files_npy:
         file_obj = pipeline_s3_client_main.client.get_object(

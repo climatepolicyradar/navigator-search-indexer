@@ -7,17 +7,17 @@ authors = ["CPR Tech <tech@climatepolicyradar.org>"]
 [tool.poetry.dependencies]
 python = "~3.9"
 sentence-transformers = "^2.2.0"
-huggingface_hub = "^0.4.0"
+huggingface_hub = ">=0.14.0,<1.0.0"
 click = "^8.0.4"
 pytest = "^7.1.1"
-pydantic = "^1.10.2"
+pydantic = "^2.4.0"
 python-json-logger = "^2.0.4"
 awscli = "^1.27.8"
 boto3 = "^1.26.153"
 aws-error-utils = "^2.7.0"
 moto = "^4.1.11"
-torch = "^1.10.0"
-cpr-data-access = {git = "https://github.com/climatepolicyradar/data-access.git", tag = "v0.1.4"}
+torch = "2.0.0"
+cpr-data-access = {git = "https://github.com/climatepolicyradar/data-access.git", tag = "0.3.0"}
 
 [tool.poetry.dev-dependencies]
 black = "^22.1.0"
