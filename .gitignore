@@ -150,3 +150,6 @@ dmypy.json
 
 # Pycharm
 .idea/
+
+# Misc
+secret/
