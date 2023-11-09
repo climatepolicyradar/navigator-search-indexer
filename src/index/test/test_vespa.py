@@ -20,5 +20,3 @@ def test_get_vespa_instance() -> None:
     with pytest.raises(VespaConfigError) as context:
         _get_vespa_instance()
     assert expected_error_string not in str(context.value)
-
-

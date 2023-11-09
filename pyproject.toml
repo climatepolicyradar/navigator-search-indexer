@@ -8,10 +8,10 @@ authors = ["CPR Tech <tech@climatepolicyradar.org>"]
 python = "~3.9"
 click = "^8.0.4"
 cloudpathlib = {version = "^0.7.0", extras = ["s3"]}
-cpr-data-access = {git = "https://github.com/climatepolicyradar/data-access.git", tag = "v0.1.9"}
-huggingface_hub = "^0.4.0"
+cpr-data-access = {git = "https://github.com/climatepolicyradar/data-access.git", tag = "0.3.0"}
+huggingface_hub = ">=0.14.0,<1.0.0"
 opensearch-py = "^1.1.0"
-pydantic = "^1.10.2"
+pydantic = "^2.4.0"
 python-json-logger = "^2.0.4"
 pyvespa = "^0.37.1"
 awscli = "^1.27.8"

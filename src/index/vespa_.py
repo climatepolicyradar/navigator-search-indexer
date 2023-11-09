@@ -45,10 +45,14 @@ _NAMESPACE = "doc_search"
 
 
 class VespaConfigError(config.ConfigError):
+    """Error for invalid vespa config."""
+
     pass
 
 
 class VespaIndexError(config.ConfigError):
+    """Error to throw during vespa indexing."""
+
     pass
 
 
@@ -68,8 +72,8 @@ class VespaDocumentPassage(BaseModel):
     text_block: str
     text_block_id: str
     text_block_type: str
-    text_block_page: Optional[Annotated[int, Field(ge=0)]]
-    text_block_coords: Optional[TextCoords]
+    text_block_page: Optional[Annotated[int, Field(ge=0)]] = None
+    text_block_coords: Optional[TextCoords] = None
     text_embedding: Annotated[list[float], 768]
 
 
@@ -94,10 +98,10 @@ class VespaFamilyDocument(BaseModel):
     document_import_id: str
     document_slug: str
     document_languages: Sequence[str]
-    document_md5_sum: Optional[str]
-    document_content_type: Optional[str]
-    document_cdn_object: Optional[str]
-    document_source_url: Optional[str]
+    document_md5_sum: Optional[str] = None
+    document_content_type: Optional[str] = None
+    document_cdn_object: Optional[str] = None
+    document_source_url: Optional[str] = None
 
 
 def get_document_generator(
@@ -123,7 +127,7 @@ def get_document_generator(
         description_weight=2.0,
         passage_weight=1.0,
     )
-    yield SEARCH_WEIGHTS_SCHEMA, search_weights_id, search_weights.dict()
+    yield SEARCH_WEIGHTS_SCHEMA, search_weights_id, search_weights.model_dump()
 
     _LOGGER.info(
         "Filtering unwanted text block types.",
@@ -135,7 +139,9 @@ def get_document_generator(
 
     physical_document_count = 0
     for task in tasks:
-        task_array_file_path = cast(Path, embedding_dir_as_path / f"{task.document_id}.npy")
+        task_array_file_path = cast(
+            Path, embedding_dir_as_path / f"{task.document_id}.npy"
+        )
         with open(task_array_file_path, "rb") as task_array_file_like:
             embeddings = np.load(BytesIO(task_array_file_like.read()))
 
@@ -162,7 +168,7 @@ def get_document_generator(
             document_cdn_object=task.document_cdn_object,
             document_source_url=task.document_metadata.source_url,
         )
-        yield FAMILY_DOCUMENT_SCHEMA, family_document_id, family_document.dict()
+        yield FAMILY_DOCUMENT_SCHEMA, family_document_id, family_document.model_dump()
         physical_document_count += 1
         if (physical_document_count % 50) == 0:
             _LOGGER.info(
@@ -201,7 +207,7 @@ def get_document_generator(
                 text_embedding=embedding.tolist(),
             )
             document_psg_id = DocumentID(f"{task.document_id}.{document_passage_idx}")
-            yield DOCUMENT_PASSAGE_SCHEMA, document_psg_id, document_passage.dict()
+            yield DOCUMENT_PASSAGE_SCHEMA, document_psg_id, document_passage.model_dump()
 
     _LOGGER.info(
         f"Document generator processed {physical_document_count} physical documents"
