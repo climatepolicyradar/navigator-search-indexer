@@ -1,15 +1,17 @@
 from typing import Generator
 from cloudpathlib import S3Path
-from unittest.mock import patch
+from unittest.mock import Mock, patch
+from typing import Any
 
 from src.index.opensearch import get_text_document_generator
 from cpr_data_access.pipeline_general_models import CONTENT_TYPE_PDF
+from cpr_data_access.parser_models import ParserOutput
 
 
 @patch("src.index.opensearch.np.load")
 def test_get_text_document_generator(
-    mock_np_load,
-    test_document_data,
+    mock_np_load: Mock,
+    test_document_data: tuple[ParserOutput, Any],
     embeddings_dir_as_path: S3Path,
 ) -> None:
     """
@@ -42,7 +44,8 @@ def test_get_text_document_generator(
 
     assert document is not None
     assert isinstance(document, dict)
-
+    assert parser_output.pdf_data is not None
+     
     parser_output_tb_pages = {
         block.page_number for block in parser_output.pdf_data.text_blocks
     }
