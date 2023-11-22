@@ -1,7 +1,6 @@
 import asyncio
 import logging
 from collections import defaultdict
-from io import BytesIO
 from pathlib import Path
 from typing import (
     Annotated,
@@ -13,7 +12,6 @@ from typing import (
     Tuple,
     Union,
     cast,
-    Any,
 )
 
 from cloudpathlib import S3Path
@@ -21,10 +19,10 @@ from cpr_data_access.parser_models import ParserOutput, PDFTextBlock, VerticalFl
 from pydantic import BaseModel, Field
 from vespa.application import Vespa
 from vespa.io import VespaResponse
-import numpy as np
+
 
 from src import config
-from src.utils import filter_on_block_type
+from src.utils import filter_on_block_type, read_npy_file
 
 
 _LOGGER = logging.getLogger(__name__)
@@ -103,13 +101,6 @@ class VespaFamilyDocument(BaseModel):
     document_content_type: Optional[str] = None
     document_cdn_object: Optional[str] = None
     document_source_url: Optional[str] = None
-
-
-# TODO: Move this function
-def read_npy_file(file_path: Path) -> Any:
-    """Read an npy file."""
-    with open(file_path, "rb") as task_array_file_like:
-        return np.load(BytesIO(task_array_file_like.read()))
 
 
 def get_document_generator(
