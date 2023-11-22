@@ -1,7 +1,6 @@
 import asyncio
 import logging
 from collections import defaultdict
-from io import BytesIO
 from pathlib import Path
 from typing import (
     Annotated,
@@ -20,10 +19,10 @@ from cpr_data_access.parser_models import ParserOutput, PDFTextBlock, VerticalFl
 from pydantic import BaseModel, Field
 from vespa.application import Vespa
 from vespa.io import VespaResponse
-import numpy as np
+
 
 from src import config
-from src.utils import filter_on_block_type
+from src.utils import filter_on_block_type, read_npy_file
 
 
 _LOGGER = logging.getLogger(__name__)
@@ -142,8 +141,7 @@ def get_document_generator(
         task_array_file_path = cast(
             Path, embedding_dir_as_path / f"{task.document_id}.npy"
         )
-        with open(task_array_file_path, "rb") as task_array_file_like:
-            embeddings = np.load(BytesIO(task_array_file_like.read()))
+        embeddings = read_npy_file(task_array_file_path)
 
         family_document_id = DocumentID(task.document_metadata.family_import_id)
         family_document = VespaFamilyDocument(

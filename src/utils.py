@@ -1,5 +1,9 @@
 import logging
-from typing import Sequence
+from typing import Sequence, Any
+from io import BytesIO
+from pathlib import Path
+import numpy as np
+
 
 from cpr_data_access.parser_models import BlockType, ParserOutput, TextBlock
 
@@ -65,3 +69,9 @@ def filter_on_block_type(
         )
         for _input in inputs
     ]
+
+
+def read_npy_file(file_path: Path) -> Any:
+    """Read an npy file."""
+    with open(file_path, "rb") as task_array_file_like:
+        return np.load(BytesIO(task_array_file_like.read()))

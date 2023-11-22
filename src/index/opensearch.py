@@ -507,6 +507,9 @@ def get_text_document_generator(
 
     for task in tasks:
         all_metadata = get_metadata_dict(task)
+        # FIXME: This feels wrong here, would it not be better to pass in the
+        # embeddings along with the ParserOutput rather than read in here?
+        # Makes testing hard. We could create a new pydantic object?
         embeddings = np.load(str(embedding_dir_as_path / f"{task.document_id}.npy"))
 
         # Generate text block docs
