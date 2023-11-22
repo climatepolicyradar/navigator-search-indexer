@@ -3,7 +3,10 @@ from cloudpathlib import S3Path
 from unittest.mock import Mock, patch
 from typing import Any
 
-from src.index.opensearch import get_text_document_generator
+from src.index.opensearch import (
+    get_text_document_generator,
+    get_core_document_generator,
+)
 from cpr_data_access.pipeline_general_models import CONTENT_TYPE_PDF
 from cpr_data_access.parser_models import ParserOutput
 
@@ -22,8 +25,6 @@ def test_get_text_document_generator(
     # TODO Test that we successfully filter for translated
     # TODO test that we correctly filter for content-type
     # TODO Test that we successfully remove the correct block types
-    # TODO Test that we successfully preserve page numbers
-    #   (or +1 if that's the desired functionality)
     # TODO Test the keys of the returned document dictionary
 
     parser_output, embeddings = test_document_data
@@ -45,7 +46,7 @@ def test_get_text_document_generator(
     assert document is not None
     assert isinstance(document, dict)
     assert parser_output.pdf_data is not None
-     
+
     parser_output_tb_pages = {
         block.page_number for block in parser_output.pdf_data.text_blocks
     }
@@ -67,4 +68,33 @@ def test_get_text_document_generator(
     assert document is None
 
 
-# TODO test the other generators
+@patch("src.index.opensearch.np.load")
+def test_get_core_document_generator(
+    mock_np_load: Mock,
+    test_document_data: tuple[ParserOutput, Any],
+    embeddings_dir_as_path: S3Path,
+) -> None:
+    """Test that the generator successfully represents json files."""
+    # TODO Test the keys of the returned document dictionary
+
+    parser_output, embeddings = test_document_data
+
+    mock_np_load.return_value = embeddings
+
+    text_document_generator = get_core_document_generator(
+        tasks=[parser_output], embedding_dir_as_path=embeddings_dir_as_path
+    )
+
+    assert isinstance(text_document_generator, Generator)
+
+    document = next(text_document_generator, None)
+    assert document is not None
+    assert isinstance(document, dict)
+
+    document = next(text_document_generator, None)
+    assert document is not None
+    assert isinstance(document, dict)
+
+    # We expect the generator to only yield two items
+    document = next(text_document_generator, None)
+    assert document is None
