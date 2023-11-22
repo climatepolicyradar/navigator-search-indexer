@@ -13,6 +13,7 @@ from typing import (
     Tuple,
     Union,
     cast,
+    Any,
 )
 
 from cloudpathlib import S3Path
@@ -104,6 +105,13 @@ class VespaFamilyDocument(BaseModel):
     document_source_url: Optional[str] = None
 
 
+# TODO: Move this function
+def read_npy_file(file_path: Path) -> Any:
+    """Read an npy file."""
+    with open(file_path, "rb") as task_array_file_like:
+        return np.load(BytesIO(task_array_file_like.read()))
+
+
 def get_document_generator(
     tasks: Sequence[ParserOutput],
     embedding_dir_as_path: Union[Path, S3Path],
@@ -142,8 +150,7 @@ def get_document_generator(
         task_array_file_path = cast(
             Path, embedding_dir_as_path / f"{task.document_id}.npy"
         )
-        with open(task_array_file_path, "rb") as task_array_file_like:
-            embeddings = np.load(BytesIO(task_array_file_like.read()))
+        embeddings = read_npy_file(task_array_file_path)
 
         family_document_id = DocumentID(task.document_metadata.family_import_id)
         family_document = VespaFamilyDocument(
