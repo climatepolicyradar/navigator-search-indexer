@@ -60,7 +60,11 @@ def test_get_text_document_generator(
     for text_block_page in parser_output_tb_pages:
         assert text_block_page in parser_output_md_pages
 
-    document_pages = {doc["text_block_page"] for doc in text_document_generator}
+    document_pages = set()
+    for doc in text_document_generator:
+        assert doc["text_block_page"] == int(doc["text_block_id"].split("_")[1])
+        document_pages.add(doc["text_block_page"])
+
     assert document_pages == parser_output_tb_pages
 
     # We expect the generator to only yield one item
