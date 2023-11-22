@@ -60,6 +60,7 @@ def test_get_text_document_generator(
     for text_block_page in parser_output_tb_pages:
         assert text_block_page in parser_output_md_pages
 
+    breakpoint()
     document_pages = {doc["text_block_page"] for doc in text_document_generator}
     assert document_pages == parser_output_tb_pages
 
