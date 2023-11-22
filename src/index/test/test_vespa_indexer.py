@@ -97,5 +97,4 @@ def test_get_document_generator(
         document_generator, set(), 0
     )
 
-    breakpoint()
     assert document_pages == parser_output_tb_pages
