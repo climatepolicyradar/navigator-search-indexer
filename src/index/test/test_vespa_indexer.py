@@ -83,11 +83,12 @@ def test_get_document_generator(
 
         schema, document_id, data = document  # type: ignore
         assert schema == DOCUMENT_PASSAGE_SCHEMA
-        # The document id is document_id + passage index
-        assert document_id == parser_output.document_id + f".{counter}"
-        assert isinstance(data, dict)
-
         document_passage = VespaDocumentPassage.model_validate(data)
+
+        id_page = document_passage.text_block_id.split("_")[1]
+
+        assert document_id == parser_output.document_id + f".{counter}"
+        assert document_passage.text_block_page == int(id_page)
         pages.add(document_passage.text_block_page)
 
         return validate_passages_and_collect_page_numbers(doc_gen, pages, counter + 1)
@@ -96,4 +97,5 @@ def test_get_document_generator(
         document_generator, set(), 0
     )
 
+    breakpoint()
     assert document_pages == parser_output_tb_pages
