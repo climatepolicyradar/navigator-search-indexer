@@ -63,7 +63,7 @@ def test_get_document_generator(
 
     schema, document_id, data = document
     assert schema == FAMILY_DOCUMENT_SCHEMA
-    assert document_id == parser_output.document_metadata.family_import_id
+    assert document_id == parser_output.document_metadata.import_id
     assert isinstance(data, dict)
     VespaFamilyDocument.model_validate(data)
 
