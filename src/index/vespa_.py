@@ -143,7 +143,7 @@ def get_document_generator(
         )
         embeddings = read_npy_file(task_array_file_path)
 
-        family_document_id = DocumentID(task.document_metadata.family_import_id)
+        family_document_id = DocumentID(task.document_metadata.import_id)
         family_document = VespaFamilyDocument(
             search_weights_ref=f"id:{_NAMESPACE}:search_weights::{search_weights_id}",
             family_name=task.document_name,
