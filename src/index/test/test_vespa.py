@@ -50,22 +50,23 @@ def test_get_document_generator(mock_read_npy_file):
 
     generator = get_document_generator(tasks, embedding_dir_as_path)
 
-    vespa_family_documents = []
-    vespa_document_passages = {}
+    vespa_family_document_ids = []
+    vespa_document_passage_fam_refs = []
     for schema, id, data in generator:
         if schema == FAMILY_DOCUMENT_SCHEMA:
-            vespa_family_documents.append(id)
+            vespa_family_document_ids.append(id)
         if schema == DOCUMENT_PASSAGE_SCHEMA:
-            vespa_document_passages[id] = data
+            vespa_document_passage_fam_refs.append(data["family_document_ref"])
 
-    # Check every id is unique and that there's one for each task
-    assert len(set(vespa_family_documents)) == len(vespa_family_documents)
-    assert len(vespa_family_documents) == len(tasks)
+    # Check every family document id is unique and that there's one for each task
+    assert len(set(vespa_family_document_ids)) == len(vespa_family_document_ids)
+    assert len(vespa_family_document_ids) == len(tasks)
 
-    for id in vespa_document_passages:
+    # Check that every family document is referenced by one passage
+    # (this is as we had one text block for each family document)
+    assert len(vespa_family_document_ids) == len(vespa_document_passage_fam_refs)
+    for ref in vespa_document_passage_fam_refs:
         # A document passage id CCLW.executive.0.0.0 would take the form
         # 'id:doc_search:family_document::CCLW.executive.0.0'
-        family_doc_ref_id_format = (
-            vespa_document_passages[id]["family_document_ref"].split(":")[-1] + ".0"
-        )
-        assert id == family_doc_ref_id_format
+        ref_id_format = ref.split(":")[-1]
+        assert ref_id_format in vespa_family_document_ids
