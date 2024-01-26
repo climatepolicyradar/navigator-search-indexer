@@ -317,7 +317,7 @@ def populate_vespa(
             }
         )
 
-        if len(to_process[FAMILY_DOCUMENT_SCHEMA]) >= config.VESPA_DOCUMENT_BATCH_SIZE:
+        if len(to_process[DOCUMENT_PASSAGE_SCHEMA]) >= config.VESPA_DOCUMENT_BATCH_SIZE:
             asyncio.run(_batch_ingest(vespa, to_process))
             to_process.clear()
 
