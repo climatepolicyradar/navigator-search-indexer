@@ -310,6 +310,9 @@ def populate_vespa(
     to_process: dict[SchemaName, list] = defaultdict(list)
 
     for schema, doc_id, fields in document_generator:
+        if not fields:
+            _LOGGER.critical(f"No fields for {doc_id}, of schema {schema}: {fields}")
+            continue
         to_process[schema].append(
             {
                 "id": doc_id,
