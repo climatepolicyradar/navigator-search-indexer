@@ -193,3 +193,10 @@ Run [this command](https://www.elastic.co/guide/en/elasticsearch/reference/curre
 ```shell
 sysctl -w vm.max_map_count=262144
 ```
+
+# Vespa test setup
+
+```
+make vespa_test_setup
+poetry run pytest ./tests
+```
