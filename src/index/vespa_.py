@@ -17,7 +17,7 @@ from typing import (
 from cloudpathlib import S3Path
 from cpr_data_access.parser_models import ParserOutput, PDFTextBlock, VerticalFlipError
 from pydantic import BaseModel, Field
-from tenacity import retry, retry_if_exception_type, wait_fixed, stop_after_attempt
+from tenacity import retry, retry_if_exception_type, wait_exponential, stop_after_attempt
 from vespa.application import Vespa
 from vespa.io import VespaResponse
 
@@ -267,7 +267,7 @@ def _get_vespa_instance() -> Vespa:
         cert=cert_location,
     )
 
-@retry(retry=retry_if_exception_type(VespaIndexError), wait=wait_fixed(5), stop=stop_after_attempt(3))
+@retry(retry=retry_if_exception_type(VespaIndexError), wait=wait_exponential(multiplier=1), stop=stop_after_attempt(3))
 def _batch_ingest(vespa: Vespa, to_process: Mapping[SchemaName, list]):
     responses: list[VespaResponse] = []
     for schema in _SCHEMAS_TO_PROCESS:
@@ -280,8 +280,8 @@ def _batch_ingest(vespa: Vespa, to_process: Mapping[SchemaName, list]):
                     schema=str(schema),
                     namespace=_NAMESPACE,
                     asynchronous=True,
-                    connections=50,
-                    batch_size=1000,
+                    connections=20,
+                    batch_size=100,
                 )
             )
 

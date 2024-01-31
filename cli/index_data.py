@@ -2,6 +2,7 @@
 
 import os
 import sys
+import time
 import logging
 import logging.config
 from pathlib import Path
@@ -119,7 +120,10 @@ def run_as_cli(
         tasks, embedding_dir_as_path = _get_index_tasks(
             indexer_input_dir, s3, files_to_index, limit
         )
+        start = time.time()
         populate_vespa(tasks=tasks, embedding_dir_as_path=embedding_dir_as_path)
+        duration = time.time() - start
+        _LOGGER.info(f"Vespa indexing completed after: {duration}s")
         sys.exit(0)
     _LOGGER.error(f"Unknown index type: {index_type}")
     sys.exit(1)
