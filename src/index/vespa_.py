@@ -1,4 +1,4 @@
-import asyncio
+import copy
 import logging
 from collections import defaultdict
 from pathlib import Path
@@ -270,7 +270,8 @@ def _get_vespa_instance() -> Vespa:
 def _batch_ingest(vespa: Vespa, to_process: Mapping[SchemaName, list]):
     responses: list[VespaResponse] = []
     for schema in _SCHEMAS_TO_PROCESS:
-        if documents := to_process[schema]:
+        if to_process[schema]:
+            documents = copy.deepcopy(to_process[schema])
             _LOGGER.info(f"Processing {schema}, with {len(documents)} documents")
             responses.extend(
                 vespa.feed_batch(
