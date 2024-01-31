@@ -262,10 +262,11 @@ def _get_vespa_instance() -> Vespa:
     )
 
 
-async def _batch_ingest(vespa: Vespa, to_process: Mapping[SchemaName, list]):
+def _batch_ingest(vespa: Vespa, to_process: Mapping[SchemaName, list]):
     responses: list[VespaResponse] = []
     for schema in _SCHEMAS_TO_PROCESS:
         if documents := to_process[schema]:
+            _LOGGER.info(f"Processing {schema}, with {len(documents)} documents")
             responses.extend(
                 vespa.feed_batch(
                     batch=list(documents),
@@ -277,13 +278,19 @@ async def _batch_ingest(vespa: Vespa, to_process: Mapping[SchemaName, list]):
                 )
             )
 
-    errors = [(r.status_code, r.json) for r in responses if r.status_code >= 300]
-    if errors:
-        _LOGGER.error(
-            "Indexing Failed",
-            extra={"props": {"error_responses": errors}},
-        )
-        raise VespaIndexError("Indexing Failed")
+            errors = [(r.status_code, r.json) for r in responses if r.status_code >= 300]
+            if errors:
+                _LOGGER.error(
+                    "Indexing Failed",
+                    extra={
+                        "props": {
+                            "error_responses": errors,
+                            "document_counts": f"{schema}: {[len(i) for i in to_process.values()]}",
+                            "schema": schema,
+                            },
+                    }
+                )
+                raise VespaIndexError("Indexing Failed")
 
 
 def populate_vespa(
@@ -321,7 +328,9 @@ def populate_vespa(
         )
 
         if len(to_process[DOCUMENT_PASSAGE_SCHEMA]) >= config.VESPA_DOCUMENT_BATCH_SIZE:
-            asyncio.run(_batch_ingest(vespa, to_process))
+            _batch_ingest(vespa, to_process)
+            _LOGGER.info(f"Clearing batch with length: {len(to_process[DOCUMENT_PASSAGE_SCHEMA])}")
             to_process.clear()
 
-    asyncio.run(_batch_ingest(vespa, to_process))
+    _LOGGER.info("Final ingest batch")
+    _batch_ingest(vespa, to_process)
