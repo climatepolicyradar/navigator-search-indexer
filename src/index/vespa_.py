@@ -255,7 +255,7 @@ def _get_vespa_instance() -> Vespa:
 
     :return Vespa: a Vespa instance to use for populating a new namespace.
     """
-    if config.DEV_MODE:
+    if config.DEVELOPMENT_MODE:
         key_location = cert_location = None
     else:
         key_location, cert_location = _check_vespa_certs()
