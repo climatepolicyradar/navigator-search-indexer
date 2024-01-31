@@ -212,15 +212,7 @@ def get_document_generator(
     )
 
 
-def _get_vespa_instance() -> Vespa:
-    """
-    Creates a Vespa instance based on validated config values.
-
-    :return Vespa: a Vespa instance to use for populating a new namespace.
-    """
-    # TODO: consider creating a pydantic config objects & allowing pydantic to
-    #   validate the config values we have/throw validation errors
-
+def _check_vespa_certs():
     config_issues = []
     if not config.VESPA_INSTANCE_URL:
         config_issues.append(
@@ -255,10 +247,23 @@ def _get_vespa_instance() -> Vespa:
     if config_issues:
         raise VespaConfigError(f"Vespa configuration issues found: {config_issues}")
 
+    return str(key_location), str(cert_location)
+
+def _get_vespa_instance() -> Vespa:
+    """
+    Creates a Vespa instance based on validated config values.
+
+    :return Vespa: a Vespa instance to use for populating a new namespace.
+    """
+    if config.DEV_MODE:
+        key_location = cert_location = None
+    else:
+        key_location, cert_location = _check_vespa_certs()
+    
     return Vespa(
         url=config.VESPA_INSTANCE_URL,
-        key=str(key_location),
-        cert=str(cert_location),
+        key=key_location,
+        cert=cert_location,
     )
 
 
