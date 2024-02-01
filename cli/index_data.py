@@ -38,6 +38,8 @@ DEFAULT_LOGGING = {
 _LOGGER = logging.getLogger(__name__)
 logging.config.dictConfig(DEFAULT_LOGGING)
 
+os.environ["CLOUPATHLIB_FILE_CACHE_MODE"] = "close_file"
+
 
 def _get_index_tasks(
     text2embedding_output_dir: str,
@@ -47,10 +49,11 @@ def _get_index_tasks(
 ) -> Tuple[Sequence[ParserOutput], Union[Path, S3Path]]:
     if s3:
         embedding_dir_as_path = cast(S3Path, S3Path(text2embedding_output_dir))
+        _LOGGER.info(f"Getting tasks from s3, cache dir: {embedding_dir_as_path._local}")
     else:
         embedding_dir_as_path = Path(text2embedding_output_dir)
+        _LOGGER.info(f"Getting tasks from local")
 
-    _LOGGER.info(f"Getting tasks from {'s3' if s3 else 'local'}")
     tasks = [
         ParserOutput.model_validate_json(path.read_text())
         for path in tqdm(list(embedding_dir_as_path.glob("*.json")))
