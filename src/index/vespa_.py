@@ -336,7 +336,6 @@ def populate_vespa(
 
         if len(to_process[DOCUMENT_PASSAGE_SCHEMA]) >= config.VESPA_DOCUMENT_BATCH_SIZE:
             _batch_ingest(vespa, to_process)
-            _LOGGER.info(f"Clearing batch with length: {len(to_process[DOCUMENT_PASSAGE_SCHEMA])}")
             to_process.clear()
 
     _LOGGER.info("Final ingest batch")

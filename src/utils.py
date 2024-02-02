@@ -73,5 +73,4 @@ def filter_on_block_type(
 
 def read_npy_file(file_path: Path) -> Any:
     """Read an npy file."""
-    with open(file_path, "rb") as task_array_file_like:
-        return np.load(BytesIO(task_array_file_like.read()))
+    return np.load(BytesIO(file_path.read_bytes()))
