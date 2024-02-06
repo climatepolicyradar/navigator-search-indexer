@@ -8,7 +8,9 @@ setup:
 build:
 	docker-compose -f docker-compose.dev.yml build
 
-test: vespa_setup
+vespa_setup: vespa_confirm_cli_installed vespa_dev_start vespa_healthy vespa_deploy_schema
+
+test:
 	docker-compose -f docker-compose.dev.yml run --rm navigator-search-indexer python -m pytest -vvv
 
 dev_install:
@@ -35,5 +37,3 @@ vespa_healthy:
 vespa_deploy_schema:
 	vespa config set target local
 	@vespa deploy tests/vespa_test_schema --wait 300
-
-vespa_setup: vespa_confirm_cli_installed vespa_dev_start vespa_healthy vespa_deploy_schema
