@@ -1357,28 +1357,6 @@ files = [
 ]
 
 [[package]]
-name = "opensearch-py"
-version = "1.1.0"
-description = "Python low-level client for OpenSearch"
-category = "main"
-optional = false
-python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, <4"
-files = [
-    {file = "opensearch-py-1.1.0.tar.gz", hash = "sha256:7d0c41cea61fedc34542be7fb9169931360134cf823c596f719106c3bd8466fe"},
-    {file = "opensearch_py-1.1.0-py2.py3-none-any.whl", hash = "sha256:cb573546fb373dac8091be9b8eac2ba8da277713eea4b50b4a49ccd30dec25f1"},
-]
-
-[package.dependencies]
-certifi = "*"
-urllib3 = ">=1.21.1,<2"
-
-[package.extras]
-async = ["aiohttp (>=3,<4)"]
-develop = ["black", "botocore", "coverage", "jinja2", "mock", "myst-parser", "pytest", "pytest-cov", "pyyaml", "requests (>=2.0.0,<3.0.0)", "sphinx", "sphinx-copybutton", "sphinx-rtd-theme"]
-docs = ["myst-parser", "sphinx", "sphinx-copybutton", "sphinx-rtd-theme"]
-requests = ["requests (>=2.4.0,<3.0.0)"]
-
-[[package]]
 name = "packaging"
 version = "23.2"
 description = "Core utilities for Python packages"
@@ -2371,4 +2349,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "~3.9"
-content-hash = "5a966ca17d8a2a73c7859d870adf94e725f95a063fbad82c2ce14b7622de85c3"
+content-hash = "92aaee6fcdba5a151683217c7fb7b62a633f63a353211c5ebb1733bccf367b19"

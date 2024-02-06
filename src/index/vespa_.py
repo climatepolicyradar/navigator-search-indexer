@@ -305,7 +305,7 @@ def populate_vespa(
     embedding_dir_as_path: Union[Path, S3Path],
 ) -> None:
     """
-    Index documents into Opensearch.
+    Index documents into Vespa.
 
     :param pdf_parser_output_dir: directory or S3 folder containing output JSON
         files from the PDF parser.

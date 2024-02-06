@@ -1,5 +1,3 @@
-"""Index data into a running Opensearch index."""
-
 import os
 import sys
 import time
@@ -13,7 +11,6 @@ from cloudpathlib import S3Path
 from tqdm.auto import tqdm
 from cpr_data_access.parser_models import ParserOutput
 
-from src.index.opensearch import populate_opensearch
 from src.index.vespa_ import populate_vespa
 
 LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO").upper()
@@ -113,11 +110,8 @@ def run_as_cli(
     index_type: str,
 ) -> None:
     if index_type.lower() == "opensearch":
-        tasks, embedding_dir_as_path = _get_index_tasks(
-            indexer_input_dir, s3, files_to_index, limit
-        )
-        populate_opensearch(tasks=tasks, embedding_dir_as_path=embedding_dir_as_path)
-        sys.exit(0)
+        click.echo(f"Index type: {index_type}, is no longer used", err=True)
+        sys.exit(1)
     elif index_type.lower() == "vespa":
         _LOGGER.warning("Vespa indexing still experimental")
         tasks, embedding_dir_as_path = _get_index_tasks(
