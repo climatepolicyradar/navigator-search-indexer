@@ -1,7 +1,6 @@
 """In-app config. Set by environment variables."""
 
 import os
-from typing import Set
 
 
 class ConfigError(Exception):

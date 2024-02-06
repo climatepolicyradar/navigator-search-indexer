@@ -18,9 +18,9 @@ RUN poetry config virtualenvs.create false
 RUN poetry install
 
 # Copy files to image
-COPY ./data ./data
 COPY ./src ./src
 COPY ./cli ./cli
+COPY ./tests ./tests
 
 # Pre-download the model
 ENV PYTHONPATH "${PYTHONPATH}:/app"

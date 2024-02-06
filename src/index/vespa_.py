@@ -1,6 +1,7 @@
 import copy
-import logging
 from collections import defaultdict
+import logging
+import os
 from pathlib import Path
 from typing import (
     Annotated,
@@ -215,12 +216,6 @@ def get_document_generator(
 
 def _check_vespa_certs():
     config_issues = []
-    if not config.VESPA_INSTANCE_URL:
-        config_issues.append(
-            "Vespa instance URL must be configured using environment "
-            "variable: 'VESPA_INSTANCE_URL'"
-        )
-
     if not config.VESPA_KEY_LOCATION:
         config_issues.append(
             "Vespa key location must be configured using environment "
@@ -256,6 +251,12 @@ def _get_vespa_instance() -> Vespa:
 
     :return Vespa: a Vespa instance to use for populating a new namespace.
     """
+    if not config.VESPA_INSTANCE_URL:
+        raise VespaConfigError(
+            "Vespa instance URL must be configured using environment "
+            "variable: 'VESPA_INSTANCE_URL'"
+        )
+
     if config.DEVELOPMENT_MODE:
         key_location = cert_location = None
     else:

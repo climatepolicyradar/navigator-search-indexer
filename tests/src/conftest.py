@@ -16,7 +16,15 @@ from cpr_data_access.parser_models import (
     BlockType,
     PDFPageMetadata,
 )
+from src.config import VESPA_INSTANCE_URL
 
+
+def pytest_configure(config):
+    if "vespa-app.cloud" in VESPA_INSTANCE_URL:
+        pytest.exit(
+            f"Vespa instance url looks like a cloud url: {VESPA_INSTANCE_URL} "
+            "Has something been misconfigured?"
+        )
 
 def read_local_json_file(file_path: str) -> dict:
     """Read a local json file and return the data."""
