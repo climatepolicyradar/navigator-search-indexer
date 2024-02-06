@@ -172,26 +172,6 @@ files = [
 botocore = "*"
 
 [[package]]
-name = "awscli"
-version = "1.32.32"
-description = "Universal Command Line Environment for AWS."
-category = "main"
-optional = false
-python-versions = ">= 3.8"
-files = [
-    {file = "awscli-1.32.32-py3-none-any.whl", hash = "sha256:60b8ac0ebe7c5c0540dd3982dc109683b69352c4350d63056311a52f42c94042"},
-    {file = "awscli-1.32.32.tar.gz", hash = "sha256:5d5ac346d97bfa0d2514077671acfbba1934bc7fd74ff31e95787068639bae0d"},
-]
-
-[package.dependencies]
-botocore = "1.34.32"
-colorama = ">=0.2.5,<0.4.5"
-docutils = ">=0.10,<0.17"
-PyYAML = ">=3.10,<6.1"
-rsa = ">=3.1.2,<4.8"
-s3transfer = ">=0.10.0,<0.11.0"
-
-[[package]]
 name = "black"
 version = "22.12.0"
 description = "The uncompromising code formatter."
@@ -694,18 +674,6 @@ urllib3 = ">=1.26.0"
 [package.extras]
 ssh = ["paramiko (>=2.4.3)"]
 websockets = ["websocket-client (>=1.3.0)"]
-
-[[package]]
-name = "docutils"
-version = "0.16"
-description = "Docutils -- Python Documentation Utilities"
-category = "main"
-optional = false
-python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
-files = [
-    {file = "docutils-0.16-py2.py3-none-any.whl", hash = "sha256:0c5b78adfbf7762415433f5515cd5c9e762339e23369dbe8000d84a4bf4ab3af"},
-    {file = "docutils-0.16.tar.gz", hash = "sha256:c2de3a60e9e7d07be26b7f2b00ca0309c207e06c100f9cc2a94931fc75a478fc"},
-]
 
 [[package]]
 name = "exceptiongroup"
@@ -1538,18 +1506,6 @@ files = [
 ]
 
 [[package]]
-name = "pyasn1"
-version = "0.5.1"
-description = "Pure-Python implementation of ASN.1 types and DER/BER/CER codecs (X.208)"
-category = "main"
-optional = false
-python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,!=3.5.*,>=2.7"
-files = [
-    {file = "pyasn1-0.5.1-py2.py3-none-any.whl", hash = "sha256:4439847c58d40b1d0a573d07e3856e95333f1976294494c325775aeca506eb58"},
-    {file = "pyasn1-0.5.1.tar.gz", hash = "sha256:6d391a96e59b23130a5cfa74d6fd7f388dbbe26cc8f1edf39fdddf08d9d6676c"},
-]
-
-[[package]]
 name = "pycodestyle"
 version = "2.8.0"
 description = "Python style guide checker"
@@ -1906,21 +1862,6 @@ urllib3 = ">=1.25.10,<3.0"
 
 [package.extras]
 tests = ["coverage (>=6.0.0)", "flake8", "mypy", "pytest (>=7.0.0)", "pytest-asyncio", "pytest-cov", "pytest-httpserver", "tomli", "tomli-w", "types-PyYAML", "types-requests"]
-
-[[package]]
-name = "rsa"
-version = "4.7.2"
-description = "Pure-Python RSA implementation"
-category = "main"
-optional = false
-python-versions = ">=3.5, <4"
-files = [
-    {file = "rsa-4.7.2-py3-none-any.whl", hash = "sha256:78f9a9bf4e7be0c5ded4583326e7461e3a3c5aae24073648b4bdfa797d78c9d2"},
-    {file = "rsa-4.7.2.tar.gz", hash = "sha256:9d689e6ca1b3038bc82bf8d23e944b6b6037bc02301a574935b2dd946e0353b9"},
-]
-
-[package.dependencies]
-pyasn1 = ">=0.1.3"
 
 [[package]]
 name = "s3transfer"
@@ -2349,4 +2290,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "~3.9"
-content-hash = "92aaee6fcdba5a151683217c7fb7b62a633f63a353211c5ebb1733bccf367b19"
+content-hash = "a20b0977b3d3fc8634928c504ad46afb55b815eb05fb03ed4b3224d8dca26231"
