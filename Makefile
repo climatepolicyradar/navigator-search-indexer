@@ -6,7 +6,7 @@ setup:
 	cp .env.example .env
 
 build:
-	docker-compose -f docker-compose.dev.yml build
+	docker build -t navigator-search-indexer .
 
 vespa_setup: vespa_confirm_cli_installed vespa_dev_start vespa_healthy vespa_deploy_schema
 
