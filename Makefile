@@ -25,7 +25,7 @@ vespa_confirm_cli_installed:
 	fi
 
 vespa_dev_start:
-	docker-compose -f docker-compose.dev.yml up vespaindexertest -d --remove-orphans --wait
+	docker compose -f docker-compose.dev.yml up --detach --wait vespaindexertest
 
 vespa_healthy:
 	@if [ ! $$(curl -f -s 'http://localhost:19071/status.html') ]; then \
