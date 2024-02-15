@@ -14,7 +14,25 @@ from cpr_data_access.parser_models import (
     HTMLTextBlock,
 )
 
-from src.utils import build_indexer_input_path, filter_on_block_type, get_index_paths
+from src.utils import (
+    build_indexer_input_path,
+    filter_on_block_type,
+    get_index_paths,
+    parse_files_to_index,
+)
+
+
+@pytest.mark.parametrize(
+        "value, want",
+        [
+            (None, []),
+            ("[]", []),
+            ('["doc.1", "doc.2"]', ["doc.1","doc.2"]),
+        ]
+)
+def test_parse_files_to_index(value, want):
+    got = parse_files_to_index(value)
+    assert got == want, f"Expected {want}, got {got}"
 
 
 @pytest.mark.parametrize(

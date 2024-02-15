@@ -1,7 +1,9 @@
-import logging
-from typing import Any, Optional, Sequence, Tuple, Union, cast
 from io import BytesIO
+import json
+import logging
 from pathlib import Path
+from typing import Any, Optional, Sequence, Tuple, Union, cast
+
 import numpy as np
 
 from cloudpathlib import S3Path
@@ -19,20 +21,34 @@ def build_indexer_input_path(indexer_input_dir: str, s3: bool) -> Union[S3Path, 
     return indexer_input_path
 
 
+def parse_files_to_index(files_to_index):
+    if files_to_index:
+        try:
+            files_to_index = json.loads(files_to_index)
+        except json.JSONDecodeError as e:
+            _LOGGER.error(f"Unable to parse json: {files_to_index}")
+            raise e
+
+        _LOGGER.info(f"Runnng on {len(files_to_index)} files")
+        return files_to_index
+    else:
+        _LOGGER.info("Runnng on all files")
+        return []
+
+
 def get_index_paths(
     indexer_input_path: str,
     files_to_index: Optional[str] = None,
     limit: Optional[int] = None,
 ) -> Tuple[Sequence[ParserOutput]]:
 
-    files_to_index = files_to_index.split(",") if files_to_index else []
+    files_to_index = parse_files_to_index(files_to_index)
 
     paths = []
     doc_ids = []
     for i, path in enumerate(list(indexer_input_path.glob("*.json")), 1):        
         doc_id = path.stem
-
-        if doc_id in files_to_index:
+        if files_to_index and (doc_id not in files_to_index):
             continue
 
         paths.append(path)
