@@ -38,40 +38,42 @@ logging.config.dictConfig(DEFAULT_LOGGING)
 os.environ["CLOUPATHLIB_FILE_CACHE_MODE"] = "close_file"
 
 
+def build_indexer_input_path(indexer_input_dir: str, s3: bool) -> Union[S3Path, Path]:
+    _LOGGER.info(f"Tasks will be retrieved from {'s3' if s3 else 'local'}: {indexer_input_dir}")
+    if s3:
+        indexer_input_path = cast(S3Path, S3Path(indexer_input_dir))
+    else:
+        indexer_input_path = Path(indexer_input_dir)
+    return indexer_input_path
+
+
 def _get_index_tasks(
-    text2embedding_output_dir: str,
-    s3: bool,
+    indexer_input_path: str,
     files_to_index: Optional[str] = None,
     limit: Optional[int] = None,
-) -> Tuple[Sequence[ParserOutput], Union[Path, S3Path]]:
-    if s3:
-        embedding_dir_as_path = cast(S3Path, S3Path(text2embedding_output_dir))
-        _LOGGER.info(f"Getting tasks from s3, cache dir: {embedding_dir_as_path._local}")
-    else:
-        embedding_dir_as_path = Path(text2embedding_output_dir)
-        _LOGGER.info(f"Getting tasks from local")
+) -> Tuple[Sequence[ParserOutput]]:
+    
+    files_to_index = files_to_index.split(",") if files_to_index else []
 
-    tasks = [
-        ParserOutput.model_validate_json(path.read_text())
-        for path in tqdm(list(embedding_dir_as_path.glob("*.json")))
-    ]
+    tasks = []
+    task_ids = []
+    for i, path in enumerate(tqdm(list(indexer_input_path.glob("*.json")))):
+        task = ParserOutput.model_validate_json(path.read_text())
+        
+        if task.document_id in files_to_index:
+            continue
 
-    if files_to_index is not None:
-        tasks = [
-            task for task in tasks if task.document_id in files_to_index.split(",")
-        ]
+        tasks.append(task)
+        task_ids.append(task.document_id)
 
-        if missing_ids := set(files_to_index.split(",")) - set(
-            [task.document_id for task in tasks]
-        ):
-            _LOGGER.warning(
-                f"Missing files in the input directory for {', '.join(missing_ids)}"
-            )
+        if limit and i == limit:
+            break
 
-    if limit is not None:
-        tasks = tasks[:limit]
-
-    return tasks, embedding_dir_as_path
+    if missing_ids := set(files_to_index) - set(task_ids):
+        _LOGGER.warning(
+            f"Missing files in the input directory for {', '.join(missing_ids)}"
+        )
+    return tasks
 
 
 @click.command()
@@ -114,11 +116,12 @@ def run_as_cli(
         sys.exit(1)
     elif index_type.lower() == "vespa":
         _LOGGER.warning("Vespa indexing still experimental")
-        tasks, embedding_dir_as_path = _get_index_tasks(
-            indexer_input_dir, s3, files_to_index, limit
-        )
+        
+        indexer_input_path = build_indexer_input_path(indexer_input_dir, s3)
+        tasks = _get_index_tasks(indexer_input_path, files_to_index, limit)
+
         start = time.time()
-        populate_vespa(tasks=tasks, embedding_dir_as_path=embedding_dir_as_path)
+        populate_vespa(tasks=tasks, embedding_dir_as_path=indexer_input_path)
         duration = time.time() - start
         _LOGGER.info(f"Vespa indexing completed after: {duration}s")
         sys.exit(0)
