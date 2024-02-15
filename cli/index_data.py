@@ -47,7 +47,7 @@ def build_indexer_input_path(indexer_input_dir: str, s3: bool) -> Union[S3Path, 
     return indexer_input_path
 
 
-def _get_index_tasks(
+def _get_index_paths(
     indexer_input_path: str,
     files_to_index: Optional[str] = None,
     limit: Optional[int] = None,
@@ -55,25 +55,25 @@ def _get_index_tasks(
     
     files_to_index = files_to_index.split(",") if files_to_index else []
 
-    tasks = []
-    task_ids = []
-    for i, path in enumerate(tqdm(list(indexer_input_path.glob("*.json")))):
-        task = ParserOutput.model_validate_json(path.read_text())
-        
-        if task.document_id in files_to_index:
+    paths = []
+    doc_ids = []
+    for i, path in enumerate(tqdm(list(indexer_input_path.glob("*.json")))):        
+        doc_id = path.stem
+
+        if doc_id in files_to_index:
             continue
 
-        tasks.append(task)
-        task_ids.append(task.document_id)
+        paths.append(path)
+        doc_ids.append(doc_id)
 
         if limit and i == limit:
             break
 
-    if missing_ids := set(files_to_index) - set(task_ids):
+    if missing_ids := set(files_to_index) - set(doc_ids):
         _LOGGER.warning(
             f"Missing files in the input directory for {', '.join(missing_ids)}"
         )
-    return tasks
+    return paths
 
 
 @click.command()
@@ -118,10 +118,10 @@ def run_as_cli(
         _LOGGER.warning("Vespa indexing still experimental")
         
         indexer_input_path = build_indexer_input_path(indexer_input_dir, s3)
-        tasks = _get_index_tasks(indexer_input_path, files_to_index, limit)
+        paths = _get_index_paths(indexer_input_path, files_to_index, limit)
 
         start = time.time()
-        populate_vespa(tasks=tasks, embedding_dir_as_path=indexer_input_path)
+        populate_vespa(paths=paths, embedding_dir_as_path=indexer_input_path)
         duration = time.time() - start
         _LOGGER.info(f"Vespa indexing completed after: {duration}s")
         sys.exit(0)

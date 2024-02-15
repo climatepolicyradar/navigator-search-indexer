@@ -105,7 +105,7 @@ class VespaFamilyDocument(BaseModel):
 
 
 def get_document_generator(
-    tasks: Sequence[ParserOutput],
+    paths: Sequence[Union[S3Path, Path]],
     embedding_dir_as_path: Union[Path, S3Path],
 ) -> Generator[Tuple[SchemaName, DocumentID, dict], None, None]:
     """
@@ -133,12 +133,15 @@ def get_document_generator(
         "Filtering unwanted text block types.",
         extra={"props": {"BLOCKS_TO_FILTER": config.BLOCKS_TO_FILTER}},
     )
-    tasks = filter_on_block_type(
-        inputs=tasks, remove_block_types=config.BLOCKS_TO_FILTER
-    )
 
     physical_document_count = 0
-    for task in tasks:
+    for path in paths:
+        task = ParserOutput.model_validate_json(path.read_text())
+ 
+        task = filter_on_block_type(
+            inputs=[task], remove_block_types=config.BLOCKS_TO_FILTER
+        )[0]
+
         task_array_file_path = cast(
             Path, embedding_dir_as_path / f"{task.document_id}.npy"
         )
@@ -303,7 +306,7 @@ def _batch_ingest(vespa: Vespa, to_process: Mapping[SchemaName, list]):
 
 
 def populate_vespa(
-    tasks: Sequence[ParserOutput],
+    paths: Sequence[Union[Path, S3Path]],
     embedding_dir_as_path: Union[Path, S3Path],
 ) -> None:
     """
@@ -317,7 +320,7 @@ def populate_vespa(
     vespa = _get_vespa_instance()
 
     document_generator = get_document_generator(
-        tasks=tasks,
+        paths=paths,
         embedding_dir_as_path=embedding_dir_as_path,
     )
 
