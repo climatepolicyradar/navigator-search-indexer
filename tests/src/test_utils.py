@@ -1,5 +1,7 @@
 import datetime
+from pathlib import Path
 
+from cloudpathlib import S3Path
 import pytest
 from pydantic import AnyHttpUrl
 
@@ -12,7 +14,35 @@ from cpr_data_access.parser_models import (
     HTMLTextBlock,
 )
 
-from src.utils import filter_on_block_type
+from src.utils import build_indexer_input_path, filter_on_block_type, get_index_paths
+
+
+@pytest.mark.parametrize(
+    "dir, use_s3, want",
+    [
+        ("local/path", False, Path("local/path")),
+        ("s3://bucket/path", True, S3Path("s3://bucket/path")),
+    ]
+)
+def test_build_indexer_input_path(dir, use_s3, want):
+    got = build_indexer_input_path(dir, use_s3)
+    assert got == want
+
+
+@pytest.mark.parametrize(
+    "files, limit, count",
+    [
+        (None, None, 2),
+        (None, 1, 1),
+        ("CCLW.executive.10002.4495,", None, 1),
+    ]
+)
+def test_get_index_paths(files, limit, count):
+    path = Path(__file__).parent / "data"
+    got = get_index_paths(path, files, limit)
+    assert len(got) == count
+    for f in got:
+        assert type(f) == type(path)
 
 
 def get_pdf_text_block(text_block_type: str) -> PDFTextBlock:
