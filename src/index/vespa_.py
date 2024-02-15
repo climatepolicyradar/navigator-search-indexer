@@ -1,7 +1,6 @@
 import copy
 from collections import defaultdict
 import logging
-import os
 from pathlib import Path
 from typing import (
     Annotated,
@@ -106,7 +105,7 @@ class VespaFamilyDocument(BaseModel):
 
 
 def get_document_generator(
-    tasks: Sequence[ParserOutput],
+    paths: Sequence[Union[S3Path, Path]],
     embedding_dir_as_path: Union[Path, S3Path],
 ) -> Generator[Tuple[SchemaName, DocumentID, dict], None, None]:
     """
@@ -134,12 +133,15 @@ def get_document_generator(
         "Filtering unwanted text block types.",
         extra={"props": {"BLOCKS_TO_FILTER": config.BLOCKS_TO_FILTER}},
     )
-    tasks = filter_on_block_type(
-        inputs=tasks, remove_block_types=config.BLOCKS_TO_FILTER
-    )
 
     physical_document_count = 0
-    for task in tasks:
+    for path in paths:
+        task = ParserOutput.model_validate_json(path.read_text())
+ 
+        task = filter_on_block_type(
+            input=task, remove_block_types=config.BLOCKS_TO_FILTER
+        )
+
         task_array_file_path = cast(
             Path, embedding_dir_as_path / f"{task.document_id}.npy"
         )
@@ -259,16 +261,18 @@ def _get_vespa_instance() -> Vespa:
 
     if config.DEVELOPMENT_MODE:
         key_location = cert_location = None
+        _LOGGER.info("Running in dev mode, authentication will not be used")
     else:
         key_location, cert_location = _check_vespa_certs()
     
+    _LOGGER.info(f"Indexing into: {config.VESPA_INSTANCE_URL}")
     return Vespa(
         url=config.VESPA_INSTANCE_URL,
         key=key_location,
         cert=cert_location,
     )
 
-@retry(retry=retry_if_exception_type(VespaIndexError), wait=wait_exponential(multiplier=1), stop=stop_after_attempt(3))
+@retry(retry=retry_if_exception_type(VespaIndexError), wait=wait_exponential(multiplier=3), stop=stop_after_attempt(5))
 def _batch_ingest(vespa: Vespa, to_process: Mapping[SchemaName, list]):
     responses: list[VespaResponse] = []
     for schema in _SCHEMAS_TO_PROCESS:
@@ -281,8 +285,8 @@ def _batch_ingest(vespa: Vespa, to_process: Mapping[SchemaName, list]):
                     schema=str(schema),
                     namespace=_NAMESPACE,
                     asynchronous=True,
-                    connections=20,
-                    batch_size=100,
+                    connections=config.VESPA_CONNECTIONS,
+                    batch_size=config.VESPA_DOCUMENT_BATCH_SIZE,
                 )
             )
 
@@ -302,7 +306,7 @@ def _batch_ingest(vespa: Vespa, to_process: Mapping[SchemaName, list]):
 
 
 def populate_vespa(
-    tasks: Sequence[ParserOutput],
+    paths: Sequence[Union[Path, S3Path]],
     embedding_dir_as_path: Union[Path, S3Path],
 ) -> None:
     """
@@ -316,7 +320,7 @@ def populate_vespa(
     vespa = _get_vespa_instance()
 
     document_generator = get_document_generator(
-        tasks=tasks,
+        paths=paths,
         embedding_dir_as_path=embedding_dir_as_path,
     )
 

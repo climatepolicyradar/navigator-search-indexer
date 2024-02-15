@@ -4,12 +4,8 @@ import pytest
 from typing import Any, Generator
 from unittest.mock import Mock, patch
 
-
-
 from cpr_data_access.parser_models import ParserOutput
 
-from src.index.vespa_ import _get_vespa_instance, VespaConfigError
-from src import config
 from src.index.vespa_ import (
     get_document_generator,
     VespaDocumentPassage,
@@ -20,26 +16,24 @@ from src.index.vespa_ import (
     DOCUMENT_PASSAGE_SCHEMA,
 )
 from src.utils import read_npy_file
-from conftest import get_parser_output
 
 
 @patch("src.index.vespa_.read_npy_file")
 def test_get_document_generator(mock_read_npy_file):
     """Assert that the vespa document generator works as expected."""
     mock_read_npy_file.return_value = read_npy_file(
-        Path("src/index/test/data/CCLW.executive.10002.4495.npy")
+        Path("tests/src/data/CCLW.executive.10002.4495.npy")
     )
 
-    embedding_dir_as_path = S3Path("s3://path/to/embeddings")
+    embedding_dir_as_path = Path("s3://path/to/embeddings")
 
     # An array of ParserOutputs, some belonging to the same family.
-    tasks = [
-        get_parser_output(document_id=0, family_id=0),
-        get_parser_output(document_id=1, family_id=0),
-        get_parser_output(document_id=2, family_id=1),
+    paths = [
+        Path(__file__).parent / "data" / "CCLW.executive.10002.4495.json",
+        Path(__file__).parent / "data" / "CCLW.executive.10002.4496.json",
     ]
 
-    generator = get_document_generator(tasks, embedding_dir_as_path)
+    generator = get_document_generator(paths, embedding_dir_as_path)
 
     vespa_family_document_ids = []
     vespa_document_passage_fam_refs = []
@@ -51,11 +45,11 @@ def test_get_document_generator(mock_read_npy_file):
 
     # Check every family document id is unique and that there's one for each task
     assert len(set(vespa_family_document_ids)) == len(vespa_family_document_ids)
-    assert len(vespa_family_document_ids) == len(tasks)
+    assert len(vespa_family_document_ids) == len(paths)
 
     # Check that every family document is referenced by one passage
     # (this is as we had one text block for each family document)
-    assert len(vespa_family_document_ids) == len(vespa_document_passage_fam_refs)
+    assert len(vespa_family_document_ids) == len(set(vespa_document_passage_fam_refs))
     for ref in vespa_document_passage_fam_refs:
         # A document passage id CCLW.executive.0.0.0 would take the form
         # 'id:doc_search:family_document::CCLW.executive.0.0'
@@ -64,13 +58,15 @@ def test_get_document_generator(mock_read_npy_file):
 
 
 @patch("src.index.vespa_.read_npy_file")
-def test_get_document_generator(
+def test_get_document_generator_(
     mock_np_load: Mock,
     test_document_data: tuple[ParserOutput, Any],
     embeddings_dir_as_path: S3Path,
 ) -> None:
     """Test that the get_document_generator correctly yields data."""
-    parser_output, embeddings = test_document_data
+    parser_output_path, embeddings = test_document_data
+    
+    parser_output = ParserOutput.model_validate_json(parser_output_path.read_text())
     # Test that the pdf data is valid to test against
     assert parser_output.pdf_data is not None
 
@@ -90,7 +86,7 @@ def test_get_document_generator(
     mock_np_load.return_value = embeddings
 
     document_generator = get_document_generator(
-        tasks=[parser_output], embedding_dir_as_path=embeddings_dir_as_path
+        paths=[parser_output_path], embedding_dir_as_path=embeddings_dir_as_path
     )
 
     # Only loading one document so we know the order of schemas that should be

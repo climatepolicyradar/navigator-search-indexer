@@ -108,14 +108,7 @@ def embeddings_dir_as_path(
 
 @pytest.fixture
 def test_document_data() -> tuple[ParserOutput, Any]:
-    parser_output_json = read_local_json_file(
-        str(
-            Path(__file__).parent
-            / os.path.join("data", "CCLW.executive.10002.4495.json")
-        )
-    )
-    parser_output = ParserOutput.model_validate(parser_output_json)
-
+    parser_output_path = Path(__file__).parent / "data" / "CCLW.executive.10002.4495.json"
     embeddings = read_local_npy_file(
         str(
             Path(__file__).parent
@@ -123,4 +116,4 @@ def test_document_data() -> tuple[ParserOutput, Any]:
         )
     )
 
-    return (parser_output, embeddings)
+    return (parser_output_path, embeddings)

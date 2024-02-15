@@ -1,8 +1,6 @@
 from pathlib import Path
-from typing import Optional, Sequence
 
 import pytest
-from cpr_data_access.parser_models import ParserOutput
 
 from src.index.vespa_ import (
     _NAMESPACE,
@@ -23,17 +21,11 @@ def test_vespa_document_generator(
 ):
     """Test that the document generator returns documents in the correct format."""
 
-    tasks = [
-        ParserOutput.model_validate_json(path.read_text())
-        for path in list(test_input_dir.glob("*.json"))
-    ]
-
-    # checking that we've picked up some tasks, otherwise the test is pointless
-    # because the document generator will be empty
-    assert len(tasks) > 0
+    paths = list(test_input_dir.glob("*.json"))
+    assert len(paths) > 0
 
     doc_generator = get_document_generator(
-        tasks=tasks,
+        paths=paths,
         embedding_dir_as_path=test_input_dir,
     )
 
