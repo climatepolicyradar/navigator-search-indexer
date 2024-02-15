@@ -139,8 +139,8 @@ def get_document_generator(
         task = ParserOutput.model_validate_json(path.read_text())
  
         task = filter_on_block_type(
-            inputs=[task], remove_block_types=config.BLOCKS_TO_FILTER
-        )[0]
+            input=task, remove_block_types=config.BLOCKS_TO_FILTER
+        )
 
         task_array_file_path = cast(
             Path, embedding_dir_as_path / f"{task.document_id}.npy"

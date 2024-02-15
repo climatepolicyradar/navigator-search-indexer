@@ -43,7 +43,7 @@ def filter_blocks(
 
 
 def filter_on_block_type(
-    inputs: Sequence[ParserOutput], remove_block_types: list[str]
+    input: ParserOutput, remove_block_types: list[str]
 ) -> Sequence[ParserOutput]:
     """
     Filter a sequence of IndexerInputs to remove unwanted TextBlocks.
@@ -60,15 +60,12 @@ def filter_on_block_type(
             )
             remove_block_types.remove(_filter)
 
-    return [
-        replace_text_blocks(
-            block=_input,
+    return replace_text_blocks(
+            block=input,
             new_text_blocks=filter_blocks(
-                indexer_input=_input, remove_block_types=remove_block_types
+                indexer_input=input, remove_block_types=remove_block_types
             ),
         )
-        for _input in inputs
-    ]
 
 
 def read_npy_file(file_path: Path) -> Any:
