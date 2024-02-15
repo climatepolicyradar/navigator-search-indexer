@@ -1,7 +1,6 @@
 import copy
 from collections import defaultdict
 import logging
-import os
 from pathlib import Path
 from typing import (
     Annotated,
@@ -259,16 +258,18 @@ def _get_vespa_instance() -> Vespa:
 
     if config.DEVELOPMENT_MODE:
         key_location = cert_location = None
+        _LOGGER.info("Running in dev mode, authentication will not be used")
     else:
         key_location, cert_location = _check_vespa_certs()
     
+    _LOGGER.info(f"Indexing into: {config.VESPA_INSTANCE_URL}")
     return Vespa(
         url=config.VESPA_INSTANCE_URL,
         key=key_location,
         cert=cert_location,
     )
 
-@retry(retry=retry_if_exception_type(VespaIndexError), wait=wait_exponential(multiplier=1), stop=stop_after_attempt(3))
+@retry(retry=retry_if_exception_type(VespaIndexError), wait=wait_exponential(multiplier=3), stop=stop_after_attempt(5))
 def _batch_ingest(vespa: Vespa, to_process: Mapping[SchemaName, list]):
     responses: list[VespaResponse] = []
     for schema in _SCHEMAS_TO_PROCESS:
@@ -281,8 +282,8 @@ def _batch_ingest(vespa: Vespa, to_process: Mapping[SchemaName, list]):
                     schema=str(schema),
                     namespace=_NAMESPACE,
                     asynchronous=True,
-                    connections=20,
-                    batch_size=100,
+                    connections=config.VESPA_CONNECTIONS,
+                    batch_size=config.VESPA_DOCUMENT_BATCH_SIZE,
                 )
             )
 

@@ -12,7 +12,8 @@ class ConfigError(Exception):
 BLOCKS_TO_FILTER = os.getenv("BLOCKS_TO_FILTER", "Table,Figure").split(",")
 
 # Vespa config
-VESPA_DOCUMENT_BATCH_SIZE: int = int(os.getenv("VESPA_BATCH_SIZE", "50000"))
+VESPA_CONNECTIONS: int = int(os.getenv("VESPA_CONNECTIONS", "200"))
+VESPA_DOCUMENT_BATCH_SIZE: int = int(os.getenv("VESPA_BATCH_SIZE", "20000"))
 VESPA_INSTANCE_URL: str = os.getenv("VESPA_INSTANCE_URL", "")
 VESPA_CERT_LOCATION: str = os.getenv("VESPA_CERT_LOCATION", "")
 VESPA_KEY_LOCATION: str = os.getenv("VESPA_KEY_LOCATION", "")
