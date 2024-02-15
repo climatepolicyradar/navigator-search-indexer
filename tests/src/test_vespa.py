@@ -1,12 +1,14 @@
 from cloudpathlib import S3Path
 from pathlib import Path
-import pytest
 from typing import Any, Generator
 from unittest.mock import Mock, patch
 
 from cpr_data_access.parser_models import ParserOutput
+import numpy as np
 
 from src.index.vespa_ import (
+    build_vespa_family_document,
+    build_vespa_document_passage,
     get_document_generator,
     VespaDocumentPassage,
     VespaFamilyDocument,
@@ -16,6 +18,29 @@ from src.index.vespa_ import (
     DOCUMENT_PASSAGE_SCHEMA,
 )
 from src.utils import read_npy_file
+from tests.src.conftest import get_parser_output
+
+
+def test_build_vespa_family_document():
+    parser_output = get_parser_output(1,1)
+    model = build_vespa_family_document(
+        task=parser_output,
+        embeddings=[np.array([-0.11900115,  0.17448892])],
+        search_weights_ref="id:doc_search:weight::default",
+    )
+    VespaFamilyDocument.model_validate(model)
+
+
+def test_build_vespa_document_passage():
+    parser_output = get_parser_output(1,1)
+    text_block = parser_output.pdf_data.text_blocks[0]
+    model = build_vespa_document_passage(
+        family_document_id="doc.1.1",
+        search_weights_ref="id:doc_search:weight::default",
+        text_block=text_block,
+        embedding=np.array([-0.11900115,  0.17448892]),
+    )
+    VespaDocumentPassage.model_validate(model)
 
 
 @patch("src.index.vespa_.read_npy_file")
