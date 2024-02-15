@@ -15,12 +15,13 @@ COPY ./poetry.lock ./pyproject.toml ./
 
 # Install python dependencies using poetry
 RUN poetry config virtualenvs.create false
-RUN poetry install
+RUN poetry install --no-interaction --no-root
 
 # Copy files to image
 COPY ./src ./src
 COPY ./cli ./cli
 COPY ./tests ./tests
+RUN poetry install --no-interaction
 
 # Pre-download the model
 ENV PYTHONPATH "${PYTHONPATH}:/app"
