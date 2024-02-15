@@ -161,31 +161,34 @@ def test_indexer_input_array() -> list[ParserOutput]:
 def test_filter_on_block_type(test_indexer_input_array):
     """Tests that the filter_on_block_type function removes the correct text blocks."""
 
-    filtered_inputs = filter_on_block_type(
-        inputs=test_indexer_input_array, remove_block_types=["Text", "Figure"]
+    filtered_input = filter_on_block_type(
+        input=test_indexer_input_array[0], remove_block_types=["Text", "Figure"]
     )
-    assert filtered_inputs[0].html_data is not None
+    assert filtered_input.html_data is not None
 
-    assert len(filtered_inputs[0].html_data.text_blocks) == 3
+    assert len(filtered_input.html_data.text_blocks) == 3
 
-    assert filtered_inputs[0].html_data.text_blocks[0].type == "Table"
-    assert filtered_inputs[0].html_data.text_blocks[0].text == ["test_text"]
+    assert filtered_input.html_data.text_blocks[0].type == "Table"
+    assert filtered_input.html_data.text_blocks[0].text == ["test_text"]
 
-    assert filtered_inputs[0].html_data.text_blocks[1].type == "Ambiguous"
-    assert filtered_inputs[0].html_data.text_blocks[1].text == ["test_text"]
+    assert filtered_input.html_data.text_blocks[1].type == "Ambiguous"
+    assert filtered_input.html_data.text_blocks[1].text == ["test_text"]
 
-    assert filtered_inputs[0].html_data.text_blocks[2].type == "Google Text Block"
-    assert filtered_inputs[0].html_data.text_blocks[2].text == ["test_text"]
+    assert filtered_input.html_data.text_blocks[2].type == "Google Text Block"
+    assert filtered_input.html_data.text_blocks[2].text == ["test_text"]
 
     # Assert that we can filter on ParserOutputs that don't have valid text
-    assert filtered_inputs[1].html_data is not None
-    assert len(filtered_inputs[1].html_data.text_blocks) == 2
+    filtered_input = filter_on_block_type(
+        input=test_indexer_input_array[1], remove_block_types=["Text", "Figure"]
+    )
+    assert filtered_input.html_data is not None
+    assert len(filtered_input.html_data.text_blocks) == 2
 
-    assert filtered_inputs[1].html_data.text_blocks[0].type == "Table"
-    assert filtered_inputs[1].html_data.text_blocks[0].text == ["test_text"]
+    assert filtered_input.html_data.text_blocks[0].type == "Table"
+    assert filtered_input.html_data.text_blocks[0].text == ["test_text"]
 
-    assert filtered_inputs[1].html_data.text_blocks[1].type == "Google Text Block"
-    assert filtered_inputs[1].html_data.text_blocks[1].text == ["test_text"]
+    assert filtered_input.html_data.text_blocks[1].type == "Google Text Block"
+    assert filtered_input.html_data.text_blocks[1].text == ["test_text"]
 
 
 def test_has_valid_text_override(test_indexer_input_array):
