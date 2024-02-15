@@ -3,15 +3,12 @@ import sys
 import time
 import logging
 import logging.config
-from pathlib import Path
-from typing import Optional, Sequence, Tuple, Union, cast
+from typing import Optional
 
 import click
-from cloudpathlib import S3Path
-from tqdm.auto import tqdm
-from cpr_data_access.parser_models import ParserOutput
 
 from src.index.vespa_ import populate_vespa
+from src.utils import build_indexer_input_path, get_index_paths
 
 LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO").upper()
 DEFAULT_LOGGING = {
@@ -36,44 +33,6 @@ _LOGGER = logging.getLogger(__name__)
 logging.config.dictConfig(DEFAULT_LOGGING)
 
 os.environ["CLOUPATHLIB_FILE_CACHE_MODE"] = "close_file"
-
-
-def build_indexer_input_path(indexer_input_dir: str, s3: bool) -> Union[S3Path, Path]:
-    _LOGGER.info(f"Tasks will be retrieved from {'s3' if s3 else 'local'}: {indexer_input_dir}")
-    if s3:
-        indexer_input_path = cast(S3Path, S3Path(indexer_input_dir))
-    else:
-        indexer_input_path = Path(indexer_input_dir)
-    return indexer_input_path
-
-
-def _get_index_paths(
-    indexer_input_path: str,
-    files_to_index: Optional[str] = None,
-    limit: Optional[int] = None,
-) -> Tuple[Sequence[ParserOutput]]:
-    
-    files_to_index = files_to_index.split(",") if files_to_index else []
-
-    paths = []
-    doc_ids = []
-    for i, path in enumerate(tqdm(list(indexer_input_path.glob("*.json")))):        
-        doc_id = path.stem
-
-        if doc_id in files_to_index:
-            continue
-
-        paths.append(path)
-        doc_ids.append(doc_id)
-
-        if limit and i == limit:
-            break
-
-    if missing_ids := set(files_to_index) - set(doc_ids):
-        _LOGGER.warning(
-            f"Missing files in the input directory for {', '.join(missing_ids)}"
-        )
-    return paths
 
 
 @click.command()
@@ -118,7 +77,7 @@ def run_as_cli(
         _LOGGER.warning("Vespa indexing still experimental")
         
         indexer_input_path = build_indexer_input_path(indexer_input_dir, s3)
-        paths = _get_index_paths(indexer_input_path, files_to_index, limit)
+        paths = get_index_paths(indexer_input_path, files_to_index, limit)
 
         start = time.time()
         populate_vespa(paths=paths, embedding_dir_as_path=indexer_input_path)
