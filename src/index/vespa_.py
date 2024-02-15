@@ -104,6 +104,60 @@ class VespaFamilyDocument(BaseModel):
     document_source_url: Optional[str] = None
 
 
+def build_vespa_family_document(
+        task,
+        embeddings,
+        search_weights_ref,
+    ) -> VespaFamilyDocument:
+    return VespaFamilyDocument(
+            search_weights_ref=search_weights_ref,
+            family_name=task.document_name,
+            family_name_index=task.document_name,
+            family_description=task.document_description,
+            family_description_index=task.document_description,
+            family_description_embedding=embeddings[0].tolist(),
+            family_import_id=task.document_metadata.family_import_id,
+            family_slug=task.document_metadata.family_slug,
+            family_publication_ts=task.document_metadata.publication_ts.isoformat(),
+            family_publication_year=task.document_metadata.publication_ts.year,
+            family_category=task.document_metadata.category,
+            family_geography=task.document_metadata.geography,
+            family_source=task.document_metadata.source,
+            document_import_id=task.document_id,
+            document_slug=task.document_slug,
+            document_languages=task.document_metadata.languages,
+            document_md5_sum=task.document_md5_sum,
+            document_content_type=task.document_content_type,
+            document_cdn_object=task.document_cdn_object,
+            document_source_url=task.document_metadata.source_url,
+        )
+
+
+def build_vespa_document_passage(
+        family_document_id,
+        search_weights_ref,
+        text_block,
+        embedding
+    ) -> VespaDocumentPassage:
+    fam_doc_ref = f"id:{_NAMESPACE}:family_document::{family_document_id}"
+    return VespaDocumentPassage(
+        family_document_ref=fam_doc_ref,
+        search_weights_ref=search_weights_ref,
+        text_block="\n".join(text_block.text),
+        text_block_id=text_block.text_block_id,
+        text_block_type=str(text_block.type),
+        text_block_page=(
+            text_block.page_number
+            if isinstance(text_block, PDFTextBlock)
+            else None
+        ),
+        text_block_coords=(
+            text_block.coords if isinstance(text_block, PDFTextBlock) else None
+        ),
+        text_embedding=embedding.tolist(),
+    )
+
+
 def get_document_generator(
     paths: Sequence[Union[S3Path, Path]],
     embedding_dir_as_path: Union[Path, S3Path],
@@ -134,6 +188,7 @@ def get_document_generator(
         extra={"props": {"BLOCKS_TO_FILTER": config.BLOCKS_TO_FILTER}},
     )
 
+    search_weights_ref = f"id:{_NAMESPACE}:search_weights::{search_weights_id}"
     physical_document_count = 0
     for path in paths:
         task = ParserOutput.model_validate_json(path.read_text())
@@ -148,28 +203,8 @@ def get_document_generator(
         embeddings = read_npy_file(task_array_file_path)
 
         family_document_id = DocumentID(task.document_metadata.import_id)
-        family_document = VespaFamilyDocument(
-            search_weights_ref=f"id:{_NAMESPACE}:search_weights::{search_weights_id}",
-            family_name=task.document_name,
-            family_name_index=task.document_name,
-            family_description=task.document_description,
-            family_description_index=task.document_description,
-            family_description_embedding=embeddings[0].tolist(),
-            family_import_id=task.document_metadata.family_import_id,
-            family_slug=task.document_metadata.family_slug,
-            family_publication_ts=task.document_metadata.publication_ts.isoformat(),
-            family_publication_year=task.document_metadata.publication_ts.year,
-            family_category=task.document_metadata.category,
-            family_geography=task.document_metadata.geography,
-            family_source=task.document_metadata.source,
-            document_import_id=task.document_id,
-            document_slug=task.document_slug,
-            document_languages=task.document_metadata.languages,
-            document_md5_sum=task.document_md5_sum,
-            document_content_type=task.document_content_type,
-            document_cdn_object=task.document_cdn_object,
-            document_source_url=task.document_metadata.source_url,
-        )
+        family_document = build_vespa_family_document(task, embeddings, search_weights_ref)
+
         yield FAMILY_DOCUMENT_SCHEMA, family_document_id, family_document.model_dump()
         physical_document_count += 1
         if (physical_document_count % 50) == 0:
@@ -190,25 +225,8 @@ def get_document_generator(
         for document_passage_idx, (text_block, embedding) in enumerate(
             zip(text_blocks, embeddings[1:, :])
         ):
-            fam_doc_ref = f"id:{_NAMESPACE}:family_document::{family_document_id}"
-            search_weights_ref = f"id:{_NAMESPACE}:search_weights::{search_weights_id}"
-            document_passage = VespaDocumentPassage(
-                family_document_ref=fam_doc_ref,
-                search_weights_ref=search_weights_ref,
-                text_block="\n".join(text_block.text),
-                text_block_id=text_block.text_block_id,
-                text_block_type=str(text_block.type),
-                text_block_page=(
-                    text_block.page_number
-                    if isinstance(text_block, PDFTextBlock)
-                    else None
-                ),
-                text_block_coords=(
-                    text_block.coords if isinstance(text_block, PDFTextBlock) else None
-                ),
-                text_embedding=embedding.tolist(),
-            )
             document_psg_id = DocumentID(f"{task.document_id}.{document_passage_idx}")
+            document_passage = build_vespa_document_passage(family_document_id, search_weights_ref, text_block, embedding)
             yield DOCUMENT_PASSAGE_SCHEMA, document_psg_id, document_passage.model_dump()
 
     _LOGGER.info(
