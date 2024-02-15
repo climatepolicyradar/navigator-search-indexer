@@ -5,7 +5,6 @@ from pathlib import Path
 import numpy as np
 
 from cloudpathlib import S3Path
-from tqdm.auto import tqdm
 from cpr_data_access.parser_models import BlockType, ParserOutput, TextBlock
 
 _LOGGER = logging.getLogger(__name__)
@@ -30,7 +29,7 @@ def get_index_paths(
 
     paths = []
     doc_ids = []
-    for i, path in enumerate(tqdm(list(indexer_input_path.glob("*.json"))), 1):        
+    for i, path in enumerate(list(indexer_input_path.glob("*.json")), 1):        
         doc_id = path.stem
 
         if doc_id in files_to_index:
