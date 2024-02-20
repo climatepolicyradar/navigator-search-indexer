@@ -18,7 +18,7 @@ from src.index.vespa_ import (
     DOCUMENT_PASSAGE_SCHEMA,
 )
 from src.utils import read_npy_file
-from tests.src.conftest import get_parser_output
+from tests.conftest import get_parser_output, FIXTURE_DIR
 
 
 def test_build_vespa_family_document():
@@ -47,15 +47,15 @@ def test_build_vespa_document_passage():
 def test_get_document_generator(mock_read_npy_file):
     """Assert that the vespa document generator works as expected."""
     mock_read_npy_file.return_value = read_npy_file(
-        Path("tests/src/data/CCLW.executive.10002.4495.npy")
+        FIXTURE_DIR / "s3_files" / "CCLW.executive.10002.4495.npy"
     )
 
     embedding_dir_as_path = Path("s3://path/to/embeddings")
 
     # An array of ParserOutputs, some belonging to the same family.
     paths = [
-        Path(__file__).parent / "data" / "CCLW.executive.10002.4495.json",
-        Path(__file__).parent / "data" / "CCLW.executive.10002.4496.json",
+        FIXTURE_DIR / "s3_files" / "CCLW.executive.10002.4495.json",
+        FIXTURE_DIR / "s3_files" / "CCLW.executive.10014.4470.json",
     ]
 
     generator = get_document_generator(paths, embedding_dir_as_path)

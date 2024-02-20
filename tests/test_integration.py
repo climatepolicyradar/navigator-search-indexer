@@ -6,7 +6,7 @@ from cli.index_data import run_as_cli
 
 
 def test_integration():
-    fixture_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "s3_fixtures")
+    fixture_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "fixtures", "s3_files")
     
     runner = CliRunner()
     result = runner.invoke(
