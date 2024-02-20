@@ -1,0 +1,4678 @@
+{
+    "document_id": "CCLW.executive.10002.4495",
+    "document_metadata": {
+        "name": "National Adaptation Plan 2015-2030",
+        "description": "This document identifies Kenya's vulnerabilities to the effect of climate change, adaptation actions and implementation strategies.",
+        "import_id": "CCLW.executive.10002.4495",
+        "slug": "national-adaptation-plan-2015-2030_7788",
+        "family_import_id": "CCLW.family.10002.0",
+        "family_slug": "national-adaptation-plan-2015-2030_4df8",
+        "publication_ts": "2016-07-01T00:00:00+00:00",
+        "date": "01/07/2016",
+        "source_url": "https://www4.unfccc.int/sites/NAPC/Documents%20NAP/Kenya_NAP_Final.pdf",
+        "download_url": "",
+        "type": "Plan",
+        "source": "CCLW",
+        "category": "Executive",
+        "geography": "KEN",
+        "languages": [
+            "English"
+        ],
+        "metadata": {
+            "topic": [
+                "Adaptation"
+            ],
+            "hazard": [],
+            "sector": [
+                "Adaptation"
+            ],
+            "keyword": [],
+            "framework": [],
+            "instrument": [
+                "Capacity building|Governance",
+                "Processes, plans and strategies|Governance",
+                "Subnational and citizen participation|Governance"
+            ]
+        }
+    },
+    "document_name": "National Adaptation Plan 2015-2030",
+    "document_description": "This document identifies Kenya's vulnerabilities to the effect of climate change, adaptation actions and implementation strategies.",
+    "document_source_url": "https://www4.unfccc.int/sites/NAPC/Documents%20NAP/Kenya_NAP_Final.pdf",
+    "document_cdn_object": "KEN/2016/national-adaptation-plan-2015-2030_3e27e7c1312d4af318ca4b6344e12fd5.pdf",
+    "document_content_type": "application/pdf",
+    "document_md5_sum": "3e27e7c1312d4af318ca4b6344e12fd5",
+    "document_slug": "national-adaptation-plan-2015-2030_7788",
+    "languages": [
+        "en"
+    ],
+    "translated": false,
+    "html_data": null,
+    "pdf_data": {
+        "page_metadata": [
+            {
+                "page_number": 0,
+                "dimensions": [
+                    612.0,
+                    792.0
+                ]
+            },
+            {
+                "page_number": 1,
+                "dimensions": [
+                    612.0,
+                    792.0
+                ]
+            },
+            {
+                "page_number": 2,
+                "dimensions": [
+                    612.0,
+                    792.0
+                ]
+            },
+            {
+                "page_number": 3,
+                "dimensions": [
+                    612.0,
+                    792.0
+                ]
+            },
+            {
+                "page_number": 4,
+                "dimensions": [
+                    612.0,
+                    792.0
+                ]
+            },
+            {
+                "page_number": 5,
+                "dimensions": [
+                    612.0,
+                    792.0
+                ]
+            },
+            {
+                "page_number": 6,
+                "dimensions": [
+                    612.0,
+                    792.0
+                ]
+            },
+            {
+                "page_number": 7,
+                "dimensions": [
+                    612.0,
+                    792.0
+                ]
+            },
+            {
+                "page_number": 8,
+                "dimensions": [
+                    612.0,
+                    792.0
+                ]
+            },
+            {
+                "page_number": 9,
+                "dimensions": [
+                    612.0,
+                    792.0
+                ]
+            },
+            {
+                "page_number": 10,
+                "dimensions": [
+                    612.0,
+                    792.0
+                ]
+            },
+            {
+                "page_number": 11,
+                "dimensions": [
+                    612.0,
+                    792.0
+                ]
+            },
+            {
+                "page_number": 12,
+                "dimensions": [
+                    612.0,
+                    792.0
+                ]
+            },
+            {
+                "page_number": 13,
+                "dimensions": [
+                    612.0,
+                    792.0
+                ]
+            },
+            {
+                "page_number": 14,
+                "dimensions": [
+                    612.0,
+                    792.0
+                ]
+            },
+            {
+                "page_number": 15,
+                "dimensions": [
+                    612.0,
+                    792.0
+                ]
+            },
+            {
+                "page_number": 16,
+                "dimensions": [
+                    612.0,
+                    792.0
+                ]
+            },
+            {
+                "page_number": 17,
+                "dimensions": [
+                    612.0,
+                    792.0
+                ]
+            },
+            {
+                "page_number": 18,
+                "dimensions": [
+                    612.0,
+                    792.0
+                ]
+            },
+            {
+                "page_number": 19,
+                "dimensions": [
+                    612.0,
+                    792.0
+                ]
+            },
+            {
+                "page_number": 20,
+                "dimensions": [
+                    612.0,
+                    792.0
+                ]
+            },
+            {
+                "page_number": 21,
+                "dimensions": [
+                    612.0,
+                    792.0
+                ]
+            },
+            {
+                "page_number": 22,
+                "dimensions": [
+                    612.0,
+                    792.0
+                ]
+            },
+            {
+                "page_number": 23,
+                "dimensions": [
+                    612.0,
+                    792.0
+                ]
+            },
+            {
+                "page_number": 24,
+                "dimensions": [
+                    612.0,
+                    792.0
+                ]
+            },
+            {
+                "page_number": 25,
+                "dimensions": [
+                    612.0,
+                    792.0
+                ]
+            },
+            {
+                "page_number": 26,
+                "dimensions": [
+                    612.0,
+                    792.0
+                ]
+            },
+            {
+                "page_number": 27,
+                "dimensions": [
+                    612.0,
+                    792.0
+                ]
+            },
+            {
+                "page_number": 28,
+                "dimensions": [
+                    612.0,
+                    792.0
+                ]
+            },
+            {
+                "page_number": 29,
+                "dimensions": [
+                    612.0,
+                    792.0
+                ]
+            },
+            {
+                "page_number": 30,
+                "dimensions": [
+                    612.0,
+                    792.0
+                ]
+            },
+            {
+                "page_number": 31,
+                "dimensions": [
+                    612.0,
+                    792.0
+                ]
+            },
+            {
+                "page_number": 32,
+                "dimensions": [
+                    612.0,
+                    792.0
+                ]
+            },
+            {
+                "page_number": 33,
+                "dimensions": [
+                    612.0,
+                    792.0
+                ]
+            },
+            {
+                "page_number": 34,
+                "dimensions": [
+                    612.0,
+                    792.0
+                ]
+            },
+            {
+                "page_number": 35,
+                "dimensions": [
+                    612.0,
+                    792.0
+                ]
+            },
+            {
+                "page_number": 36,
+                "dimensions": [
+                    612.0,
+                    792.0
+                ]
+            },
+            {
+                "page_number": 37,
+                "dimensions": [
+                    612.0,
+                    792.0
+                ]
+            },
+            {
+                "page_number": 38,
+                "dimensions": [
+                    612.0,
+                    792.0
+                ]
+            },
+            {
+                "page_number": 39,
+                "dimensions": [
+                    612.0,
+                    792.0
+                ]
+            },
+            {
+                "page_number": 40,
+                "dimensions": [
+                    612.0,
+                    792.0
+                ]
+            },
+            {
+                "page_number": 41,
+                "dimensions": [
+                    612.0,
+                    792.0
+                ]
+            },
+            {
+                "page_number": 42,
+                "dimensions": [
+                    612.0,
+                    792.0
+                ]
+            },
+            {
+                "page_number": 43,
+                "dimensions": [
+                    612.0,
+                    792.0
+                ]
+            },
+            {
+                "page_number": 44,
+                "dimensions": [
+                    612.0,
+                    792.0
+                ]
+            },
+            {
+                "page_number": 45,
+                "dimensions": [
+                    612.0,
+                    792.0
+                ]
+            },
+            {
+                "page_number": 46,
+                "dimensions": [
+                    612.0,
+                    792.0
+                ]
+            },
+            {
+                "page_number": 47,
+                "dimensions": [
+                    612.0,
+                    792.0
+                ]
+            },
+            {
+                "page_number": 48,
+                "dimensions": [
+                    612.0,
+                    792.0
+                ]
+            },
+            {
+                "page_number": 49,
+                "dimensions": [
+                    612.0,
+                    792.0
+                ]
+            },
+            {
+                "page_number": 50,
+                "dimensions": [
+                    612.0,
+                    792.0
+                ]
+            },
+            {
+                "page_number": 51,
+                "dimensions": [
+                    612.0,
+                    792.0
+                ]
+            },
+            {
+                "page_number": 52,
+                "dimensions": [
+                    612.0,
+                    792.0
+                ]
+            },
+            {
+                "page_number": 53,
+                "dimensions": [
+                    612.0,
+                    792.0
+                ]
+            },
+            {
+                "page_number": 54,
+                "dimensions": [
+                    612.0,
+                    792.0
+                ]
+            },
+            {
+                "page_number": 55,
+                "dimensions": [
+                    612.0,
+                    792.0
+                ]
+            },
+            {
+                "page_number": 56,
+                "dimensions": [
+                    612.0,
+                    792.0
+                ]
+            },
+            {
+                "page_number": 57,
+                "dimensions": [
+                    612.0,
+                    792.0
+                ]
+            },
+            {
+                "page_number": 58,
+                "dimensions": [
+                    612.0,
+                    792.0
+                ]
+            },
+            {
+                "page_number": 59,
+                "dimensions": [
+                    612.0,
+                    792.0
+                ]
+            },
+            {
+                "page_number": 60,
+                "dimensions": [
+                    612.0,
+                    792.0
+                ]
+            },
+            {
+                "page_number": 61,
+                "dimensions": [
+                    612.0,
+                    792.0
+                ]
+            },
+            {
+                "page_number": 62,
+                "dimensions": [
+                    612.0,
+                    792.0
+                ]
+            },
+            {
+                "page_number": 63,
+                "dimensions": [
+                    612.0,
+                    792.0
+                ]
+            },
+            {
+                "page_number": 64,
+                "dimensions": [
+                    612.0,
+                    792.0
+                ]
+            },
+            {
+                "page_number": 65,
+                "dimensions": [
+                    612.0,
+                    792.0
+                ]
+            },
+            {
+                "page_number": 66,
+                "dimensions": [
+                    612.0,
+                    792.0
+                ]
+            },
+            {
+                "page_number": 67,
+                "dimensions": [
+                    612.0,
+                    792.0
+                ]
+            }
+        ],
+        "md5sum": "3e27e7c1312d4af318ca4b6344e12fd5",
+        "text_blocks": [
+            {
+                "text": [
+                    "Ministry of Environment and Natural Resources"
+                ],
+                "text_block_id": "p_0_b_0",
+                "language": "en",
+                "type": "Text",
+                "type_confidence": 0.8976990580558777,
+                "coords": [
+                    [
+                        197.05770874023438,
+                        191.58106994628906
+                    ],
+                    [
+                        410.6773681640625,
+                        191.58106994628906
+                    ],
+                    [
+                        410.6773681640625,
+                        205.4823455810547
+                    ],
+                    [
+                        197.05770874023438,
+                        205.4823455810547
+                    ]
+                ],
+                "page_number": 0
+            },
+            {
+                "text": [
+                    "Kenya National Adaptation Plan\n2015-2030"
+                ],
+                "text_block_id": "p_0_b_1",
+                "language": "en",
+                "type": "Title",
+                "type_confidence": 0.9992538094520569,
+                "coords": [
+                    [
+                        89.58967590332031,
+                        243.0702667236328
+                    ],
+                    [
+                        519.2817077636719,
+                        243.0702667236328
+                    ],
+                    [
+                        519.2817077636719,
+                        303.5213928222656
+                    ],
+                    [
+                        89.58967590332031,
+                        303.5213928222656
+                    ]
+                ],
+                "page_number": 0
+            },
+            {
+                "text": [
+                    "Prof Judi Wakhungu, Cabinet Secretary, Ministry of Environment and\nNatural Resources"
+                ],
+                "text_block_id": "p_4_b_0",
+                "language": "en",
+                "type": "Title",
+                "type_confidence": 0.992421567440033,
+                "coords": [
+                    [
+                        73.15137481689453,
+                        159.69833374023438
+                    ],
+                    [
+                        508.8292541503906,
+                        159.69833374023438
+                    ],
+                    [
+                        508.8292541503906,
+                        196.385498046875
+                    ],
+                    [
+                        73.15137481689453,
+                        196.385498046875
+                    ]
+                ],
+                "page_number": 4
+            },
+            {
+                "text": [
+                    "Climate change has adverse impacts on our country's economic\ndevelopment and threatens the realisation of our Vision 2030\ngoals of creating a competitive and prosperous nation with a\nhigh quality of life. Kenya's economy is highly dependent on\nnatural resources, meaning that recurring droughts, erratic\nrainfall patterns and floods will continue to negatively impact\nlivelihoods and community assets."
+                ],
+                "text_block_id": "p_4_b_1",
+                "language": "en",
+                "type": "Text",
+                "type_confidence": 0.9830765724182129,
+                "coords": [
+                    [
+                        229.4781951904297,
+                        220.71853637695312
+                    ],
+                    [
+                        537.16650390625,
+                        220.71853637695312
+                    ],
+                    [
+                        537.16650390625,
+                        319.4053649902344
+                    ],
+                    [
+                        229.4781951904297,
+                        319.4053649902344
+                    ]
+                ],
+                "page_number": 4
+            },
+            {
+                "text": [
+                    "The Government of Kenya recognizes the threats posed by climate\nchange and has taken action to address them. In this regard, my\nministry coordinated the development of the National Climate\nChange Response Strategy in 2010, and the National Climate\nChange Action Plan (NCCAP 2013-2017) in 2012. This National Adaptation Plan (NAP) marks yet\nanother landmark in efforts to address the country's vulnerability and resilience to climate change."
+                ],
+                "text_block_id": "p_4_b_2",
+                "language": "en",
+                "type": "Text",
+                "type_confidence": 0.6799868941307068,
+                "coords": [
+                    [
+                        74.85240936279297,
+                        326.4476318359375
+                    ],
+                    [
+                        549.052978515625,
+                        326.4476318359375
+                    ],
+                    [
+                        549.052978515625,
+                        413.7626953125
+                    ],
+                    [
+                        74.85240936279297,
+                        413.7626953125
+                    ]
+                ],
+                "page_number": 4
+            },
+            {
+                "text": [
+                    "The NAP was developed through a cooperative and consultative process that included stakeholders\nfrom the Government, the private sector, and the civil society; with the support of international\ndevelopment agencies. All of these partners continue to support the implementation of the NAP\nthrough the design, financing and implementation of priority actions. Effective implementation of\nthe NAP will be supported through the establishment of enabling governance structures, including\nthose set out in the Climate Change Act, that was enacted into law by His Excellency, the President\nin May 2016. Additional support and increased partnerships will be required for Kenya to achieve\nits adaptation goals."
+                ],
+                "text_block_id": "p_4_b_3",
+                "language": "en",
+                "type": "Text",
+                "type_confidence": 0.9950749278068542,
+                "coords": [
+                    [
+                        72.27301025390625,
+                        423.6494445800781
+                    ],
+                    [
+                        536.2330322265625,
+                        423.6494445800781
+                    ],
+                    [
+                        536.2330322265625,
+                        540.1387329101562
+                    ],
+                    [
+                        72.27301025390625,
+                        540.1387329101562
+                    ]
+                ],
+                "page_number": 4
+            },
+            {
+                "text": [
+                    "The Government of Kenya is fully committed to addressing climate change domestically, as well as\ndemonstrating leadership in the global fight against climate change. Kenya submitted an ambitious\nIntended Nationally Determined Contribution (INDC) to the United Nations Framework Convention\non Climate Change (UNFCCC). INDCs are anchored in the Paris Agreement as five-year Nationally\nDetermined Contribution (NDC) iterative cycles. It is informative that the Paris Agreement, indeed,\nrecognises the role of NDCS and NAPs as the vehicles for delivering on mitigation and adaptation\nobligations, respectively, under the Agreement. Our INDC reiterates that adaptation is Kenya's priority\nresponse to climate change, and this NAP is the foundation of Kenya's contribution on adaptation."
+                ],
+                "text_block_id": "p_4_b_4",
+                "language": "en",
+                "type": "Text",
+                "type_confidence": 0.99748295545578,
+                "coords": [
+                    [
+                        69.58241271972656,
+                        548.0397338867188
+                    ],
+                    [
+                        536.8211059570312,
+                        548.0397338867188
+                    ],
+                    [
+                        536.8211059570312,
+                        663.2770385742188
+                    ],
+                    [
+                        69.58241271972656,
+                        663.2770385742188
+                    ]
+                ],
+                "page_number": 4
+            },
+            {
+                "text": [
+                    "This NAP demonstrates Kenya's commitment to the Paris Agreement, and will help bring to life our\ncritical responses to the impacts of climate change. Building climate resilience in as low carbon a\nmanner as possible will ensure that Kenya contributes to the goals of the Paris Agreement and the\nSustainable Development Goals."
+                ],
+                "text_block_id": "p_5_b_0",
+                "language": "en",
+                "type": "Text",
+                "type_confidence": 0.9907447695732117,
+                "coords": [
+                    [
+                        73.01153564453125,
+                        159.56072998046875
+                    ],
+                    [
+                        537.3886108398438,
+                        159.56072998046875
+                    ],
+                    [
+                        537.3886108398438,
+                        216.8965606689453
+                    ],
+                    [
+                        73.01153564453125,
+                        216.8965606689453
+                    ]
+                ],
+                "page_number": 5
+            },
+            {
+                "text": [
+                    "Ministry of Environment and Natural Resources"
+                ],
+                "text_block_id": "p_5_b_2",
+                "language": "en",
+                "type": "Text",
+                "type_confidence": 0.8384367227554321,
+                "coords": [
+                    [
+                        74.39680480957031,
+                        315.19256591796875
+                    ],
+                    [
+                        314.27142333984375,
+                        315.19256591796875
+                    ],
+                    [
+                        314.27142333984375,
+                        331.7469177246094
+                    ],
+                    [
+                        74.39680480957031,
+                        331.7469177246094
+                    ]
+                ],
+                "page_number": 5
+            },
+            {
+                "text": [
+                    "Charles Sunkuli, Principal Secretary - State Department of Environment"
+                ],
+                "text_block_id": "p_6_b_0",
+                "language": "en",
+                "type": "Title",
+                "type_confidence": 0.9896886348724365,
+                "coords": [
+                    [
+                        69.4029541015625,
+                        160.0564727783203
+                    ],
+                    [
+                        526.8928527832031,
+                        160.0564727783203
+                    ],
+                    [
+                        526.8928527832031,
+                        180.55166625976562
+                    ],
+                    [
+                        69.4029541015625,
+                        180.55166625976562
+                    ]
+                ],
+                "page_number": 6
+            },
+            {
+                "text": [
+                    "This National Adaptation Plan (NAP 2015-2030) is a critical response\nto the climate change challenge facing our country. The NAP is\nKenya's first plan on adaptation, and demonstrates our commitment\nto operationalise the National Climate Change Action Plan by\nmainstreaming adaptation across all sectors in the national planning,\nbudgeting and implementation processes. Our mainstreaming\napproach recognizes that climate change is a cross-cutting sustainable\ndevelopment issue with economic, social and environmental impacts.\nThe NAP was validated at a national workshop held in Nairobi on 18\nNovember 2015."
+                ],
+                "text_block_id": "p_6_b_1",
+                "language": "en",
+                "type": "Text",
+                "type_confidence": 0.9970782995223999,
+                "coords": [
+                    [
+                        200.1839599609375,
+                        199.05264282226562
+                    ],
+                    [
+                        535.8470458984375,
+                        199.05264282226562
+                    ],
+                    [
+                        535.8470458984375,
+                        339.7229309082031
+                    ],
+                    [
+                        200.1839599609375,
+                        339.7229309082031
+                    ]
+                ],
+                "page_number": 6
+            },
+            {
+                "text": [
+                    "The NAP sets out Kenya's national circumstances, focusing on current and future climate trends,\nand describes the country's vulnerability to climate change. The NAP also elaborates institutional\narrangements, including monitoring and evaluation processes. Priority actions are identified in 20\nplanning sectors for the short, medium and long term. This builds on the premise that all our socio-\neconomic sectors are vulnerable to climate change impacts, although the manifestation of these\nimpacts may vary from one sector to the other."
+                ],
+                "text_block_id": "p_6_b_2",
+                "language": "en",
+                "type": "Text",
+                "type_confidence": 0.994870662689209,
+                "coords": [
+                    [
+                        70.39982604980469,
+                        344.2995910644531
+                    ],
+                    [
+                        540.2333984375,
+                        344.2995910644531
+                    ],
+                    [
+                        540.2333984375,
+                        429.89166259765625
+                    ],
+                    [
+                        70.39982604980469,
+                        429.89166259765625
+                    ]
+                ],
+                "page_number": 6
+            },
+            {
+                "text": [
+                    "The NAP was prepared through an extensive consultation process. The consultations cut across\nstakeholders from within the Government, and non-state-actors like civil society, academia and the\nprivate sector, at both national and county levels. The process was coordinated by personnel from the\nNational Climate Change Secretariat, whom I would like to recognise for their professionalism and\ndiligence throughout the process. The technical inputs of the Adaptation Thematic Working Group\n(TWG), whose membership was inclusive and drawn from Government, civil society, academia and\nthe private sector institutions, enriched the process. The contribution of the TWG members, both\nindividually and corporately, is greatly appreciated. The Ministry is also grateful to the national and\ninternational adaptation experts who provided valuable technical guidance to the process."
+                ],
+                "text_block_id": "p_6_b_3",
+                "language": "en",
+                "type": "Text",
+                "type_confidence": 0.997401237487793,
+                "coords": [
+                    [
+                        71.9700927734375,
+                        430.59161376953125
+                    ],
+                    [
+                        538.7642822265625,
+                        430.59161376953125
+                    ],
+                    [
+                        538.7642822265625,
+                        560.1653442382812
+                    ],
+                    [
+                        71.9700927734375,
+                        560.1653442382812
+                    ]
+                ],
+                "page_number": 6
+            },
+            {
+                "text": [
+                    "The NAP was finalised with the support of the Technical Assistance component of the Strengthening\nAdaptation and Resilience to Climate Change Plus (STARCK+) programme, which is funded by the\nUnited Kingdom's Department for International Development (DFID). I would, consequently, like\nto thank DFID for this support."
+                ],
+                "text_block_id": "p_6_b_4",
+                "language": "en",
+                "type": "Text",
+                "type_confidence": 0.9869577884674072,
+                "coords": [
+                    [
+                        73.18037414550781,
+                        562.31005859375
+                    ],
+                    [
+                        538.5194091796875,
+                        562.31005859375
+                    ],
+                    [
+                        538.5194091796875,
+                        622.407470703125
+                    ],
+                    [
+                        73.18037414550781,
+                        622.407470703125
+                    ]
+                ],
+                "page_number": 6
+            },
+            {
+                "text": [
+                    "The NAP will be distributed widely to national and county government institutions, and amongst\nnon-state actors, to guide their expected implementation roles. It is expected that development\npartners will find the information helpful in aligning their funding preferences with Kenya's aspirations\nto attain a low carbon climate resilient economy by addressing climate change adaptation and\nmitigation on equal footing."
+                ],
+                "text_block_id": "p_7_b_0",
+                "language": "en",
+                "type": "Text",
+                "type_confidence": 0.9885550141334534,
+                "coords": [
+                    [
+                        71.16720581054688,
+                        197.33779907226562
+                    ],
+                    [
+                        540.2880249023438,
+                        197.33779907226562
+                    ],
+                    [
+                        540.2880249023438,
+                        270.70391845703125
+                    ],
+                    [
+                        71.16720581054688,
+                        270.70391845703125
+                    ]
+                ],
+                "page_number": 7
+            },
+            {
+                "text": [
+                    "The Government is committed to the implementation and continuous revision of the National\nAdaptation Plan and its integration in the national development agenda, not only for the attainment\nof Vision 2030, but also for the realisation of the goals of the Paris Agreement and the UN Sustainable\nDevelopment Goals."
+                ],
+                "text_block_id": "p_7_b_1",
+                "language": "en",
+                "type": "Text",
+                "type_confidence": 0.9778072237968445,
+                "coords": [
+                    [
+                        71.90678405761719,
+                        273.11419677734375
+                    ],
+                    [
+                        539.0170288085938,
+                        273.11419677734375
+                    ],
+                    [
+                        539.0170288085938,
+                        332.7690734863281
+                    ],
+                    [
+                        71.90678405761719,
+                        332.7690734863281
+                    ]
+                ],
+                "page_number": 7
+            },
+            {
+                "text": [
+                    "Principal Secretary - State Department of Environment, Ministry of Environment\nand Natural Resources"
+                ],
+                "text_block_id": "p_7_b_3",
+                "language": "en",
+                "type": "Title",
+                "type_confidence": 0.6184535622596741,
+                "coords": [
+                    [
+                        71.48171997070312,
+                        398.9998779296875
+                    ],
+                    [
+                        457.2774658203125,
+                        398.9998779296875
+                    ],
+                    [
+                        457.2774658203125,
+                        428.9858703613281
+                    ],
+                    [
+                        71.48171997070312,
+                        428.9858703613281
+                    ]
+                ],
+                "page_number": 7
+            },
+            {
+                "text": [
+                    "National Adaptation Plan Thematic\nWorking Group"
+                ],
+                "text_block_id": "p_8_b_0",
+                "language": "en",
+                "type": "Title",
+                "type_confidence": 0.9990553259849548,
+                "coords": [
+                    [
+                        72.60831451416016,
+                        125.81600952148438
+                    ],
+                    [
+                        451.6823425292969,
+                        125.81600952148438
+                    ],
+                    [
+                        451.6823425292969,
+                        180.77474975585938
+                    ],
+                    [
+                        72.60831451416016,
+                        180.77474975585938
+                    ]
+                ],
+                "page_number": 8
+            },
+            {
+                "text": [
+                    "Victor Orindi (Chair)"
+                ],
+                "text_block_id": "p_8_b_1",
+                "language": "en",
+                "type": "Text",
+                "type_confidence": 0.7699797749519348,
+                "coords": [
+                    [
+                        73.5001449584961,
+                        201.86691284179688
+                    ],
+                    [
+                        194.7184600830078,
+                        201.86691284179688
+                    ],
+                    [
+                        194.7184600830078,
+                        218.13995361328125
+                    ],
+                    [
+                        73.5001449584961,
+                        218.13995361328125
+                    ]
+                ],
+                "page_number": 8
+            },
+            {
+                "text": [
+                    "Ministry of Agriculture Livestock and Fisheries"
+                ],
+                "text_block_id": "p_8_b_2",
+                "language": "en",
+                "type": "Text",
+                "type_confidence": 0.8619075417518616,
+                "coords": [
+                    [
+                        277.15533447265625,
+                        212.40713500976562
+                    ],
+                    [
+                        507.8197326660156,
+                        212.40713500976562
+                    ],
+                    [
+                        507.8197326660156,
+                        229.84622192382812
+                    ],
+                    [
+                        277.15533447265625,
+                        229.84622192382812
+                    ]
+                ],
+                "page_number": 8
+            },
+            {
+                "text": [
+                    "Kenya Climate Innovation Centre"
+                ],
+                "text_block_id": "p_8_b_3",
+                "language": "en",
+                "type": "Text",
+                "type_confidence": 0.6457999348640442,
+                "coords": [
+                    [
+                        275.18115234375,
+                        248.09144592285156
+                    ],
+                    [
+                        451.32830810546875,
+                        248.09144592285156
+                    ],
+                    [
+                        451.32830810546875,
+                        264.92938232421875
+                    ],
+                    [
+                        275.18115234375,
+                        264.92938232421875
+                    ]
+                ],
+                "page_number": 8
+            },
+            {
+                "text": [
+                    "Kenya Agricultural and Livestock Research\nOrganisation"
+                ],
+                "text_block_id": "p_8_b_4",
+                "language": "en",
+                "type": "Text",
+                "type_confidence": 0.664134681224823,
+                "coords": [
+                    [
+                        273.73175048828125,
+                        283.6445617675781
+                    ],
+                    [
+                        492.57177734375,
+                        283.6445617675781
+                    ],
+                    [
+                        492.57177734375,
+                        311.8376159667969
+                    ],
+                    [
+                        273.73175048828125,
+                        311.8376159667969
+                    ]
+                ],
+                "page_number": 8
+            },
+            {
+                "text": [
+                    "Kenya Association of Manufacturers"
+                ],
+                "text_block_id": "p_8_b_5",
+                "language": "en",
+                "type": "Text",
+                "type_confidence": 0.694401204586029,
+                "coords": [
+                    [
+                        276.69940185546875,
+                        330.79473876953125
+                    ],
+                    [
+                        463.49468994140625,
+                        330.79473876953125
+                    ],
+                    [
+                        463.49468994140625,
+                        348.1728515625
+                    ],
+                    [
+                        276.69940185546875,
+                        348.1728515625
+                    ]
+                ],
+                "page_number": 8
+            },
+            {
+                "text": [
+                    "Bernard Karicho\nMinistry of Water and Irrigation\nSamuel Kiptorus\nMinistry of Devolution and Planning\nWangari Kirumba\nNational Environmental Management\nJane Wamboi\nKenya Wildlife Service\nStephen King'uyu\nNational Climate Change Secretariat\nCharles Mutai"
+                ],
+                "text_block_id": "p_8_b_6",
+                "language": "en",
+                "type": "Inferred from gaps",
+                "type_confidence": 1.0,
+                "coords": [
+                    [
+                        72.60831451416016,
+                        344.1728515625
+                    ],
+                    [
+                        507.8197326660156,
+                        344.1728515625
+                    ],
+                    [
+                        507.8197326660156,
+                        441.4181213378906
+                    ],
+                    [
+                        72.60831451416016,
+                        441.4181213378906
+                    ]
+                ],
+                "page_number": 8
+            },
+            {
+                "text": [
+                    "National Climate Change Secretariat"
+                ],
+                "text_block_id": "p_8_b_7",
+                "language": "en",
+                "type": "Text",
+                "type_confidence": 0.7517939209938049,
+                "coords": [
+                    [
+                        275.5179443359375,
+                        437.4181213378906
+                    ],
+                    [
+                        466.81005859375,
+                        437.4181213378906
+                    ],
+                    [
+                        466.81005859375,
+                        454.2699890136719
+                    ],
+                    [
+                        275.5179443359375,
+                        454.2699890136719
+                    ]
+                ],
+                "page_number": 8
+            },
+            {
+                "text": [
+                    "Abbreviations"
+                ],
+                "text_block_id": "p_9_b_0",
+                "language": "en",
+                "type": "Title",
+                "type_confidence": 0.9066852927207947,
+                "coords": [
+                    [
+                        73.35456848144531,
+                        124.13900756835938
+                    ],
+                    [
+                        238.3287353515625,
+                        124.13900756835938
+                    ],
+                    [
+                        238.3287353515625,
+                        155.45338439941406
+                    ],
+                    [
+                        73.35456848144531,
+                        155.45338439941406
+                    ]
+                ],
+                "page_number": 9
+            },
+            {
+                "text": [
+                    "AMCEN\nASAL\nATAR\nCIDP\nDFID\nEDE\nGCF\nGCM\nGDP\nICT\nINDC\nM&E\nMDAs\nMRV\nMTEF\nMTP\nNAP\nNCCAP\nNCCRS\nNCCS\nNDMA\nNEMA\nNIE\nSTARCK+\nTWG\nUNDP\nUNFCCC\nAfrican Ministerial Conference on the Environment.\nArid and semi-arid lands\nAdaptation Technical Analysis Report\nCounty Integrated Development Plan\nDepartment for International Development (United Kingdom)\nEnding Drought Emergencies\nGreen Climate Fund\nGlobal Climate Model\nGross domestic product\nInformation and communication technology\nIntended Nationally Determined Contribution\nMonitoring and evaluation\nMinistries, departments and agencies\nMeasuring, Reporting and Verification\nMedium Term Expenditure Framework\nMedium Term Plan\nNational Adaptation Plan\nNational Climate Change Action Plan\nNational Climate Change Response Strategy\nNational Climate Change Secretariat\nNational Drought Management Authority\nNational Environment Management Authority\nNational Implementing Agency\nStrengthening Adaptation and Resilience to Climate Change in\nThematic Working Group\nUnited Nations Development Programme\nUnited Nations Framework Convention on Climate Change"
+                ],
+                "text_block_id": "p_9_b_1",
+                "language": "en",
+                "type": "List",
+                "type_confidence": 0.85701984167099,
+                "coords": [
+                    [
+                        77.63361358642578,
+                        172.31068420410156
+                    ],
+                    [
+                        430.6730041503906,
+                        172.31068420410156
+                    ],
+                    [
+                        430.6730041503906,
+                        581.9744262695312
+                    ],
+                    [
+                        77.63361358642578,
+                        581.9744262695312
+                    ]
+                ],
+                "page_number": 9
+            },
+            {
+                "text": [
+                    "Foreword."
+                ],
+                "text_block_id": "p_10_b_0",
+                "language": "en",
+                "type": "Text",
+                "type_confidence": 0.9262645840644836,
+                "coords": [
+                    [
+                        72.55323028564453,
+                        181.5354766845703
+                    ],
+                    [
+                        150.65476989746094,
+                        181.5354766845703
+                    ],
+                    [
+                        150.65476989746094,
+                        196.66380310058594
+                    ],
+                    [
+                        72.55323028564453,
+                        196.66380310058594
+                    ]
+                ],
+                "page_number": 10
+            },
+            {
+                "text": [
+                    "Chapter 1: National Circumstances"
+                ],
+                "text_block_id": "p_12_b_0",
+                "language": "en",
+                "type": "Title",
+                "type_confidence": 0.9970878958702087,
+                "coords": [
+                    [
+                        70.01181030273438,
+                        127.03968811035156
+                    ],
+                    [
+                        455.34423828125,
+                        127.03968811035156
+                    ],
+                    [
+                        455.34423828125,
+                        155.26161193847656
+                    ],
+                    [
+                        70.01181030273438,
+                        155.26161193847656
+                    ]
+                ],
+                "page_number": 12
+            },
+            {
+                "text": [
+                    "1.1 Introduction"
+                ],
+                "text_block_id": "p_12_b_1",
+                "language": "en",
+                "type": "Title",
+                "type_confidence": 0.6913627982139587,
+                "coords": [
+                    [
+                        82.41032409667969,
+                        174.28326416015625
+                    ],
+                    [
+                        237.68263244628906,
+                        174.28326416015625
+                    ],
+                    [
+                        237.68263244628906,
+                        201.25328063964844
+                    ],
+                    [
+                        82.41032409667969,
+                        201.25328063964844
+                    ]
+                ],
+                "page_number": 12
+            },
+            {
+                "text": [
+                    "Kenya, like other African countries, is bearing the brunt of climate variability and change; hence\nthe need for a coordinated approach to address related vulnerabilities and risks. Adaptation and\nresilience remain Kenya's, and indeed Africa's priority response to climate change. This was affirmed\nby the 15th African Ministerial Conference on the Environment (AMCEN) that, in the build-up to\nthe Paris Agreement of December 2015, called for \"a global goal for adaptation which takes into\naccount adaptation needs and associated costs, including support for developing countries, while\nrecognizing the need to increase adaptation investments in developing nations\" and \"an ambitious\nglobal mitigation action in the long-run, combined with large-scale, rapidly increasing and\npredictable funding for adaptation.\"\u00b9 AMCEN recommended that investment in building resilience\nmust continue to be a top funding priority, including as an integral part of national development\nplanning. This resonates well with Kenya's approach of mainstreaming climate adaptation in national\nand county (sub-national) development planning."
+                ],
+                "text_block_id": "p_12_b_2",
+                "language": "en",
+                "type": "Text",
+                "type_confidence": 0.9997460246086121,
+                "coords": [
+                    [
+                        71.328125,
+                        202.5639190673828
+                    ],
+                    [
+                        539.4824829101562,
+                        202.5639190673828
+                    ],
+                    [
+                        539.4824829101562,
+                        372.4185791015625
+                    ],
+                    [
+                        71.328125,
+                        372.4185791015625
+                    ]
+                ],
+                "page_number": 12
+            },
+            {
+                "text": [
+                    "Kenya has been in the forefront of advocating for climate change. It is in this respect that it launched\na National Climate Change Response Strategy (NCCRS) in 2010 and a National Climate Change\nAction Plan (NCCAP 2013-2017) in 2013. The action plan has been acclaimed internationally as\nbeing very progressive and comprehensive. The action plan is clear that adaptation is the main\npriority for the country because of the adverse socio-economic impacts related to climate change\nbeing experienced and the ever increasing vulnerabilities of the different sectors. The NCCAP clearly\narticulates that sustainable development is difficult to achieve in light of a changing climate that has\nnegative economic, social, and environmental impacts; meaning that adaptation and development\ngoals need to complement each other. Kenya's recommended approach for addressing climate\nchange is mainstreaming of climate change actions in development planning, budgeting and\nimplementation."
+                ],
+                "text_block_id": "p_12_b_3",
+                "language": "en",
+                "type": "Text",
+                "type_confidence": 0.9976867437362671,
+                "coords": [
+                    [
+                        75.54930877685547,
+                        374.19647216796875
+                    ],
+                    [
+                        537.5391235351562,
+                        374.19647216796875
+                    ],
+                    [
+                        537.5391235351562,
+                        531.5996704101562
+                    ],
+                    [
+                        75.54930877685547,
+                        531.5996704101562
+                    ]
+                ],
+                "page_number": 12
+            },
+            {
+                "text": [
+                    "This national adaptation plan (NAP) builds on the foundation laid by the NCCRS and the NCCAP.\nAdditionally, the NAP is the basis for the adaptation component of Kenya's Intended Nationally\nDetermined Contribution (INDC) that was submitted to the United Nations Framework Convention\non Climate Change (UNFCCC) Secretariat."
+                ],
+                "text_block_id": "p_12_b_4",
+                "language": "en",
+                "type": "Text",
+                "type_confidence": 0.980933666229248,
+                "coords": [
+                    [
+                        72.70313262939453,
+                        532.2288208007812
+                    ],
+                    [
+                        538.0227661132812,
+                        532.2288208007812
+                    ],
+                    [
+                        538.0227661132812,
+                        591.9027709960938
+                    ],
+                    [
+                        72.70313262939453,
+                        591.9027709960938
+                    ]
+                ],
+                "page_number": 12
+            },
+            {
+                "text": [
+                    "The aim of this NAP is to consolidate the country's vision on adaptation supported by macro-level\nadaptation actions that relate with the economic sectors and county level vulnerabilities to enhance\nlong term resilience and adaptive capacity. This NAP presents adaptation actions that cover the time\nframe 2015-2030."
+                ],
+                "text_block_id": "p_12_b_5",
+                "language": "en",
+                "type": "Text",
+                "type_confidence": 0.9947457313537598,
+                "coords": [
+                    [
+                        72.91777801513672,
+                        594.8406982421875
+                    ],
+                    [
+                        538.2319946289062,
+                        594.8406982421875
+                    ],
+                    [
+                        538.2319946289062,
+                        652.6972045898438
+                    ],
+                    [
+                        72.91777801513672,
+                        652.6972045898438
+                    ]
+                ],
+                "page_number": 12
+            },
+            {
+                "text": [
+                    "This NAP builds on the Adaptation Technical Analysis Report (ATAR) developed under the NCCAP.\u00b2\nThe ATAR provided a detailed analysis of sectors and vulnerabilities in the various counties, identified\nadaptation needs in various economic processes, and developed a long list of potential adaptation\nactions. The ATAR was informed by a highly participatory process that included meetings with the\nadaptation thematic working group (TWG), NCCAP task force, civil society and the private sector;\nas well as consultations with counties.\u00b3 Finalisation of the NAP was the first priority action in the\nATAR and the adaptation TWG was tasked with completing this action using the NAP consultation\nand analytical guidelines of the UNFCCC."
+                ],
+                "text_block_id": "p_13_b_0",
+                "language": "en",
+                "type": "Text",
+                "type_confidence": 0.9984034895896912,
+                "coords": [
+                    [
+                        73.84232330322266,
+                        127.30287170410156
+                    ],
+                    [
+                        535.8243408203125,
+                        127.30287170410156
+                    ],
+                    [
+                        535.8243408203125,
+                        242.4646453857422
+                    ],
+                    [
+                        73.84232330322266,
+                        242.4646453857422
+                    ]
+                ],
+                "page_number": 13
+            },
+            {
+                "text": [
+                    "The NAP is anchored in the Constitution of Kenya and Vision 2030 - Kenya's blueprint for\ndevelopment. It also aligns itself with the Medium Term Plan (MTP) and Medium-Term Expenditure\nFramework (MTEF) planning processes. The NAP is also aligned with the Climate Change Act that\nwas enacted into law in May 2016. In the MTP II sectors, climate change adaptation is represented\nin the drought risk management and ending drought emergencies, environment, water, energy,\nagriculture, livestock, and fisheries sectors. Several programmes under these sectors aim to enhance\nresilience and reduce vulnerabilities of communities and systems affected by climate hazards."
+                ],
+                "text_block_id": "p_13_b_1",
+                "language": "en",
+                "type": "Text",
+                "type_confidence": 0.9925625920295715,
+                "coords": [
+                    [
+                        74.57520294189453,
+                        244.66847229003906
+                    ],
+                    [
+                        535.9429321289062,
+                        244.66847229003906
+                    ],
+                    [
+                        535.9429321289062,
+                        344.50115966796875
+                    ],
+                    [
+                        74.57520294189453,
+                        344.50115966796875
+                    ]
+                ],
+                "page_number": 13
+            },
+            {
+                "text": [
+                    "The NAP provides a background of Kenya's national circumstances, including socio-economic\ncircumstances; and future climate scenarios that the country needs to consider in decision making,\nplanning and budgetary processes. A vulnerability analysis is also presented against the identified\nhazards in the NCCAP, namely drought, floods, and sea level rise."
+                ],
+                "text_block_id": "p_13_b_2",
+                "language": "en",
+                "type": "Text",
+                "type_confidence": 0.9823070168495178,
+                "coords": [
+                    [
+                        73.55229949951172,
+                        347.7081604003906
+                    ],
+                    [
+                        540.9445190429688,
+                        347.7081604003906
+                    ],
+                    [
+                        540.9445190429688,
+                        406.7330627441406
+                    ],
+                    [
+                        73.55229949951172,
+                        406.7330627441406
+                    ]
+                ],
+                "page_number": 13
+            },
+            {
+                "text": [
+                    "The NAP recognises the governance and institutional arrangements for implementation of adaptation\nactions as stipulated in the NCCAP and Climate Change Act, 2016. With drought being the main hazard,\nthe NAP recognises that the National Drought Management Authority (NDMA) is a key institution in\nenhancing adaptive capacity. Established in 2011, NDMA is mandated to establish mechanisms to\nensure that drought does not become famine and that impacts of climate change are addressed."
+                ],
+                "text_block_id": "p_13_b_3",
+                "language": "en",
+                "type": "Text",
+                "type_confidence": 0.9961508512496948,
+                "coords": [
+                    [
+                        70.3553695678711,
+                        409.7029113769531
+                    ],
+                    [
+                        538.784423828125,
+                        409.7029113769531
+                    ],
+                    [
+                        538.784423828125,
+                        481.41363525390625
+                    ],
+                    [
+                        70.3553695678711,
+                        481.41363525390625
+                    ]
+                ],
+                "page_number": 13
+            },
+            {
+                "text": [
+                    "This NAP proposes macro-level adaptation actions and sub-actions in 20 planning sectors,\ncategorising them into short-, medium- and long-term time frames. For each sector, the NAP identifies\ngaps, estimates costs of the macro-level actions projected to 2030, and identifies key institutions\nrequired for their implementation. Prioritised actions that have not yet been mainstreamed into\nKenya's development plans are expected to be integrated in the third MTP (2017-2022). Thereafter\nthe actions will need to be revised in each MTP to ensure that Kenya's development will be resilient\nto climate shocks."
+                ],
+                "text_block_id": "p_13_b_4",
+                "language": "en",
+                "type": "Text",
+                "type_confidence": 0.9893043041229248,
+                "coords": [
+                    [
+                        72.8923568725586,
+                        483.6681823730469
+                    ],
+                    [
+                        539.70556640625,
+                        483.6681823730469
+                    ],
+                    [
+                        539.70556640625,
+                        586.75244140625
+                    ],
+                    [
+                        72.8923568725586,
+                        586.75244140625
+                    ]
+                ],
+                "page_number": 13
+            },
+            {
+                "text": [
+                    "The NAP proposes adaptation indicators at county, sectoral and national levels for monitoring and\nevaluation (M&E). These indicators will guide the collection of data and information on adaptation\noutcomes, which will be aggregated at the national level. These indicators are derived from an\nadaptation theory of change that is based on the macro-level adaptation actions and the adaptation\nvision. Adaptation data will feed into the national Monitoring, Reporting and Verification plus\n(MRV+) system - a framework for adaptation and mitigation reporting recommended in the NCCAP."
+                ],
+                "text_block_id": "p_13_b_5",
+                "language": "en",
+                "type": "Text",
+                "type_confidence": 0.9883063435554504,
+                "coords": [
+                    [
+                        68.3586654663086,
+                        588.1842651367188
+                    ],
+                    [
+                        536.4920654296875,
+                        588.1842651367188
+                    ],
+                    [
+                        536.4920654296875,
+                        674.5916137695312
+                    ],
+                    [
+                        68.3586654663086,
+                        674.5916137695312
+                    ]
+                ],
+                "page_number": 13
+            },
+            {
+                "text": [
+                    "The vision of this NAP is enhanced climate resilience towards the attainment of Vision 2030.\nEnhanced climate resilience includes strong economic growth, resilient ecosystems, and\nsustainable livelihoods for Kenyans. It will also result in reduced climate-induced loss and damage,\nmainstreamed disaster risk reduction approaches in various sectors, reduced costs of humanitarian\naid, and improved knowledge and learning for adaptation and the future protection of the country."
+                ],
+                "text_block_id": "p_14_b_0",
+                "language": "en",
+                "type": "Text",
+                "type_confidence": 0.9760088920593262,
+                "coords": [
+                    [
+                        71.33102416992188,
+                        128.86521911621094
+                    ],
+                    [
+                        542.0355834960938,
+                        128.86521911621094
+                    ],
+                    [
+                        542.0355834960938,
+                        200.8531951904297
+                    ],
+                    [
+                        71.33102416992188,
+                        200.8531951904297
+                    ]
+                ],
+                "page_number": 14
+            },
+            {
+                "text": [
+                    "Highlight the importance of adaptation and resilience building actions in development;\nIntegrate climate change adaptation into national and county level development planning\nand budgeting processes;\n\u2022 Enhance the resilience of public and private sector investment in the national transformation,\neconomic and social and pillars of Vision 2030 to climate shocks;\nEnhance synergies between adaptation and mitigation actions in order to attain a low\ncarbon climate resilient economy; and\nEnhance resilience of vulnerable populations to climate shocks through adaptation and\ndisaster risk reduction strategies."
+                ],
+                "text_block_id": "p_14_b_1",
+                "language": "en",
+                "type": "List",
+                "type_confidence": 0.9941091537475586,
+                "coords": [
+                    [
+                        86.11981964111328,
+                        213.4730682373047
+                    ],
+                    [
+                        540.7646484375,
+                        213.4730682373047
+                    ],
+                    [
+                        540.7646484375,
+                        367.37384033203125
+                    ],
+                    [
+                        86.11981964111328,
+                        367.37384033203125
+                    ]
+                ],
+                "page_number": 14
+            },
+            {
+                "text": [
+                    "1.2 Current climate trends"
+                ],
+                "text_block_id": "p_15_b_0",
+                "language": "en",
+                "type": "Title",
+                "type_confidence": 0.8148450255393982,
+                "coords": [
+                    [
+                        80.42372131347656,
+                        124.21577453613281
+                    ],
+                    [
+                        323.6678161621094,
+                        124.21577453613281
+                    ],
+                    [
+                        323.6678161621094,
+                        151.67869567871094
+                    ],
+                    [
+                        80.42372131347656,
+                        151.67869567871094
+                    ]
+                ],
+                "page_number": 15
+            },
+            {
+                "text": [
+                    "Kenya's climate is influenced by global, regional and localised climate conditions. Some of the\nvariability in the country's climate is due to the El Ni\u00f1o Southern Oscillation which has caused\nperiods of drought and flooding in the country over decades (Figure 1)."
+                ],
+                "text_block_id": "p_15_b_1",
+                "language": "en",
+                "type": "Text",
+                "type_confidence": 0.9866433143615723,
+                "coords": [
+                    [
+                        72.72017669677734,
+                        159.00735473632812
+                    ],
+                    [
+                        536.4437866210938,
+                        159.00735473632812
+                    ],
+                    [
+                        536.4437866210938,
+                        203.16177368164062
+                    ],
+                    [
+                        72.72017669677734,
+                        203.16177368164062
+                    ]
+                ],
+                "page_number": 15
+            },
+            {
+                "text": [
+                    "Source: http://www.climas.arizona.edu/sites/default/files/oni.jpg"
+                ],
+                "text_block_id": "p_15_b_2",
+                "language": "en",
+                "type": "Text",
+                "type_confidence": 0.9502450823783875,
+                "coords": [
+                    [
+                        72.1068115234375,
+                        419.7391052246094
+                    ],
+                    [
+                        335.7845153808594,
+                        419.7391052246094
+                    ],
+                    [
+                        335.7845153808594,
+                        434.7329406738281
+                    ],
+                    [
+                        72.1068115234375,
+                        434.7329406738281
+                    ]
+                ],
+                "page_number": 15
+            },
+            {
+                "text": [
+                    "The El Ni\u00f1o and La Ni\u00f1a episodes have had disastrous effects on the country's economy and\ninfrastructure and caused loss of lives. The El Ni\u00f1o Southern Oscillation periods have caused\neconomic losses and slowed down agriculture value-added growth (see Figure 2) hence the need for\nadaptation across various sectors."
+                ],
+                "text_block_id": "p_15_b_3",
+                "language": "en",
+                "type": "Text",
+                "type_confidence": 0.9754860997200012,
+                "coords": [
+                    [
+                        72.00532531738281,
+                        437.9648132324219
+                    ],
+                    [
+                        541.070556640625,
+                        437.9648132324219
+                    ],
+                    [
+                        541.070556640625,
+                        497.61981201171875
+                    ],
+                    [
+                        72.00532531738281,
+                        497.61981201171875
+                    ]
+                ],
+                "page_number": 15
+            },
+            {
+                "text": [
+                    "Figure 2: Agriculture growth index and major extreme events in Kenya 1980-2012."
+                ],
+                "text_block_id": "p_15_b_4",
+                "language": "en",
+                "type": "Text",
+                "type_confidence": 0.9756529927253723,
+                "coords": [
+                    [
+                        72.01805877685547,
+                        645.7855834960938
+                    ],
+                    [
+                        394.8509826660156,
+                        645.7855834960938
+                    ],
+                    [
+                        394.8509826660156,
+                        658.6036987304688
+                    ],
+                    [
+                        72.01805877685547,
+                        658.6036987304688
+                    ]
+                ],
+                "page_number": 15
+            },
+            {
+                "text": [
+                    "1.3 Future climate trends"
+                ],
+                "text_block_id": "p_16_b_0",
+                "language": "en",
+                "type": "Title",
+                "type_confidence": 0.8487944006919861,
+                "coords": [
+                    [
+                        76.89227294921875,
+                        125.53565979003906
+                    ],
+                    [
+                        313.38568115234375,
+                        125.53565979003906
+                    ],
+                    [
+                        313.38568115234375,
+                        152.42868041992188
+                    ],
+                    [
+                        76.89227294921875,
+                        152.42868041992188
+                    ]
+                ],
+                "page_number": 16
+            },
+            {
+                "text": [
+                    "1.3.1 Temperature"
+                ],
+                "text_block_id": "p_16_b_1",
+                "language": "en",
+                "type": "Text",
+                "type_confidence": 0.6083455681800842,
+                "coords": [
+                    [
+                        73.24801635742188,
+                        154.55838012695312
+                    ],
+                    [
+                        204.14205932617188,
+                        154.55838012695312
+                    ],
+                    [
+                        204.14205932617188,
+                        173.543212890625
+                    ],
+                    [
+                        73.24801635742188,
+                        173.543212890625
+                    ]
+                ],
+                "page_number": 16
+            },
+            {
+                "text": [
+                    "Future climate trends on temperature and precipitation show that Kenya's economy will continue\nto be affected. Global Climate Modelling (GCM) data indicates that the mean annual temperature\nis projected to increase by between 0.8 and 1.5\u00b0C by the 2030s and 1.6\u00b0C to 2.7\u00b0C by the 2060s.\"\nFigure 3 provides a visualisation of the trend that GCMs have suggested for increased temperatures\nfor Kenya. There is good model agreement of temperature increases of up to 3\u00b0C by 2100.7"
+                ],
+                "text_block_id": "p_16_b_2",
+                "language": "en",
+                "type": "Text",
+                "type_confidence": 0.9932498931884766,
+                "coords": [
+                    [
+                        68.55140686035156,
+                        184.08029174804688
+                    ],
+                    [
+                        539.0921630859375,
+                        184.08029174804688
+                    ],
+                    [
+                        539.0921630859375,
+                        256.32289123535156
+                    ],
+                    [
+                        68.55140686035156,
+                        256.32289123535156
+                    ]
+                ],
+                "page_number": 16
+            },
+            {
+                "text": [
+                    "Figure 3: GCM Visualisation of the projected temperatures for Kenya. Percentage change in average annual temperature by\n2100 from 1960-1990 baseline climate, averaged over 21 CMIP3 models."
+                ],
+                "text_block_id": "p_16_b_3",
+                "language": "en",
+                "type": "Text",
+                "type_confidence": 0.9913517236709595,
+                "coords": [
+                    [
+                        71.63666534423828,
+                        539.5806884765625
+                    ],
+                    [
+                        539.4776611328125,
+                        539.5806884765625
+                    ],
+                    [
+                        539.4776611328125,
+                        563.8140869140625
+                    ],
+                    [
+                        71.63666534423828,
+                        563.8140869140625
+                    ]
+                ],
+                "page_number": 16
+            },
+            {
+                "text": [
+                    "For precipitation, GCM data indicates that there will be a possible increase in average rainfall by the\n2060s especially from October to December. In addition the GCMs suggest with greater confidence\nthat the proportion of annual rainfall that occurs in heavy events will increase. The range of increase\nvaries from 2 to 11 per cent by the 2060s and 2 to 12 per cent by the end of the century. Figure 4\nprovides a visualisation of the rainfall trends.\""
+                ],
+                "text_block_id": "p_17_b_0",
+                "language": "en",
+                "type": "Text",
+                "type_confidence": 0.9942898750305176,
+                "coords": [
+                    [
+                        69.8154067993164,
+                        158.73606872558594
+                    ],
+                    [
+                        541.6294555664062,
+                        158.73606872558594
+                    ],
+                    [
+                        541.6294555664062,
+                        229.72813415527344
+                    ],
+                    [
+                        69.8154067993164,
+                        229.72813415527344
+                    ]
+                ],
+                "page_number": 17
+            },
+            {
+                "text": [
+                    "Figure 4: GCM Visualisation of the projected rainfall for Kenya. Percentage change in average annual precipitation by\n2100 from 1960-1990 baseline climate, averaged over 21 CMIP3 models."
+                ],
+                "text_block_id": "p_17_b_1",
+                "language": "en",
+                "type": "Text",
+                "type_confidence": 0.990265429019928,
+                "coords": [
+                    [
+                        71.31514739990234,
+                        515.9926147460938
+                    ],
+                    [
+                        523.4532775878906,
+                        515.9926147460938
+                    ],
+                    [
+                        523.4532775878906,
+                        539.9826049804688
+                    ],
+                    [
+                        71.31514739990234,
+                        539.9826049804688
+                    ]
+                ],
+                "page_number": 17
+            },
+            {
+                "text": [
+                    "The future climate trends for Kenya are discussed in more detail in the Adaptation Technical Analysis\nReport which forms part of the NCCAP.\""
+                ],
+                "text_block_id": "p_17_b_2",
+                "language": "en",
+                "type": "Text",
+                "type_confidence": 0.9676538705825806,
+                "coords": [
+                    [
+                        69.58222198486328,
+                        575.2550659179688
+                    ],
+                    [
+                        538.3134765625,
+                        575.2550659179688
+                    ],
+                    [
+                        538.3134765625,
+                        606.1935424804688
+                    ],
+                    [
+                        69.58222198486328,
+                        606.1935424804688
+                    ]
+                ],
+                "page_number": 17
+            },
+            {
+                "text": [
+                    "Chapter 2: Coordination of Adaptation\nActions"
+                ],
+                "text_block_id": "p_19_b_0",
+                "language": "en",
+                "type": "Title",
+                "type_confidence": 0.9988729357719421,
+                "coords": [
+                    [
+                        71.87289428710938,
+                        126.861572265625
+                    ],
+                    [
+                        484.31646728515625,
+                        126.861572265625
+                    ],
+                    [
+                        484.31646728515625,
+                        181.16041564941406
+                    ],
+                    [
+                        71.87289428710938,
+                        181.16041564941406
+                    ]
+                ],
+                "page_number": 19
+            },
+            {
+                "text": [
+                    "2.1 Introduction"
+                ],
+                "text_block_id": "p_19_b_1",
+                "language": "en",
+                "type": "Text",
+                "type_confidence": 0.7661616206169128,
+                "coords": [
+                    [
+                        75.86331176757812,
+                        185.45896911621094
+                    ],
+                    [
+                        242.4908905029297,
+                        185.45896911621094
+                    ],
+                    [
+                        242.4908905029297,
+                        211.9118194580078
+                    ],
+                    [
+                        75.86331176757812,
+                        211.9118194580078
+                    ]
+                ],
+                "page_number": 19
+            },
+            {
+                "text": [
+                    "This chapter presents the current coordination arrangements for climate change adaptation and those\nset out in the Climate Change Act, 2016, which include coordination of climate change adaptation."
+                ],
+                "text_block_id": "p_19_b_2",
+                "language": "en",
+                "type": "Text",
+                "type_confidence": 0.9845252633094788,
+                "coords": [
+                    [
+                        70.25367736816406,
+                        219.83103942871094
+                    ],
+                    [
+                        542.504638671875,
+                        219.83103942871094
+                    ],
+                    [
+                        542.504638671875,
+                        249.81092834472656
+                    ],
+                    [
+                        70.25367736816406,
+                        249.81092834472656
+                    ]
+                ],
+                "page_number": 19
+            },
+            {
+                "text": [
+                    "2.2 Current Institutional Arrangements"
+                ],
+                "text_block_id": "p_19_b_3",
+                "language": "en",
+                "type": "Title",
+                "type_confidence": 0.9991890788078308,
+                "coords": [
+                    [
+                        72.6312026977539,
+                        269.5396728515625
+                    ],
+                    [
+                        421.22802734375,
+                        269.5396728515625
+                    ],
+                    [
+                        421.22802734375,
+                        295.5602111816406
+                    ],
+                    [
+                        72.6312026977539,
+                        295.5602111816406
+                    ]
+                ],
+                "page_number": 19
+            },
+            {
+                "text": [
+                    "The coordination of climate change activities is currently the responsibility of the National Climate\nChange Secretariat (NCCS) in the Ministry of Environment and Natural Resources. The NCCS is\nthe National Focal Point for the UNFCCC. It also works with climate change coordination units in\ndifferent ministries, departments and agencies to ensure that climate change is mainstreamed in the\ndifferent sectors of the economy."
+                ],
+                "text_block_id": "p_19_b_4",
+                "language": "en",
+                "type": "Text",
+                "type_confidence": 0.9927674531936646,
+                "coords": [
+                    [
+                        72.77606964111328,
+                        303.33038330078125
+                    ],
+                    [
+                        537.7631225585938,
+                        303.33038330078125
+                    ],
+                    [
+                        537.7631225585938,
+                        375.61944580078125
+                    ],
+                    [
+                        72.77606964111328,
+                        375.61944580078125
+                    ]
+                ],
+                "page_number": 19
+            },
+            {
+                "text": [
+                    "The NCCS works with the Ministry of Devolution and Planning to ensure the integration of\nclimate change in the MTPs. The National Environmental Management Authority (NEMA), a semi-\nautonomous agency in the Ministry, is a National Implementing Entity (NIE) for the Adaptation Fund\nand the Green Climate Fund (GCF). The National Treasury is the National Designated Authority for\nthe GCF. The NDMA, which is mandated \"to exercise overall coordination over all matters relating\nto drought management in Kenya\u00b92\", also oversees adaptation and resilience building in the arid and\nsemi-arid areas (ASALS). It is also the secretariat of the Common Programme Framework in Ending\nDrought Emergencies in Kenya."
+                ],
+                "text_block_id": "p_19_b_5",
+                "language": "en",
+                "type": "Text",
+                "type_confidence": 0.9968883395195007,
+                "coords": [
+                    [
+                        68.60566711425781,
+                        378.27020263671875
+                    ],
+                    [
+                        538.3907470703125,
+                        378.27020263671875
+                    ],
+                    [
+                        538.3907470703125,
+                        493.3823547363281
+                    ],
+                    [
+                        68.60566711425781,
+                        493.3823547363281
+                    ]
+                ],
+                "page_number": 19
+            },
+            {
+                "text": [
+                    "2.3 Relevant Policies"
+                ],
+                "text_block_id": "p_20_b_0",
+                "language": "en",
+                "type": "Title",
+                "type_confidence": 0.8753636479377747,
+                "coords": [
+                    [
+                        75.32894134521484,
+                        123.37135314941406
+                    ],
+                    [
+                        282.8546447753906,
+                        123.37135314941406
+                    ],
+                    [
+                        282.8546447753906,
+                        152.2769012451172
+                    ],
+                    [
+                        75.32894134521484,
+                        152.2769012451172
+                    ]
+                ],
+                "page_number": 20
+            },
+            {
+                "text": [
+                    "2.3.1 National Climate Change Action Plan"
+                ],
+                "text_block_id": "p_20_b_1",
+                "language": "en",
+                "type": "Text",
+                "type_confidence": 0.6621953845024109,
+                "coords": [
+                    [
+                        71.66433715820312,
+                        153.20603942871094
+                    ],
+                    [
+                        338.9085388183594,
+                        153.20603942871094
+                    ],
+                    [
+                        338.9085388183594,
+                        173.7260284423828
+                    ],
+                    [
+                        71.66433715820312,
+                        173.7260284423828
+                    ]
+                ],
+                "page_number": 20
+            },
+            {
+                "text": [
+                    "The NCCAP analysed the existing climate change institutional structures, and proposed a\ncomprehensive institutional framework with defined roles and responsibilities for climate change\nresponse in the context of a devolved government system. Details of this structure can be found in the\nEnabling Legislative and Institutional Framework Report.\" Among the report's key recommendations\nwere comprehensive institutional reforms, including the establishment of a National Climate Change\nCouncil domiciled in the Office of the President, a Climate Change Directorate under the ministry\nresponsible for climate affairs, and a Technical Advisory Committee within the proposed Directorate.\nThe NCCAP also recommended the establishment of a Kenya climate fund domiciled in the National\nTreasury.\" In order to achieve this, enactment of a framework climate change law encapsulating\nlegislative, policy and institutional recommendations was recommended."
+                ],
+                "text_block_id": "p_20_b_2",
+                "language": "en",
+                "type": "Text",
+                "type_confidence": 0.996724545955658,
+                "coords": [
+                    [
+                        70.43231964111328,
+                        183.52980041503906
+                    ],
+                    [
+                        534.9852294921875,
+                        183.52980041503906
+                    ],
+                    [
+                        534.9852294921875,
+                        326.9390563964844
+                    ],
+                    [
+                        70.43231964111328,
+                        326.9390563964844
+                    ]
+                ],
+                "page_number": 20
+            },
+            {
+                "text": [
+                    "2.3.2 National Climate Change Framework Policy and Act"
+                ],
+                "text_block_id": "p_20_b_3",
+                "language": "en",
+                "type": "Title",
+                "type_confidence": 0.9915472865104675,
+                "coords": [
+                    [
+                        74.76741790771484,
+                        341.9198913574219
+                    ],
+                    [
+                        415.7500915527344,
+                        341.9198913574219
+                    ],
+                    [
+                        415.7500915527344,
+                        362.12310791015625
+                    ],
+                    [
+                        74.76741790771484,
+                        362.12310791015625
+                    ]
+                ],
+                "page_number": 20
+            },
+            {
+                "text": [
+                    "The draft National Climate Change Framework Policy updated the recommendations of the NCCAP\nafter further analysis and stakeholder consultations. The draft framework policy specifically underlines\nthe need to ensure internal coherence and proper coordination of functions, \"in a manner that is\ncomplementary and respects the philosophy that specific sectoral functions should be undertaken\nby the most suitable sector or level of government\u00b9\", in view of the devolved government system.\nTwo specific recommendations stand out:"
+                ],
+                "text_block_id": "p_20_b_4",
+                "language": "en",
+                "type": "Text",
+                "type_confidence": 0.9918687343597412,
+                "coords": [
+                    [
+                        70.78645324707031,
+                        372.0613708496094
+                    ],
+                    [
+                        540.9769287109375,
+                        372.0613708496094
+                    ],
+                    [
+                        540.9769287109375,
+                        458.5708923339844
+                    ],
+                    [
+                        70.78645324707031,
+                        458.5708923339844
+                    ]
+                ],
+                "page_number": 20
+            },
+            {
+                "text": [
+                    "1) Establish an institutional framework and build capacity to coordinate and enhance mainstreaming\nat the sector level; and,\n2) Put in place mechanisms linking climate change data and information with national and county\nplanning processes."
+                ],
+                "text_block_id": "p_20_b_5",
+                "language": "en",
+                "type": "List",
+                "type_confidence": 0.9928680658340454,
+                "coords": [
+                    [
+                        76.6035385131836,
+                        458.99932861328125
+                    ],
+                    [
+                        542.2824096679688,
+                        458.99932861328125
+                    ],
+                    [
+                        542.2824096679688,
+                        525.994140625
+                    ],
+                    [
+                        76.6035385131836,
+                        525.994140625
+                    ]
+                ],
+                "page_number": 20
+            },
+            {
+                "text": [
+                    "The Climate Change Act (2016)\" is much more specific in terms of institutional arrangements for\nclimate change coordination, setting out the establishment of the institutions summarised in Figure\n5 and described in section 2.4."
+                ],
+                "text_block_id": "p_20_b_6",
+                "language": "en",
+                "type": "Text",
+                "type_confidence": 0.9788317680358887,
+                "coords": [
+                    [
+                        72.09186553955078,
+                        529.4981689453125
+                    ],
+                    [
+                        539.8317260742188,
+                        529.4981689453125
+                    ],
+                    [
+                        539.8317260742188,
+                        573.6485595703125
+                    ],
+                    [
+                        72.09186553955078,
+                        573.6485595703125
+                    ]
+                ],
+                "page_number": 20
+            },
+            {
+                "text": [
+                    "Figure 5: Climate change institutional coordination structures in the Climate Change Act (2016)"
+                ],
+                "text_block_id": "p_21_b_0",
+                "language": "en",
+                "type": "Text",
+                "type_confidence": 0.9482914805412292,
+                "coords": [
+                    [
+                        72.90924072265625,
+                        428.95916748046875
+                    ],
+                    [
+                        443.49029541015625,
+                        428.95916748046875
+                    ],
+                    [
+                        443.49029541015625,
+                        442.31365966796875
+                    ],
+                    [
+                        72.90924072265625,
+                        442.31365966796875
+                    ]
+                ],
+                "page_number": 21
+            },
+            {
+                "text": [
+                    "2.4 Proposed Coordination Institutional\nArrangements"
+                ],
+                "text_block_id": "p_21_b_1",
+                "language": "en",
+                "type": "Title",
+                "type_confidence": 0.9989162683486938,
+                "coords": [
+                    [
+                        75.64048767089844,
+                        469.55377197265625
+                    ],
+                    [
+                        434.69488525390625,
+                        469.55377197265625
+                    ],
+                    [
+                        434.69488525390625,
+                        517.1038208007812
+                    ],
+                    [
+                        75.64048767089844,
+                        517.1038208007812
+                    ]
+                ],
+                "page_number": 21
+            },
+            {
+                "text": [
+                    "The institutional structures set out in the Climate Change Act 2016, and described below, provide a\nframework for coordination of adaptation (Figure 5)."
+                ],
+                "text_block_id": "p_21_b_2",
+                "language": "en",
+                "type": "Text",
+                "type_confidence": 0.9714961647987366,
+                "coords": [
+                    [
+                        71.5017318725586,
+                        524.4789428710938
+                    ],
+                    [
+                        540.5056762695312,
+                        524.4789428710938
+                    ],
+                    [
+                        540.5056762695312,
+                        554.6141357421875
+                    ],
+                    [
+                        71.5017318725586,
+                        554.6141357421875
+                    ]
+                ],
+                "page_number": 21
+            },
+            {
+                "text": [
+                    "a. The National Climate Change Council (NCCC) will be chaired by the President, with the\nCabinet Secretary responsible for Climate Affairs as its Secretary (backed by the Climate\nChange Directorate). The NCCC shall, among others, \"ensure the mainstreaming of climate\nchange functions by the national and county governments\", and \"approve and oversee the\nimplementation of the National Climate Change Action Plan (NCCAP).\" By extension, the NCCC\nwill have oversight on the mainstreaming of adaptation functions at national and county levels;\nand approve and oversee the implementation of the National Adaptation Plan.\""
+                ],
+                "text_block_id": "p_21_b_3",
+                "language": "en",
+                "type": "List",
+                "type_confidence": 0.9627459645271301,
+                "coords": [
+                    [
+                        75.44656372070312,
+                        559.26318359375
+                    ],
+                    [
+                        536.9190673828125,
+                        559.26318359375
+                    ],
+                    [
+                        536.9190673828125,
+                        659.3056030273438
+                    ],
+                    [
+                        75.44656372070312,
+                        659.3056030273438
+                    ]
+                ],
+                "page_number": 21
+            },
+            {
+                "text": [
+                    "b. The Cabinet Secretary (Climate Affairs) is given certain powers and duties, among them, to\nprovide, through the Directorate, technical assistance on climate change actions and responses\nto County governments, based on mutual agreement and needs identified by a county\ngovernment. The Cabinet Secretary shall, every five years, review and update the NCCAP; and\nreport biennially to Parliament on the status of implementation of international and national\nobligations on climate change, and progress towards attainment of a low carbon climate resilient\neconomy.\nc. The Climate Change Directorate as the principal lead agency of the government on national\nclimate change actions, and delivery of operational coordination, shall report to the Cabinet\nSecretary through the Principal Secretary of the relevant State Department. Among the specific\nduties of the Directorate are to \"set targets and coordinate actions for building resilience to\nclimate change and enhancing adaptive capacity\"; and undertake a biennial review of the\nimplementation of the NCCAP and report to the Council."
+                ],
+                "text_block_id": "p_22_b_0",
+                "language": "en",
+                "type": "List",
+                "type_confidence": 0.994767427444458,
+                "coords": [
+                    [
+                        68.53123474121094,
+                        133.33221435546875
+                    ],
+                    [
+                        540.6757202148438,
+                        133.33221435546875
+                    ],
+                    [
+                        540.6757202148438,
+                        322.54290771484375
+                    ],
+                    [
+                        68.53123474121094,
+                        322.54290771484375
+                    ]
+                ],
+                "page_number": 22
+            },
+            {
+                "text": [
+                    "2.5 Implementation Roles"
+                ],
+                "text_block_id": "p_22_b_1",
+                "language": "en",
+                "type": "Title",
+                "type_confidence": 0.9958089590072632,
+                "coords": [
+                    [
+                        72.58536529541016,
+                        342.2632141113281
+                    ],
+                    [
+                        319.59368896484375,
+                        342.2632141113281
+                    ],
+                    [
+                        319.59368896484375,
+                        369.6201171875
+                    ],
+                    [
+                        72.58536529541016,
+                        369.6201171875
+                    ]
+                ],
+                "page_number": 22
+            },
+            {
+                "text": [
+                    "The National Government will fast-track the rollout of this NAP by putting in place the requisite\nenabling environment, including the institutional structures proposed in the Climate Change Act\n(2016). In the implementation of the institutional arrangements, it will be important to put in place\ntransitional arrangements to tap from the knowledge, information and lessons acquired over the\nyears by the current coordinating institutions. The implementation of the different actions in the NAP\nwill require the involvement and contribution of all the stakeholders across the different sectors and\nlevels. Their specific roles are summarised below:"
+                ],
+                "text_block_id": "p_22_b_2",
+                "language": "en",
+                "type": "Text",
+                "type_confidence": 0.9962339997291565,
+                "coords": [
+                    [
+                        73.17009735107422,
+                        375.98419189453125
+                    ],
+                    [
+                        538.0794677734375,
+                        375.98419189453125
+                    ],
+                    [
+                        538.0794677734375,
+                        477.0979919433594
+                    ],
+                    [
+                        73.17009735107422,
+                        477.0979919433594
+                    ]
+                ],
+                "page_number": 22
+            },
+            {
+                "text": [
+                    "National Government Sectoral Agencies will integrate the NCCAP into sectoral strategies,\naction plans and other implementation projects; and designate a unit with adequate staff and\nfinancial resources to coordinate the mainstreaming of the NCCAP and other climate change\nstatutory functions and mandates into sectoral strategies for implementation. The government\nsectoral agencies will report annually to the National Climate Change Council on the status and\nprogress of all assigned climate change duties and functions.\nCounty Governments shall integrate and mainstream climate change actions, interventions and\nduties into County Integrated Development Plans (CIDPs); and designate a County Executive\nCommittee member to coordinate climate change affairs; submit a report on the implementation\nprogress of climate change actions to the County Assembly for review and debate, with a copy\nto the Climate Change Directorate for information.\nThe National Environment Management Authority will, on behalf of the Council, be responsible\nfor monitoring and enforcing compliance of climate change interventions."
+                ],
+                "text_block_id": "p_22_b_3",
+                "language": "en",
+                "type": "List",
+                "type_confidence": 0.9835695624351501,
+                "coords": [
+                    [
+                        62.13606262207031,
+                        480.22247314453125
+                    ],
+                    [
+                        541.1876831054688,
+                        480.22247314453125
+                    ],
+                    [
+                        541.1876831054688,
+                        680.6803588867188
+                    ],
+                    [
+                        62.13606262207031,
+                        680.6803588867188
+                    ]
+                ],
+                "page_number": 22
+            },
+            {
+                "text": [
+                    "The Kenya Institute of Curriculum Development will, on advice of the Council, integrate climate\nchange into various disciplines and subjects of the national education curricula at all levels; and\nadvise public agencies responsible for regulating universities and tertiary institutions curricula\non the integration of climate change into their curricula.\nThe National Drought Management Authority will continue to coordinate drought management\nand disaster risk reduction actions under the Ending Drought Emergencies programme in the\n23 (ASAL) counties. They will be expected to report annually to the National Climate Change\nCouncil on the status and progress of climate change adaptation and resilience in the ASALS.\nPrivate sector: The council may, in consultation with the Cabinet Secretary (Climate Change\nAffairs) and relevant State Departments, impose climate change obligations on private entities,\nincluding entities constituted under the Public Benefits Organizations Act, 2013. The private\nsector has been impacted by climate variability and has suffered negative impacts of droughts\nand flood risks. They include: operational, supply chain and raw materials risk, water and energy\nsupply priorities, financial and market risks, agriculture, food security and rural development,\necosystem threats, poor infrastructure, unreliable weather information and public health. In\naddition, technical interpretation of climate change issues and in particular, climate change\nadaptation is not clear to the sector. There is need to develop a business case for private sector\ninvestment in adaptation. While 'climate proofing' of private sector investments is important,\nthere are also emerging business opportunities in helping communities to reduce their climate\nrisks such as provision of financial resources for adaptation through investments, financial risk\nmanagement, and the charitable provision of resources through foundations or corporate social\nresponsibility. This sector also plays an enormous role in awareness raising and information\nbuilding hence the need for their engagement in adaptation.\nMedia: The media can provide vital information at times of emergency - from warning of\nimminent floods to explaining how to deal with disease outbreaks. As such it is expected that the\nmedia will be involved in the dissemination of this NAP and disseminating its progress against\nthe key indicators measuring Kenya's adaptive capacity. Indeed, strategic actions that improve\nclimate change journalism can themselves be forms of adaptation because accurate, timely and\nrelevant information is a critical component of resilience.\u00b9\nAcademia and research institutions: This group of actors plays a key role in building the country's\nadaptive capacity. They will provide the evidence for knowledge based decision making by\nthe national and county governments, private sector, development partners and civil society\namongst others. This will be done through research conducted on different aspects of climate\nchange adaptation and resilience, including improving the understanding of climate change\nattribution in Kenya and providing information on the appropriate mix of adaptation actions in\norder to avoid maladaptation."
+                ],
+                "text_block_id": "p_23_b_0",
+                "language": "en",
+                "type": "List",
+                "type_confidence": 0.9908542633056641,
+                "coords": [
+                    [
+                        65.18055725097656,
+                        50.331241607666016
+                    ],
+                    [
+                        543.3253173828125,
+                        50.331241607666016
+                    ],
+                    [
+                        543.3253173828125,
+                        668.7315063476562
+                    ],
+                    [
+                        65.18055725097656,
+                        668.7315063476562
+                    ]
+                ],
+                "page_number": 23
+            },
+            {
+                "text": [
+                    "Public Benefit Organisations\": These include non-governmental organisations, civil society\norganisations and faith-based organisations, amongst others. They have been involved in climate\nchange adaptation and mitigation activities in Kenya, and the UNFCCC acknowledges the role\nof civil society in Paragraph 1(i) Article 4 in the areas of education, training and public awareness\nrelated to climate change. The Convention further encourages Parties to support the widest\nparticipation of civil society in the climate change process with an emphasis on the above areas.\nIn Kenya, the civil society is known to be a powerful agent of change through public awareness\ncreation, policy research and analysis, and advocacy on key socio-economic issues including\nclimate change. They also undertake vulnerability assessments, baseline studies and research;\nadvocacy, capacity building and awareness creation; policy development and promotion of\ngood governance; information sharing; gender mainstreaming in climate change; monitoring\nand early warning systems; livelihood support; promotion of improved technologies and efficient\nuse of energy; humanitarian support; and promotion of use of indigenous knowledge. They are\nexpected to play similar roles in the implementation the NAP.\nPublic: The public will play a role in the planning, implementation and monitoring of adaptation\ninterventions in order to enhance their adaptive capacity and resilience to climate shocks."
+                ],
+                "text_block_id": "p_24_b_0",
+                "language": "en",
+                "type": "List",
+                "type_confidence": 0.982712984085083,
+                "coords": [
+                    [
+                        67.958984375,
+                        109.58600616455078
+                    ],
+                    [
+                        543.0999145507812,
+                        109.58600616455078
+                    ],
+                    [
+                        543.0999145507812,
+                        364.5938720703125
+                    ],
+                    [
+                        67.958984375,
+                        364.5938720703125
+                    ]
+                ],
+                "page_number": 24
+            },
+            {
+                "text": [
+                    "Chapter 3: Climate Hazard and\nVulnerability Analysis"
+                ],
+                "text_block_id": "p_26_b_0",
+                "language": "en",
+                "type": "Title",
+                "type_confidence": 0.999277651309967,
+                "coords": [
+                    [
+                        72.0594253540039,
+                        126.1290283203125
+                    ],
+                    [
+                        410.5660095214844,
+                        126.1290283203125
+                    ],
+                    [
+                        410.5660095214844,
+                        181.62765502929688
+                    ],
+                    [
+                        72.0594253540039,
+                        181.62765502929688
+                    ]
+                ],
+                "page_number": 26
+            },
+            {
+                "text": [
+                    "3.1 Introduction"
+                ],
+                "text_block_id": "p_26_b_1",
+                "language": "en",
+                "type": "Text",
+                "type_confidence": 0.7366931438446045,
+                "coords": [
+                    [
+                        73.79727935791016,
+                        185.1758575439453
+                    ],
+                    [
+                        240.8881378173828,
+                        185.1758575439453
+                    ],
+                    [
+                        240.8881378173828,
+                        211.48248291015625
+                    ],
+                    [
+                        73.79727935791016,
+                        211.48248291015625
+                    ]
+                ],
+                "page_number": 26
+            },
+            {
+                "text": [
+                    "Kenya faces a number of risks from climate variability and change. The preparation of the NCCAP\nincluded detailed analyses of risks and vulnerability of the different sectors, which are included in the\nATAR. This section presents an overview of the key climatic hazards in Kenya namely droughts, floods\nand sea-level rise with a view to informing key adaptation actions."
+                ],
+                "text_block_id": "p_26_b_2",
+                "language": "en",
+                "type": "Text",
+                "type_confidence": 0.9927400946617126,
+                "coords": [
+                    [
+                        71.17558288574219,
+                        218.9166717529297
+                    ],
+                    [
+                        541.7842407226562,
+                        218.9166717529297
+                    ],
+                    [
+                        541.7842407226562,
+                        278.8976745605469
+                    ],
+                    [
+                        71.17558288574219,
+                        278.8976745605469
+                    ]
+                ],
+                "page_number": 26
+            },
+            {
+                "text": [
+                    "3.2 Climate hazards and vulnerability\n3.2.1 Drought"
+                ],
+                "text_block_id": "p_26_b_3",
+                "language": "en",
+                "type": "Title",
+                "type_confidence": 0.9987267851829529,
+                "coords": [
+                    [
+                        81.3493423461914,
+                        284.3314208984375
+                    ],
+                    [
+                        408.65472412109375,
+                        284.3314208984375
+                    ],
+                    [
+                        408.65472412109375,
+                        330.73370361328125
+                    ],
+                    [
+                        81.3493423461914,
+                        330.73370361328125
+                    ]
+                ],
+                "page_number": 26
+            },
+            {
+                "text": [
+                    "Drought is the prime recurrent natural disaster in Kenya. In recent times intense droughts have occurred\nin 1983/1984, 1991/1992, 1995/1996, 1998/2000, 2004/2005, and 2008/2011. Each of these events\ncaused severe crop and livestock losses, famine and population displacement. Climate change\nintroduces an additional uncertainty into existing vulnerabilities, particularly in the ASALs which cover\nover 80 per cent of the country. Increased temperatures in the future are likely to exacerbate the\ndrought conditions and may have a significant impact on water availability and general well-being."
+                ],
+                "text_block_id": "p_26_b_4",
+                "language": "en",
+                "type": "Text",
+                "type_confidence": 0.9893947243690491,
+                "coords": [
+                    [
+                        73.23229217529297,
+                        333.7999267578125
+                    ],
+                    [
+                        537.0758666992188,
+                        333.7999267578125
+                    ],
+                    [
+                        537.0758666992188,
+                        417.9069519042969
+                    ],
+                    [
+                        73.23229217529297,
+                        417.9069519042969
+                    ]
+                ],
+                "page_number": 26
+            },
+            {
+                "text": [
+                    "The 2008/2011 drought highlights some of the devastating and pervasive socio-economic consequences\nresulting from such events. The drought is estimated to have slowed down the GDP by an average of\n2.8 per cent per annum, with total damage and losses estimated at USD 12.1 billion.\" The most\naffected sector was livestock suffering a loss of USD 87.43 billion followed by agriculture with a loss\nof USD 1.51 billion.\". Figure 6 shows how drought has impacted Kenya's annual GDP growth. Figure\n7 shows the costs of humanitarian aid as a result of drought, whilst Figure 8 shows the areas in the\ncountry exposed to drought risk."
+                ],
+                "text_block_id": "p_26_b_5",
+                "language": "en",
+                "type": "Text",
+                "type_confidence": 0.9899441003799438,
+                "coords": [
+                    [
+                        70.4403076171875,
+                        421.5581359863281
+                    ],
+                    [
+                        539.4146118164062,
+                        421.5581359863281
+                    ],
+                    [
+                        539.4146118164062,
+                        522.5616455078125
+                    ],
+                    [
+                        70.4403076171875,
+                        522.5616455078125
+                    ]
+                ],
+                "page_number": 26
+            },
+            {
+                "text": [
+                    "Figure 6: Kenya annual GDP growth with and without drought."
+                ],
+                "text_block_id": "p_26_b_6",
+                "language": "en",
+                "type": "Text",
+                "type_confidence": 0.9205821752548218,
+                "coords": [
+                    [
+                        73.16600036621094,
+                        666.43798828125
+                    ],
+                    [
+                        328.45758056640625,
+                        666.43798828125
+                    ],
+                    [
+                        328.45758056640625,
+                        679.7440185546875
+                    ],
+                    [
+                        73.16600036621094,
+                        679.7440185546875
+                    ]
+                ],
+                "page_number": 26
+            },
+            {
+                "text": [
+                    "Enhanced climate resilience towards the attainment of Vision 2030 and beyond 15"
+                ],
+                "text_block_id": "p_26_b_7",
+                "language": "en",
+                "type": "Text",
+                "type_confidence": 0.7440986037254333,
+                "coords": [
+                    [
+                        217.54640197753906,
+                        697.3175048828125
+                    ],
+                    [
+                        555.8013305664062,
+                        697.3175048828125
+                    ],
+                    [
+                        555.8013305664062,
+                        711.4037475585938
+                    ],
+                    [
+                        217.54640197753906,
+                        711.4037475585938
+                    ]
+                ],
+                "page_number": 26
+            },
+            {
+                "text": [
+                    "Source: Ending Drought Emergencies - Common Framework Programme (2014), page 6.\u00b3"
+                ],
+                "text_block_id": "p_27_b_0",
+                "language": "en",
+                "type": "Text",
+                "type_confidence": 0.9923811554908752,
+                "coords": [
+                    [
+                        71.78125,
+                        249.46812438964844
+                    ],
+                    [
+                        423.1847229003906,
+                        249.46812438964844
+                    ],
+                    [
+                        423.1847229003906,
+                        263.2769775390625
+                    ],
+                    [
+                        71.78125,
+                        263.2769775390625
+                    ]
+                ],
+                "page_number": 27
+            },
+            {
+                "text": [
+                    "Figure 8: Climate change risk for agro-climatic zones in Kenya.\nSource: Mwangi and Mutua (2015), page 16."
+                ],
+                "text_block_id": "p_27_b_1",
+                "language": "en",
+                "type": "Text",
+                "type_confidence": 0.948442816734314,
+                "coords": [
+                    [
+                        73.380859375,
+                        635.811767578125
+                    ],
+                    [
+                        325.6476135253906,
+                        635.811767578125
+                    ],
+                    [
+                        325.6476135253906,
+                        656.4840087890625
+                    ],
+                    [
+                        73.380859375,
+                        656.4840087890625
+                    ]
+                ],
+                "page_number": 27
+            },
+            {
+                "text": [
+                    "3.2.2 Floods"
+                ],
+                "text_block_id": "p_28_b_0",
+                "language": "en",
+                "type": "Title",
+                "type_confidence": 0.652834415435791,
+                "coords": [
+                    [
+                        72.37339782714844,
+                        126.92202758789062
+                    ],
+                    [
+                        175.46824645996094,
+                        126.92202758789062
+                    ],
+                    [
+                        175.46824645996094,
+                        147.483154296875
+                    ],
+                    [
+                        72.37339782714844,
+                        147.483154296875
+                    ]
+                ],
+                "page_number": 28
+            },
+            {
+                "text": [
+                    "Excessive flooding in Kenya occurs relatively frequently (on average every three to four years) and is\nlinked to El Ni\u00f1o or La Ni\u00f1a episodes that can lead to extreme weather in the country and region. Annual\nrainy seasons in Kenya are becoming progressively wetter, with sudden and/or late onsets bringing with\nthem floods and inundation. Major floods periodically afflict the Winam Gulf of Lake Victoria, Lower\nTana basin and the coastal regions. Geographically, the western, northern, eastern, central and south-\neastern parts of the country are quite susceptible to seasonal floods in the wet seasons of March-April-May\nand October-November-December. Riverine floods are the most dominant floods in Kenya, although the\nASALS are particularly vulnerable to flash flooding. The economic costs of flooding to the country are very\nhigh, resulting to losses of 5.5 per cent of GDP every seven years (Figure 9). Flood-related fatalities in\nthe country constitute 60 per cent of disaster victims. During flood events there is often an upsurge in\nwaterbome or sanitation-related diseases, such as typhoid, cholera, malaria and diarrhoeal diseases."
+                ],
+                "text_block_id": "p_28_b_1",
+                "language": "en",
+                "type": "Text",
+                "type_confidence": 0.9960011839866638,
+                "coords": [
+                    [
+                        71.38465118408203,
+                        152.55625915527344
+                    ],
+                    [
+                        536.7223510742188,
+                        152.55625915527344
+                    ],
+                    [
+                        536.7223510742188,
+                        308.79364013671875
+                    ],
+                    [
+                        71.38465118408203,
+                        308.79364013671875
+                    ]
+                ],
+                "page_number": 28
+            },
+            {
+                "text": [
+                    "Critical infrastructure that supports the national economy, such as roads, bridges, water pipelines and\npower lines are prone to flood damage. The 1997/98 El Ni\u00f1o floods seriously damaged water supply\ninfrastructure and transport networks across the country, with dams, water pans and some pipelines in 22\ncounties either destroyed or severely damaged."
+                ],
+                "text_block_id": "p_28_b_2",
+                "language": "en",
+                "type": "Text",
+                "type_confidence": 0.9733943343162537,
+                "coords": [
+                    [
+                        72.94282531738281,
+                        311.52215576171875
+                    ],
+                    [
+                        537.5540771484375,
+                        311.52215576171875
+                    ],
+                    [
+                        537.5540771484375,
+                        370.0419616699219
+                    ],
+                    [
+                        72.94282531738281,
+                        370.0419616699219
+                    ]
+                ],
+                "page_number": 28
+            },
+            {
+                "text": [
+                    "Source: Mwangi and Mutua (2015), page 14."
+                ],
+                "text_block_id": "p_28_b_3",
+                "language": "en",
+                "type": "Text",
+                "type_confidence": 0.9719229936599731,
+                "coords": [
+                    [
+                        72.93815612792969,
+                        668.8758544921875
+                    ],
+                    [
+                        268.5625915527344,
+                        668.8758544921875
+                    ],
+                    [
+                        268.5625915527344,
+                        682.6368408203125
+                    ],
+                    [
+                        72.93815612792969,
+                        682.6368408203125
+                    ]
+                ],
+                "page_number": 28
+            },
+            {
+                "text": [
+                    "Enhanced climate resilience towards the attainment of Vision 2030 and beyond 17"
+                ],
+                "text_block_id": "p_28_b_4",
+                "language": "en",
+                "type": "Text",
+                "type_confidence": 0.501437783241272,
+                "coords": [
+                    [
+                        220.93006896972656,
+                        697.6524658203125
+                    ],
+                    [
+                        554.49609375,
+                        697.6524658203125
+                    ],
+                    [
+                        554.49609375,
+                        711.6346435546875
+                    ],
+                    [
+                        220.93006896972656,
+                        711.6346435546875
+                    ]
+                ],
+                "page_number": 28
+            },
+            {
+                "text": [
+                    "Urban flooding is also increasingly becoming an issue especially in big cities and towns. Flooding\nevents are becoming frequent because of rapid urbanisation, poor urban planning and loss of green\nspaces in cities such as Nairobi and Mombasa, which leads to loss of infrastructure, loss of lives and\ndestruction of property."
+                ],
+                "text_block_id": "p_29_b_0",
+                "language": "en",
+                "type": "Text",
+                "type_confidence": 0.9921443462371826,
+                "coords": [
+                    [
+                        72.9844970703125,
+                        127.35171508789062
+                    ],
+                    [
+                        539.6416015625,
+                        127.35171508789062
+                    ],
+                    [
+                        539.6416015625,
+                        187.11032104492188
+                    ],
+                    [
+                        72.9844970703125,
+                        187.11032104492188
+                    ]
+                ],
+                "page_number": 29
+            },
+            {
+                "text": [
+                    "In some instances, however, flooding can have certain benefits, especially in ASAL areas. The\nbenefits include silt deposited from flooding events being used for flood irrigation, increasing water\ntable levels and replenishing aquifers. In the Merti area of Isiolo County, communities practice flood\nirrigation after a big flooding event from the Ewaso Nyiro which deposits fertile silt on flood plains."
+                ],
+                "text_block_id": "p_29_b_1",
+                "language": "en",
+                "type": "Text",
+                "type_confidence": 0.996631920337677,
+                "coords": [
+                    [
+                        71.05320739746094,
+                        190.3948211669922
+                    ],
+                    [
+                        536.8897705078125,
+                        190.3948211669922
+                    ],
+                    [
+                        536.8897705078125,
+                        247.89013671875
+                    ],
+                    [
+                        71.05320739746094,
+                        247.89013671875
+                    ]
+                ],
+                "page_number": 29
+            },
+            {
+                "text": [
+                    "Kenya's coastline is 1,420 kilometres in length and sea level rise is a risk to five coastal counties and\ntheir populations. Climate change impacts, including increases in sea surface temperature, sea level\nrise and coastal erosion, are likely to put additional pressure on coastal economies, communities\nand ecosystems, including islands, estuaries, beaches, coral reefs and marine biodiversity. Sea\nlevel rise in combination with extreme weather events is likely to intensify flooding as most of\nthe coastland is low-lying, with the coastal city of Mombasa particularly exposed. It is estimated\nthat an area of 4-6 km\u00b2 in Mombasa is likely to be submerged with a rise in sea level of only 0.3\nmetres. In coastal locations, sea level rise is likely to render more acute the current water supply and\nsalinization problem, as freshwater aquifers are contaminated with saline water. Water logging of\nsoils and the resulting salt stress might cause reduced crop production. In addition, the health of\ncoastal populations could be affected because of increasing ground water salinity, which might also\nlead to permanent inundation of low lying areas making them uninhabitable, leading to migration\nof population and possibly the emergence of environmental refugees.\""
+                ],
+                "text_block_id": "p_29_b_2",
+                "language": "en",
+                "type": "Text",
+                "type_confidence": 0.9995030164718628,
+                "coords": [
+                    [
+                        73.04485321044922,
+                        293.64422607421875
+                    ],
+                    [
+                        536.6040649414062,
+                        293.64422607421875
+                    ],
+                    [
+                        536.6040649414062,
+                        477.5877380371094
+                    ],
+                    [
+                        73.04485321044922,
+                        477.5877380371094
+                    ]
+                ],
+                "page_number": 29
+            },
+            {
+                "text": [
+                    "Coastal and marine resources contribute immensely towards the economic development of Kenya\nthrough tourism, fisheries, shipping and port activities. Tourism and shipping are the highest\ncontributors to the coastal economy, while small scale fishing contributes 95 per cent of the total\nmarine catch. Rising sea levels will lead to damage and destruction of infrastructure including ship\ndocking ports and industries located in the coast. Increasing population and expansion of urban\ndevelopments are likely to compound these problems. The agriculture sector along the coast will\nalso be impacted with the loss of income of USD 472.8 million from losses to mango, cashew nut\nand coconut harvest following a one metre sea level rise.\" The overall picture of vulnerability to\ndrought, flooding and sea level rise is shown in Figure 10."
+                ],
+                "text_block_id": "p_29_b_3",
+                "language": "en",
+                "type": "Text",
+                "type_confidence": 0.9962790608406067,
+                "coords": [
+                    [
+                        72.27303314208984,
+                        482.3792419433594
+                    ],
+                    [
+                        536.4705810546875,
+                        482.3792419433594
+                    ],
+                    [
+                        536.4705810546875,
+                        609.5571899414062
+                    ],
+                    [
+                        72.27303314208984,
+                        609.5571899414062
+                    ]
+                ],
+                "page_number": 29
+            },
+            {
+                "text": [
+                    "3.2.3 Sea level rise"
+                ],
+                "text_block_id": "p_29_b_4",
+                "language": "en",
+                "type": "Title",
+                "type_confidence": 0.9710894823074341,
+                "coords": [
+                    [
+                        72.0494155883789,
+                        263.03289794921875
+                    ],
+                    [
+                        209.09649658203125,
+                        263.03289794921875
+                    ],
+                    [
+                        209.09649658203125,
+                        283.6850280761719
+                    ],
+                    [
+                        72.0494155883789,
+                        283.6850280761719
+                    ]
+                ],
+                "page_number": 29
+            },
+            {
+                "text": [
+                    "Source: Mwangi and Mutua (2015), page 18."
+                ],
+                "text_block_id": "p_30_b_0",
+                "language": "en",
+                "type": "Text",
+                "type_confidence": 0.9757145047187805,
+                "coords": [
+                    [
+                        72.00627899169922,
+                        468.4071350097656
+                    ],
+                    [
+                        262.3876190185547,
+                        468.4071350097656
+                    ],
+                    [
+                        262.3876190185547,
+                        481.41973876953125
+                    ],
+                    [
+                        72.00627899169922,
+                        481.41973876953125
+                    ]
+                ],
+                "page_number": 30
+            },
+            {
+                "text": [
+                    "Chapter 4: Adaptation Actions"
+                ],
+                "text_block_id": "p_32_b_0",
+                "language": "en",
+                "type": "Title",
+                "type_confidence": 0.9982510209083557,
+                "coords": [
+                    [
+                        69.91638946533203,
+                        126.26638793945312
+                    ],
+                    [
+                        405.981201171875,
+                        126.26638793945312
+                    ],
+                    [
+                        405.981201171875,
+                        154.76394653320312
+                    ],
+                    [
+                        69.91638946533203,
+                        154.76394653320312
+                    ]
+                ],
+                "page_number": 32
+            },
+            {
+                "text": [
+                    "4.1 Introduction"
+                ],
+                "text_block_id": "p_32_b_1",
+                "language": "en",
+                "type": "Text",
+                "type_confidence": 0.766822874546051,
+                "coords": [
+                    [
+                        71.73419952392578,
+                        159.83372497558594
+                    ],
+                    [
+                        242.32504272460938,
+                        159.83372497558594
+                    ],
+                    [
+                        242.32504272460938,
+                        185.79159545898438
+                    ],
+                    [
+                        71.73419952392578,
+                        185.79159545898438
+                    ]
+                ],
+                "page_number": 32
+            },
+            {
+                "text": [
+                    "The Government of Kenya has been addressing climate change impacts, especially drought, for many\nyears. These interventions have been geared towards disaster risk reduction, humanitarian action,\npreparedness and response actions, including efforts of the NDMA to address drought and through the\ndepartment of Special Programmes for floods and other disasters. However, as climate change risks and\nvulnerabilities increase, additional efforts will be required to address future vulnerabilities and enhance\nsustainable development to enable the country to attain its goals under Vision 2030. This chapter presents\nproposed adaptation related actions with examples of ongoing efforts under each sector.\""
+                ],
+                "text_block_id": "p_32_b_2",
+                "language": "en",
+                "type": "Text",
+                "type_confidence": 0.9844892024993896,
+                "coords": [
+                    [
+                        70.25222778320312,
+                        193.80935668945312
+                    ],
+                    [
+                        541.3994750976562,
+                        193.80935668945312
+                    ],
+                    [
+                        541.3994750976562,
+                        293.6059265136719
+                    ],
+                    [
+                        70.25222778320312,
+                        293.6059265136719
+                    ]
+                ],
+                "page_number": 32
+            },
+            {
+                "text": [
+                    "4.2 Proposed sectoral adaptation actions"
+                ],
+                "text_block_id": "p_32_b_3",
+                "language": "en",
+                "type": "Title",
+                "type_confidence": 0.9998214840888977,
+                "coords": [
+                    [
+                        74.78836059570312,
+                        295.7265625
+                    ],
+                    [
+                        452.8915100097656,
+                        295.7265625
+                    ],
+                    [
+                        452.8915100097656,
+                        320.45404052734375
+                    ],
+                    [
+                        74.78836059570312,
+                        320.45404052734375
+                    ]
+                ],
+                "page_number": 32
+            },
+            {
+                "text": [
+                    "The priority adaptation actions presented in this chapter are based on the vulnerabilities described\nin Chapter 3. Stakeholders prioritised adaptation actions for the different sectors during the NCCAP\nprocess. The ATAR proposed long lists of priority actions and the NCCAP prioritised actions in\nthe agriculture, livestock, water, environment, infrastructure, sustainable livelihoods, energy\ninfrastructure and tourism sectors. These were further refined by the Adaptation TWG after the\nlaunch of the NCCAP. The criteria used to develop a shorter list of priorities were:"
+                ],
+                "text_block_id": "p_32_b_4",
+                "language": "en",
+                "type": "Text",
+                "type_confidence": 0.9797009229660034,
+                "coords": [
+                    [
+                        69.25575256347656,
+                        323.7316589355469
+                    ],
+                    [
+                        539.8685302734375,
+                        323.7316589355469
+                    ],
+                    [
+                        539.8685302734375,
+                        407.8312683105469
+                    ],
+                    [
+                        69.25575256347656,
+                        407.8312683105469
+                    ]
+                ],
+                "page_number": 32
+            },
+            {
+                "text": [
+                    ".\nUrgency and ease of implementation in the short-term;\nCompatibility with the NCCAP adaptation actions;\nCompatibility with the MTP actions; and\nLow-regrets option if implemented."
+                ],
+                "text_block_id": "p_32_b_5",
+                "language": "en",
+                "type": "List",
+                "type_confidence": 0.9979246854782104,
+                "coords": [
+                    [
+                        105.33935546875,
+                        410.09771728515625
+                    ],
+                    [
+                        395.3735046386719,
+                        410.09771728515625
+                    ],
+                    [
+                        395.3735046386719,
+                        483.9783630371094
+                    ],
+                    [
+                        105.33935546875,
+                        483.9783630371094
+                    ]
+                ],
+                "page_number": 32
+            },
+            {
+                "text": [
+                    "In the process of finalising the NAP, the actions were subjected to further scrutiny by the TWG. For each\nplanning sector, the following were identified: macro adaptation action, related sub-actions, ongoing\nprojects/initiatives, timeframe, budget and proposed implementing agencies. It is recommended that\nthe adaptation actions be implemented with gender considerations such that all data collected for\nmonitoring and evaluation purposes is gender disaggregated and analysed accordingly."
+                ],
+                "text_block_id": "p_32_b_6",
+                "language": "en",
+                "type": "Text",
+                "type_confidence": 0.9896181225776672,
+                "coords": [
+                    [
+                        73.31725311279297,
+                        490.3150329589844
+                    ],
+                    [
+                        537.4059448242188,
+                        490.3150329589844
+                    ],
+                    [
+                        537.4059448242188,
+                        562.7858276367188
+                    ],
+                    [
+                        73.31725311279297,
+                        562.7858276367188
+                    ]
+                ],
+                "page_number": 32
+            },
+            {
+                "text": [
+                    "The budgets are estimates derived from different sources which include the NCCAP, current Treasury\nspending, the sector MTEFS and the adaptation costing for different adaptation activities done after\nthe NCCAP process. The budgets have been projected to 2030. The time-scales are:"
+                ],
+                "text_block_id": "p_32_b_7",
+                "language": "en",
+                "type": "Text",
+                "type_confidence": 0.9846532940864563,
+                "coords": [
+                    [
+                        73.84764862060547,
+                        565.4554443359375
+                    ],
+                    [
+                        541.224365234375,
+                        565.4554443359375
+                    ],
+                    [
+                        541.224365234375,
+                        609.7493286132812
+                    ],
+                    [
+                        73.84764862060547,
+                        609.7493286132812
+                    ]
+                ],
+                "page_number": 32
+            },
+            {
+                "text": [
+                    "Short term: 1-2 years\nMedium term: 3-5 years\nLong term: >6 years"
+                ],
+                "text_block_id": "p_32_b_8",
+                "language": "en",
+                "type": "List",
+                "type_confidence": 0.9913678765296936,
+                "coords": [
+                    [
+                        105.69317626953125,
+                        611.5032348632812
+                    ],
+                    [
+                        261.59954833984375,
+                        611.5032348632812
+                    ],
+                    [
+                        261.59954833984375,
+                        671.057373046875
+                    ],
+                    [
+                        105.69317626953125,
+                        671.057373046875
+                    ]
+                ],
+                "page_number": 32
+            },
+            {
+                "text": [
+                    "In the formulation of County Adaptation Plans, counties will be encouraged to identify their priority\nactions from the actions presented herein and customise them to suit their county context after\nconducting risk/vulnerability assessments. Counties can also include adaptation actions not listed\nin the national priority list as long as they are in line with their CIDP priorities and do not lead to\nmaladaptation."
+                ],
+                "text_block_id": "p_33_b_0",
+                "language": "en",
+                "type": "Text",
+                "type_confidence": 0.9900231957435608,
+                "coords": [
+                    [
+                        72.78461456298828,
+                        126.98788452148438
+                    ],
+                    [
+                        540.2061767578125,
+                        126.98788452148438
+                    ],
+                    [
+                        540.2061767578125,
+                        200.41505432128906
+                    ],
+                    [
+                        72.78461456298828,
+                        200.41505432128906
+                    ]
+                ],
+                "page_number": 33
+            },
+            {
+                "text": [
+                    "The actions proposed are meant to complement or upscale adaptation actions that are ongoing through\nvarious projects and programmes being implemented by the national and county governments, civil\nsociety, private sector and academia; and not duplicate ongoing efforts."
+                ],
+                "text_block_id": "p_33_b_1",
+                "language": "en",
+                "type": "Text",
+                "type_confidence": 0.9947679042816162,
+                "coords": [
+                    [
+                        70.37993621826172,
+                        204.27182006835938
+                    ],
+                    [
+                        539.1873168945312,
+                        204.27182006835938
+                    ],
+                    [
+                        539.1873168945312,
+                        247.2503662109375
+                    ],
+                    [
+                        70.37993621826172,
+                        247.2503662109375
+                    ]
+                ],
+                "page_number": 33
+            },
+            {
+                "text": [
+                    "22 | Kenya National Adaptation Plan 2015-2030"
+                ],
+                "text_block_id": "p_33_b_2",
+                "language": "en",
+                "type": "Text",
+                "type_confidence": 0.6201062798500061,
+                "coords": [
+                    [
+                        55.96092987060547,
+                        697.125
+                    ],
+                    [
+                        260.9958190917969,
+                        697.125
+                    ],
+                    [
+                        260.9958190917969,
+                        711.3872680664062
+                    ],
+                    [
+                        55.96092987060547,
+                        711.3872680664062
+                    ]
+                ],
+                "page_number": 33
+            },
+            {
+                "text": [
+                    "Enhanced climate resilience towards the attainment of Vision 2030 and beyond | 37"
+                ],
+                "text_block_id": "p_48_b_0",
+                "language": "en",
+                "type": "Text",
+                "type_confidence": 0.8768623471260071,
+                "coords": [
+                    [
+                        217.0048828125,
+                        697.6275024414062
+                    ],
+                    [
+                        556.3042602539062,
+                        697.6275024414062
+                    ],
+                    [
+                        556.3042602539062,
+                        711.1287841796875
+                    ],
+                    [
+                        217.0048828125,
+                        711.1287841796875
+                    ]
+                ],
+                "page_number": 48
+            },
+            {
+                "text": [
+                    "PRIVATE SECTOR/TRADE; MANUFACTURING; BUSINESS PROCESS OUTSOURCING;\nFINANCIAL SERVICES"
+                ],
+                "text_block_id": "p_51_b_0",
+                "language": "en",
+                "type": "Text",
+                "type_confidence": 0.6677094101905823,
+                "coords": [
+                    [
+                        88.68534851074219,
+                        133.3152618408203
+                    ],
+                    [
+                        515.5012512207031,
+                        133.3152618408203
+                    ],
+                    [
+                        515.5012512207031,
+                        160.59193420410156
+                    ],
+                    [
+                        88.68534851074219,
+                        160.59193420410156
+                    ]
+                ],
+                "page_number": 51
+            },
+            {
+                "text": [
+                    "4.2 Cross cutting MTP sector"
+                ],
+                "text_block_id": "p_53_b_0",
+                "language": "en",
+                "type": "Title",
+                "type_confidence": 0.5961325764656067,
+                "coords": [
+                    [
+                        78.1714096069336,
+                        124.92626190185547
+                    ],
+                    [
+                        353.7257995605469,
+                        124.92626190185547
+                    ],
+                    [
+                        353.7257995605469,
+                        151.72874450683594
+                    ],
+                    [
+                        78.1714096069336,
+                        151.72874450683594
+                    ]
+                ],
+                "page_number": 53
+            },
+            {
+                "text": [
+                    "Common Programme Framework for Ending Drought Emergencies 2012-2022"
+                ],
+                "text_block_id": "p_53_b_1",
+                "language": "en",
+                "type": "Text",
+                "type_confidence": 0.9375318288803101,
+                "coords": [
+                    [
+                        74.35372924804688,
+                        158.71282958984375
+                    ],
+                    [
+                        456.3816833496094,
+                        158.71282958984375
+                    ],
+                    [
+                        456.3816833496094,
+                        175.09043884277344
+                    ],
+                    [
+                        74.35372924804688,
+                        175.09043884277344
+                    ]
+                ],
+                "page_number": 53
+            },
+            {
+                "text": [
+                    "4.3 Resource Mobilisation"
+                ],
+                "text_block_id": "p_54_b_0",
+                "language": "en",
+                "type": "Title",
+                "type_confidence": 0.9077959060668945,
+                "coords": [
+                    [
+                        73.12479400634766,
+                        124.56802368164062
+                    ],
+                    [
+                        323.27874755859375,
+                        124.56802368164062
+                    ],
+                    [
+                        323.27874755859375,
+                        151.86361694335938
+                    ],
+                    [
+                        73.12479400634766,
+                        151.86361694335938
+                    ]
+                ],
+                "page_number": 54
+            },
+            {
+                "text": [
+                    "Adaptation has been financed through various mechanisms in the country. Often the actions have not\nbeen termed adaptation, their actions have enhanced resilience to climate impacts. The Government\nof Kenya and its development partners are already financing a number of adaptation interventions in\nthe various sectors through the Adaptation Fund and the National Drought and Disaster Contingency\nFund. A challenge is the lack of a centralised system of tracking climate finance; and thus the amount\nof finance that has gone into adaptation can only be estimated. The total costs of this adaptation\nfinancing will need to be determined so that additional financing complements existing financing."
+                ],
+                "text_block_id": "p_54_b_1",
+                "language": "en",
+                "type": "Text",
+                "type_confidence": 0.9943627119064331,
+                "coords": [
+                    [
+                        73.43010711669922,
+                        158.72018432617188
+                    ],
+                    [
+                        536.8975219726562,
+                        158.72018432617188
+                    ],
+                    [
+                        536.8975219726562,
+                        259.248779296875
+                    ],
+                    [
+                        73.43010711669922,
+                        259.248779296875
+                    ]
+                ],
+                "page_number": 54
+            },
+            {
+                "text": [
+                    "Kenya needs to establish mechanisms to help increase access to climate finance, including the Green\nClimate Fund, and improve coordination and reporting on climate finance. The NCCAP proposed\nestablishment of the Kenya Climate Fund whose focal point is the National Treasury. It is hoped that\nthrough this climate fund, adaptation financing from the Kenya government, development partners\nand other actors can be pooled in order to achieve greater impacts in enhancing resilience. This\nNAP envisages that adaptation actions that are not yet financed by government will attract financing\nfrom development partners and private sector through the development of a pipeline of adaptation\ninvestment grade projects and programmes."
+                ],
+                "text_block_id": "p_54_b_2",
+                "language": "en",
+                "type": "Text",
+                "type_confidence": 0.9956488013267517,
+                "coords": [
+                    [
+                        69.60613250732422,
+                        263.0137023925781
+                    ],
+                    [
+                        538.389404296875,
+                        263.0137023925781
+                    ],
+                    [
+                        538.389404296875,
+                        377.1020202636719
+                    ],
+                    [
+                        69.60613250732422,
+                        377.1020202636719
+                    ]
+                ],
+                "page_number": 54
+            },
+            {
+                "text": [
+                    "The costs per sector in this NAP have been estimated with figures from the National Treasury, the\nNCCAP, the MTEF's, EDE Common Programme Framework and costs that were calculated in the\nfinalisation of this document after the launch of the NCCAP. Yearly costs of implementing similar\nactions in these documents were derived and then extrapolated to 2030 with a formula used by the\nTreasury for similar exercises. The estimated total cost of implementing this NAP till the year 2030\nis US$ 38,255,496,051."
+                ],
+                "text_block_id": "p_54_b_3",
+                "language": "en",
+                "type": "Text",
+                "type_confidence": 0.9914451837539673,
+                "coords": [
+                    [
+                        71.48062133789062,
+                        378.6907043457031
+                    ],
+                    [
+                        537.4795532226562,
+                        378.6907043457031
+                    ],
+                    [
+                        537.4795532226562,
+                        467.1883544921875
+                    ],
+                    [
+                        71.48062133789062,
+                        467.1883544921875
+                    ]
+                ],
+                "page_number": 54
+            },
+            {
+                "text": [
+                    "Chapter 5: Adaptation Monitoring and\nEvaluation"
+                ],
+                "text_block_id": "p_56_b_0",
+                "language": "en",
+                "type": "Title",
+                "type_confidence": 0.9988334774971008,
+                "coords": [
+                    [
+                        72.25652313232422,
+                        125.9345474243164
+                    ],
+                    [
+                        481.3807678222656,
+                        125.9345474243164
+                    ],
+                    [
+                        481.3807678222656,
+                        180.7366180419922
+                    ],
+                    [
+                        72.25652313232422,
+                        180.7366180419922
+                    ]
+                ],
+                "page_number": 56
+            },
+            {
+                "text": [
+                    "5.1 Introduction"
+                ],
+                "text_block_id": "p_56_b_1",
+                "language": "en",
+                "type": "Text",
+                "type_confidence": 0.6238783001899719,
+                "coords": [
+                    [
+                        73.0550308227539,
+                        189.5296173095703
+                    ],
+                    [
+                        242.22068786621094,
+                        189.5296173095703
+                    ],
+                    [
+                        242.22068786621094,
+                        215.6852264404297
+                    ],
+                    [
+                        73.0550308227539,
+                        215.6852264404297
+                    ]
+                ],
+                "page_number": 56
+            },
+            {
+                "text": [
+                    "This chapter outlines the monitoring and evaluation (M&E) system for the National Adaptation Plan.\nThe system is anchored in the National Performance and Benefits Measurement Framework under\nthe NCCAP.36"
+                ],
+                "text_block_id": "p_56_b_2",
+                "language": "en",
+                "type": "Text",
+                "type_confidence": 0.9867960214614868,
+                "coords": [
+                    [
+                        71.36685943603516,
+                        223.36874389648438
+                    ],
+                    [
+                        538.4287109375,
+                        223.36874389648438
+                    ],
+                    [
+                        538.4287109375,
+                        266.82904052734375
+                    ],
+                    [
+                        71.36685943603516,
+                        266.82904052734375
+                    ]
+                ],
+                "page_number": 56
+            },
+            {
+                "text": [
+                    "Adaptation M&E is an essential part of ensuring that the prospective benefits of adaptation\ninterventions aimed at building adaptive capacities and enhancing resilience are being realised and\nlessons learnt assist in the improvement of the Government of Kenya sector plans and programmes.\nTherefore, any M&E system needs to have a feedback mechanism which will ensure the continued\nbuilding of resilience and reduction of vulnerabilities to climate change in the longer term."
+                ],
+                "text_block_id": "p_56_b_3",
+                "language": "en",
+                "type": "Text",
+                "type_confidence": 0.9874030351638794,
+                "coords": [
+                    [
+                        72.21898651123047,
+                        271.1272277832031
+                    ],
+                    [
+                        539.818115234375,
+                        271.1272277832031
+                    ],
+                    [
+                        539.818115234375,
+                        341.91741943359375
+                    ],
+                    [
+                        72.21898651123047,
+                        341.91741943359375
+                    ]
+                ],
+                "page_number": 56
+            },
+            {
+                "text": [
+                    "As a result of the need to track progress in building adaptive capacity a theory of change has been\ndeveloped and indicators have been proposed against the major changes expected in resilience until\n2030. The proposed adaptation indicators will be useful for:"
+                ],
+                "text_block_id": "p_56_b_4",
+                "language": "en",
+                "type": "Text",
+                "type_confidence": 0.9819584488868713,
+                "coords": [
+                    [
+                        71.8832015991211,
+                        346.3659362792969
+                    ],
+                    [
+                        538.3004760742188,
+                        346.3659362792969
+                    ],
+                    [
+                        538.3004760742188,
+                        390.73577880859375
+                    ],
+                    [
+                        71.8832015991211,
+                        390.73577880859375
+                    ]
+                ],
+                "page_number": 56
+            },
+            {
+                "text": [
+                    "Attracting international climate finance;\nEvaluating adaptation policy, programme and project interventions (that is the inten\nobjectives and outcomes of the adaptation activities);\nInforming future adaptation policy development;\nMainstreaming adaptation in development through links with related indicators;\nComparing adaptation achievements across sectors, regions or counties;\nCommunicating adaptation progress to stakeholders and the general public;\nInforming political climate change negotiations in the international arena; and\nTargeting, justifying and monitoring adaptation funding and programmes."
+                ],
+                "text_block_id": "p_56_b_5",
+                "language": "en",
+                "type": "List",
+                "type_confidence": 0.9942223429679871,
+                "coords": [
+                    [
+                        87.1969985961914,
+                        396.07720947265625
+                    ],
+                    [
+                        509.3013916015625,
+                        396.07720947265625
+                    ],
+                    [
+                        509.3013916015625,
+                        566.3515625
+                    ],
+                    [
+                        87.1969985961914,
+                        566.3515625
+                    ]
+                ],
+                "page_number": 56
+            },
+            {
+                "text": [
+                    "5.2 The Adaptation Theory of Change"
+                ],
+                "text_block_id": "p_57_b_0",
+                "language": "en",
+                "type": "Title",
+                "type_confidence": 0.9951704144477844,
+                "coords": [
+                    [
+                        76.81410217285156,
+                        124.093505859375
+                    ],
+                    [
+                        422.79669189453125,
+                        124.093505859375
+                    ],
+                    [
+                        422.79669189453125,
+                        152.11878967285156
+                    ],
+                    [
+                        76.81410217285156,
+                        152.11878967285156
+                    ]
+                ],
+                "page_number": 57
+            },
+            {
+                "text": [
+                    "The NAP M&E framework is anchored on a theory of change. The theory of change in Figure 11\nrepresents the short, medium and long term changes expected from the implementation of the NAP\nunder the country's four MTP pillars under Vision 2030: foundations for national transformation, and\neconomic, social and political pillars. Table 1 outlines the various sectors under each pillar."
+                ],
+                "text_block_id": "p_57_b_1",
+                "language": "en",
+                "type": "Text",
+                "type_confidence": 0.9971303343772888,
+                "coords": [
+                    [
+                        71.72776794433594,
+                        159.04701232910156
+                    ],
+                    [
+                        539.2247314453125,
+                        159.04701232910156
+                    ],
+                    [
+                        539.2247314453125,
+                        215.9315643310547
+                    ],
+                    [
+                        71.72776794433594,
+                        215.9315643310547
+                    ]
+                ],
+                "page_number": 57
+            },
+            {
+                "text": [
+                    "Adaptation activities under the foundations for national transformation pillar include implementing\nrenewable energy projects, climate proofing of infrastructure and promotion and transfer of climate\nsmart technology into various sectors. Outputs from these activities include increased uptake of\nclimate smart technologies and an increase in climate smart infrastructure. This will eventually lead\nto an outcome on strengthened climate smart public service delivery."
+                ],
+                "text_block_id": "p_57_b_2",
+                "language": "en",
+                "type": "Text",
+                "type_confidence": 0.9863366484642029,
+                "coords": [
+                    [
+                        71.16594696044922,
+                        220.98471069335938
+                    ],
+                    [
+                        543.1278076171875,
+                        220.98471069335938
+                    ],
+                    [
+                        543.1278076171875,
+                        293.92120361328125
+                    ],
+                    [
+                        71.16594696044922,
+                        293.92120361328125
+                    ]
+                ],
+                "page_number": 57
+            },
+            {
+                "text": [
+                    "Table 1: Sectors of the MTP Pillars"
+                ],
+                "text_block_id": "p_57_b_3",
+                "language": "en",
+                "type": "Text",
+                "type_confidence": 0.9586321115493774,
+                "coords": [
+                    [
+                        72.21045684814453,
+                        664.8304443359375
+                    ],
+                    [
+                        225.0040283203125,
+                        664.8304443359375
+                    ],
+                    [
+                        225.0040283203125,
+                        680.04931640625
+                    ],
+                    [
+                        72.21045684814453,
+                        680.04931640625
+                    ]
+                ],
+                "page_number": 57
+            },
+            {
+                "text": [
+                    "The economic pillar activities mainly involve building resilience of Kenya's main GDP sectors, that\nis, tourism, agriculture, trade, financial services, and oil and mineral resources through conducting\nclimate risk and vulnerability assessments and implementing adaptation actions prioritised under\nthe assessments. The investments in these pillars are expected to increase climate change adaptation\nknowledge and capacity within the sectors, strengthen climate smart public service delivery, and\nincrease climate proofed infrastructure. This will lead to enhanced resilience of the agriculture and\ntourism value chains and private sector investments."
+                ],
+                "text_block_id": "p_58_b_0",
+                "language": "en",
+                "type": "Text",
+                "type_confidence": 0.9973614811897278,
+                "coords": [
+                    [
+                        73.33646392822266,
+                        127.52348327636719
+                    ],
+                    [
+                        537.0338745117188,
+                        127.52348327636719
+                    ],
+                    [
+                        537.0338745117188,
+                        228.714111328125
+                    ],
+                    [
+                        73.33646392822266,
+                        228.714111328125
+                    ]
+                ],
+                "page_number": 58
+            },
+            {
+                "text": [
+                    "Enhancing climate information services and utilizing ecosystem and community based adaptation\napproaches are the main activities in the social pillar. These activities will lead to enhanced effective\nclimate information services at the county level and ecosystem and community based adaptation\nintegrated into CIDPs, ultimately leading to climate resilient county development. The political pillar\nfocuses on devolution and mainstreaming of climate change adaptation into county planning. The\noutput of this activity is expected to be enhanced climate change adaptation that leads to climate\nresilient development at the county level."
+                ],
+                "text_block_id": "p_58_b_1",
+                "language": "en",
+                "type": "Text",
+                "type_confidence": 0.9963446259498596,
+                "coords": [
+                    [
+                        71.68791198730469,
+                        230.5044403076172
+                    ],
+                    [
+                        539.4662475585938,
+                        230.5044403076172
+                    ],
+                    [
+                        539.4662475585938,
+                        332.40667724609375
+                    ],
+                    [
+                        71.68791198730469,
+                        332.40667724609375
+                    ]
+                ],
+                "page_number": 58
+            },
+            {
+                "text": [
+                    "The outcomes of strengthened climate smart public service delivery and climate resilient county\ndevelopment will lead to the resilience of national agriculture (livestock development and fisheries)\nand tourism value chains and hereafter climate resilient economic growth at a national level. This\nclimate resilience economic growth involves both the public and private sector. This is expected to\nlead to enhanced adaptive capacity towards the attainment of Kenya's Vision 2030."
+                ],
+                "text_block_id": "p_58_b_2",
+                "language": "en",
+                "type": "Text",
+                "type_confidence": 0.9915653467178345,
+                "coords": [
+                    [
+                        71.12394714355469,
+                        334.6246032714844
+                    ],
+                    [
+                        540.4854125976562,
+                        334.6246032714844
+                    ],
+                    [
+                        540.4854125976562,
+                        405.92803955078125
+                    ],
+                    [
+                        71.12394714355469,
+                        405.92803955078125
+                    ]
+                ],
+                "page_number": 58
+            },
+            {
+                "text": [
+                    "Knowledge, learning, capacity building and climate change coordination are viewed as continuous\nprocesses taking place across all the levels of results/changes in the theory of change. Increasing\nknowledge, learning and capacity building on climate change adaptation actions will be encouraged\nacross all the sectors. Enhancing climate change coordination through the key institutions anchored\nin the Climate Change Act (2016) will be key in ensuring that climate change adaptation is\nmainstreamed at all levels."
+                ],
+                "text_block_id": "p_58_b_3",
+                "language": "en",
+                "type": "Text",
+                "type_confidence": 0.9943221807479858,
+                "coords": [
+                    [
+                        69.48055267333984,
+                        410.27734375
+                    ],
+                    [
+                        538.5281982421875,
+                        410.27734375
+                    ],
+                    [
+                        538.5281982421875,
+                        498.22259521484375
+                    ],
+                    [
+                        69.48055267333984,
+                        498.22259521484375
+                    ]
+                ],
+                "page_number": 58
+            },
+            {
+                "text": [
+                    "5.3 Performance Indicators for Adaptation"
+                ],
+                "text_block_id": "p_59_b_0",
+                "language": "en",
+                "type": "Title",
+                "type_confidence": 0.9976054430007935,
+                "coords": [
+                    [
+                        76.38844299316406,
+                        124.12983703613281
+                    ],
+                    [
+                        457.97216796875,
+                        124.12983703613281
+                    ],
+                    [
+                        457.97216796875,
+                        151.32081604003906
+                    ],
+                    [
+                        76.38844299316406,
+                        151.32081604003906
+                    ]
+                ],
+                "page_number": 59
+            },
+            {
+                "text": [
+                    "The National Performance and Benefits Measurement Framework of the NCCAP proposed adaptation\nindicators based on the Tracking Adaptation and Measuring Development (TAMD) framework. TAMD\nprovides an explicit framework for two paths or \"tracks\". Track 1 entails assessing the capacity of\ninstitutions to undertake effective climate risk management actions (also called top-down), while\nTrack 2 assesses impacts of interventions aimed at reducing vulnerability and the extent to which\nsuch interventions keep development on track (development performance or bottom-up)."
+                ],
+                "text_block_id": "p_59_b_1",
+                "language": "en",
+                "type": "Text",
+                "type_confidence": 0.9932698607444763,
+                "coords": [
+                    [
+                        69.6383285522461,
+                        161.06741333007812
+                    ],
+                    [
+                        539.0560913085938,
+                        161.06741333007812
+                    ],
+                    [
+                        539.0560913085938,
+                        244.53298950195312
+                    ],
+                    [
+                        69.6383285522461,
+                        244.53298950195312
+                    ]
+                ],
+                "page_number": 59
+            },
+            {
+                "text": [
+                    "As a result 10 top-down county level institutional adaptive capacity indicators and 10 bottom-up\nvulnerability indicators were chosen based on adaptation relevant development activities that had\nbeen screened from the sector plans and programmes during the NCCAP process. These indicators\nwere to be refined after the finalisation of the priority adaptation actions in this NAP."
+                ],
+                "text_block_id": "p_59_b_2",
+                "language": "en",
+                "type": "Text",
+                "type_confidence": 0.9853911399841309,
+                "coords": [
+                    [
+                        71.4664077758789,
+                        246.9739990234375
+                    ],
+                    [
+                        538.42333984375,
+                        246.9739990234375
+                    ],
+                    [
+                        538.42333984375,
+                        306.86004638671875
+                    ],
+                    [
+                        71.4664077758789,
+                        306.86004638671875
+                    ]
+                ],
+                "page_number": 59
+            },
+            {
+                "text": [
+                    "In developing the NAP performance indicators, the following issues were taken into account:"
+                ],
+                "text_block_id": "p_59_b_3",
+                "language": "en",
+                "type": "Text",
+                "type_confidence": 0.9904758334159851,
+                "coords": [
+                    [
+                        72.54265594482422,
+                        311.5262451171875
+                    ],
+                    [
+                        510.398193359375,
+                        311.5262451171875
+                    ],
+                    [
+                        510.398193359375,
+                        327.210693359375
+                    ],
+                    [
+                        72.54265594482422,
+                        327.210693359375
+                    ]
+                ],
+                "page_number": 59
+            },
+            {
+                "text": [
+                    "Assisting the Kenyan Government to demonstrate progress towards adaptation objectives\nand priority actions as outlined in this NAP, which in turn will assist it to access international\nfinance for adaptation.\n\u2022 Measuring progress towards increasing the resilience to climate change of some of the most\nvulnerable in society as well as measuring progress at a national level by designing a system\nthat can incorporate community level data.\n\u2022 The possibility of emerging future requirements and the need for the M&E system to be\nsufficiently flexible to enable compliance with future international regulations.\nThe M&E system should not add significantly to the workload and be a burden to the\nnational and county government institutions that will be involved in adaptation M&E\nimplementation.\nThe M&E system should reflect the planning hierarchy from national to county level. At\ncounty level, process based indicators may be more appropriate.\nEach indicator should be aligned to the appropriate metadata that will provide the rationale\nfor its measurement."
+                ],
+                "text_block_id": "p_59_b_4",
+                "language": "en",
+                "type": "List",
+                "type_confidence": 0.9971796274185181,
+                "coords": [
+                    [
+                        90.13753509521484,
+                        327.94842529296875
+                    ],
+                    [
+                        539.6099853515625,
+                        327.94842529296875
+                    ],
+                    [
+                        539.6099853515625,
+                        570.166259765625
+                    ],
+                    [
+                        90.13753509521484,
+                        570.166259765625
+                    ]
+                ],
+                "page_number": 59
+            },
+            {
+                "text": [
+                    "The indicators are dynamic and should be contextualised. Counties and various sectors can use the\noverall theory of change or develop their own theories of change and adaptation indicators, whose\ndata should be aggregated at the national level."
+                ],
+                "text_block_id": "p_59_b_5",
+                "language": "en",
+                "type": "Text",
+                "type_confidence": 0.9843602776527405,
+                "coords": [
+                    [
+                        71.23577117919922,
+                        574.772705078125
+                    ],
+                    [
+                        540.16357421875,
+                        574.772705078125
+                    ],
+                    [
+                        540.16357421875,
+                        618.8097534179688
+                    ],
+                    [
+                        71.23577117919922,
+                        618.8097534179688
+                    ]
+                ],
+                "page_number": 59
+            },
+            {
+                "text": [
+                    "The adaptation indicators will need to be reviewed and revised accordingly with each MTP revision."
+                ],
+                "text_block_id": "p_59_b_6",
+                "language": "en",
+                "type": "Text",
+                "type_confidence": 0.9866383075714111,
+                "coords": [
+                    [
+                        74.23409271240234,
+                        623.5201416015625
+                    ],
+                    [
+                        536.5801391601562,
+                        623.5201416015625
+                    ],
+                    [
+                        536.5801391601562,
+                        640.588134765625
+                    ],
+                    [
+                        74.23409271240234,
+                        640.588134765625
+                    ]
+                ],
+                "page_number": 59
+            },
+            {
+                "text": [
+                    "Figure 11: Kenya's Adaptation theory of change"
+                ],
+                "text_block_id": "p_60_b_0",
+                "language": "en",
+                "type": "Text",
+                "type_confidence": 0.9946048855781555,
+                "coords": [
+                    [
+                        72.45167541503906,
+                        128.59471130371094
+                    ],
+                    [
+                        270.6162872314453,
+                        128.59471130371094
+                    ],
+                    [
+                        270.6162872314453,
+                        143.2939453125
+                    ],
+                    [
+                        72.45167541503906,
+                        143.2939453125
+                    ]
+                ],
+                "page_number": 60
+            },
+            {
+                "text": [
+                    "5.4 Adaptation Reporting and Learning"
+                ],
+                "text_block_id": "p_61_b_0",
+                "language": "en",
+                "type": "Title",
+                "type_confidence": 0.995287299156189,
+                "coords": [
+                    [
+                        76.44226837158203,
+                        124.28569030761719
+                    ],
+                    [
+                        430.7743225097656,
+                        124.28569030761719
+                    ],
+                    [
+                        430.7743225097656,
+                        152.05101013183594
+                    ],
+                    [
+                        76.44226837158203,
+                        152.05101013183594
+                    ]
+                ],
+                "page_number": 61
+            },
+            {
+                "text": [
+                    "Key ministries mentioned under each sector are expected to integrate the proposed adaptation\nactions into their sectoral and MDA plans. They will also report progress on the implementation of\nthe actions annually to the Climate Change Secretariat whose functions of review and coordination\nare outlined in Chapter 2."
+                ],
+                "text_block_id": "p_61_b_1",
+                "language": "en",
+                "type": "Text",
+                "type_confidence": 0.9858754277229309,
+                "coords": [
+                    [
+                        72.26642608642578,
+                        159.41018676757812
+                    ],
+                    [
+                        538.5924072265625,
+                        159.41018676757812
+                    ],
+                    [
+                        538.5924072265625,
+                        217.90182495117188
+                    ],
+                    [
+                        72.26642608642578,
+                        217.90182495117188
+                    ]
+                ],
+                "page_number": 61
+            },
+            {
+                "text": [
+                    "Learning from implementation of climate change adaptation activities in the country will need to\nbe collected and submitted to policy makers to influence future adaptation implementation and\ndecision making. It is proposed that lessons learnt be captured from implementing stakeholders\nacross the country through the proposed knowledge management system as outlined in Chapter 9 of\nthe NCCAP. The knowledge management system is housed in the Climate Change Resource Centre\nas well as in other web-based systems such as the Kenya Climate Change Knowledge Portal."
+                ],
+                "text_block_id": "p_61_b_2",
+                "language": "en",
+                "type": "Text",
+                "type_confidence": 0.9887625575065613,
+                "coords": [
+                    [
+                        72.26502227783203,
+                        220.61557006835938
+                    ],
+                    [
+                        540.0458374023438,
+                        220.61557006835938
+                    ],
+                    [
+                        540.0458374023438,
+                        305.99755859375
+                    ],
+                    [
+                        72.26502227783203,
+                        305.99755859375
+                    ]
+                ],
+                "page_number": 61
+            },
+            {
+                "text": [
+                    "Endnotes"
+                ],
+                "text_block_id": "p_63_b_0",
+                "language": "en",
+                "type": "Title",
+                "type_confidence": 0.8479238152503967,
+                "coords": [
+                    [
+                        72.64046478271484,
+                        125.10975646972656
+                    ],
+                    [
+                        179.23159790039062,
+                        125.10975646972656
+                    ],
+                    [
+                        179.23159790039062,
+                        151.4162139892578
+                    ],
+                    [
+                        72.64046478271484,
+                        151.4162139892578
+                    ]
+                ],
+                "page_number": 63
+            },
+            {
+                "text": [
+                    "29 Information from community member from Merti, Adaptation Consortium Project.\n30 ATAR, page 57.\nATAR, page 58.\nCamco (in preparation). Climate Risk Assessment of Agriculture, Water and Energy Sector in Kenya.\nThese are some examples of ongoing government efforts. The list is by no means exhaustive. Acomprehensive\nlist of drought-related projects reference can be accessed at: http://kenya.droughtresilience.info/project/\nkenya-integrated-climate-risk-management-project and an IISD report on Current and Planned Adaptation\nAction in Kenya. The ATAR includes a list of ongoing adaptations efforts by various stakeholders reference\nand can be accessed at: http://www.kccap.info/index.php?option=com_phocadownload&view=category\n&id=30:adaptation-analysis,\n31\n32\n33\n34\n35\n36\n37\n38\nATAR, Technical Report 5.\nNCCAP, pages 60-61.\nNCCAP, pages 129-143.\nNCCAP, pages 135-136.\nLTS, AEA and Baastel, 2012, National Performance and Benefits Framework Systems Review Report."
+                ],
+                "text_block_id": "p_64_b_0",
+                "language": "en",
+                "type": "List",
+                "type_confidence": 0.5234642028808594,
+                "coords": [
+                    [
+                        49.375328063964844,
+                        103.87313842773438
+                    ],
+                    [
+                        549.8229370117188,
+                        103.87313842773438
+                    ],
+                    [
+                        549.8229370117188,
+                        309.5191650390625
+                    ],
+                    [
+                        49.375328063964844,
+                        309.5191650390625
+                    ]
+                ],
+                "page_number": 64
+            },
+            {
+                "text": [
+                    "Acknowledgements"
+                ],
+                "text_block_id": "p_65_b_0",
+                "language": "en",
+                "type": "Title",
+                "type_confidence": 0.992365300655365,
+                "coords": [
+                    [
+                        72.21228790283203,
+                        126.42752075195312
+                    ],
+                    [
+                        300.7680358886719,
+                        126.42752075195312
+                    ],
+                    [
+                        300.7680358886719,
+                        155.42965698242188
+                    ],
+                    [
+                        72.21228790283203,
+                        155.42965698242188
+                    ]
+                ],
+                "page_number": 65
+            },
+            {
+                "text": [
+                    "The preparation of this document was supported financially by the Technical Assistance (TA)\nComponent of the Strengthening Adaptation and Resilience to Climate Change in Kenya Plus\n(StARCK+) Programme, which is funded by the United Kingdom's Department for International\nDevelopment (DFID), and delivered by a Consortium of DAI, Matrix Development Consultants and\nthe International Institute for Sustainable Development."
+                ],
+                "text_block_id": "p_65_b_1",
+                "language": "en",
+                "type": "Text",
+                "type_confidence": 0.9935065507888794,
+                "coords": [
+                    [
+                        70.71489715576172,
+                        162.4857635498047
+                    ],
+                    [
+                        537.3057861328125,
+                        162.4857635498047
+                    ],
+                    [
+                        537.3057861328125,
+                        234.58616638183594
+                    ],
+                    [
+                        70.71489715576172,
+                        234.58616638183594
+                    ]
+                ],
+                "page_number": 65
+            },
+            {
+                "text": [
+                    "The Principal Secretary, State Department of Environment, and officials from the National Climate\nChange Secretariat, Ministry of Environment and Natural Resources, provided guidance and\nleadership that enabled the development of this report. The Adaptation Working Group oversaw the\nprocess provided technical and substantive inputs to the development of the document. This report\nwas prepared with the technical guidance of experts from LTS International."
+                ],
+                "text_block_id": "p_65_b_2",
+                "language": "en",
+                "type": "Text",
+                "type_confidence": 0.9895780086517334,
+                "coords": [
+                    [
+                        71.70502471923828,
+                        237.27122497558594
+                    ],
+                    [
+                        539.280517578125,
+                        237.27122497558594
+                    ],
+                    [
+                        539.280517578125,
+                        309.4937744140625
+                    ],
+                    [
+                        71.70502471923828,
+                        309.4937744140625
+                    ]
+                ],
+                "page_number": 65
+            }
+        ]
+    },
+    "pipeline_metadata": {}
+}

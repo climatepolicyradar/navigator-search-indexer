@@ -20,6 +20,7 @@ from src.utils import (
     get_index_paths,
     parse_files_to_index,
 )
+from tests.conftest import FIXTURE_DIR
 
 
 @pytest.mark.parametrize(
@@ -50,13 +51,13 @@ def test_build_indexer_input_path(dir, use_s3, want):
 @pytest.mark.parametrize(
     "files, limit, count",
     [
-        (None, None, 2),
+        (None, None, 3),
         (None, 1, 1),
-        ("CCLW.executive.10002.4495,", None, 1),
+        ('["CCLW.executive.10014.4470"]', None, 1),
     ]
 )
 def test_get_index_paths(files, limit, count):
-    path = Path(__file__).parent / "data"
+    path = FIXTURE_DIR / "s3_files"
     got = get_index_paths(path, files, limit)
     assert len(got) == count
     for f in got:

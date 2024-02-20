@@ -1,0 +1,68 @@
+{
+  "document_id": "CCLW.document.i00000004.n0000",
+  "document_metadata": {
+    "name": "Climate Change Adaptation and Low Emissions Growth Strategy by 2035 ",
+    "description": "<p><span style=\"font-size: 10pt;font-family: Arial;\">This strategy upgrades the 2013 strategy on Climate Change Adaptation. It identifies six priority sectors for climate change adaptation action, namely agriculture, water management/water resources, forestry and forest resources, biodiversity and sensitive ecosystems, tourism, human health, and energy, and six priority sectors for low emissions growth, namely electricity generation, building and housing, transport, agriculture, forestry and waste. It summarises the key impacts of climate change in BiH, and outlines strategies for the transformation of BiH to a green economy, focusing on social inclusivity and gender equity.</span></p>\n",
+    "import_id": "CCLW.document.i00000004.n0000",
+    "slug": "climate-change-adaptation-and-low-emissions-growth-strategy-by-2035_6c4c",
+    "family_import_id": "CCLW.family.i00000003.n0000",
+    "family_slug": "climate-change-adaptation-and-low-emissions-growth-strategy-by-2035_75e3",
+    "publication_ts": "2020-12-01T00:00:00Z",
+    "date": "01/12/2020",
+    "source_url": "https://unfccc.int/sites/default/files/resource/ENG_CC%20adaptation%20and%20Low%20emission%20development%20Strategy%20BiH%202020-2030.pdf",
+    "download_url": "",
+    "type": "Strategy",
+    "source": "CCLW",
+    "category": "Executive",
+    "geography": "BIH",
+    "languages": [
+      "English"
+    ],
+    "metadata": {
+      "topic": [
+        "Adaptation"
+      ],
+      "hazard": [],
+      "sector": [
+        "Adaptation",
+        "Economy-wide",
+        "Waste",
+        "Agriculture",
+        "Water"
+      ],
+      "keyword": [
+        "Energy Efficiency",
+        "Adaptation",
+        "Adaptation Planning",
+        "Tourism",
+        "Agriculture",
+        "Forests",
+        "Biodiversity",
+        "Water Management"
+      ],
+      "framework": [
+        "Adaptation"
+      ],
+      "instrument": []
+    }
+  },
+  "document_name": "Climate Change Adaptation and Low Emissions Growth Strategy by 2035",
+  "document_description": "<p><span style=\"font-size: 10pt;font-family: Arial;\">This strategy upgrades the 2013 strategy on Climate Change Adaptation. It identifies six priority sectors for climate change adaptation action, namely agriculture, water management/water resources, forestry and forest resources, biodiversity and sensitive ecosystems, tourism, human health, and energy, and six priority sectors for low emissions growth, namely electricity generation, building and housing, transport, agriculture, forestry and waste. It summarises the key impacts of climate change in BiH, and outlines strategies for the transformation of BiH to a green economy, focusing on social inclusivity and gender equity.</span></p>",
+  "document_source_url": "https://unfccc.int/sites/default/files/resource/ENG_CC%20adaptation%20and%20Low%20emission%20development%20Strategy%20BiH%202020-2030.pdf",
+  "document_cdn_object": null,
+  "document_content_type": "text/html",
+  "document_md5_sum": null,
+  "document_slug": "climate-change-adaptation-and-low-emissions-growth-strategy-by-2035_6c4c",
+  "languages": [
+    "en"
+  ],
+  "translated": true,
+  "html_data": {
+    "detected_title": "[no-title]",
+    "detected_date": null,
+    "has_valid_text": false,
+    "text_blocks": []
+  },
+  "pdf_data": null,
+  "pipeline_metadata": {}
+}
