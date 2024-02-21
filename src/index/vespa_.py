@@ -158,7 +158,56 @@ def build_vespa_document_passage(
     )
 
 
+def get_existing_passage_ids(vespa: Vespa, family_doc_id: DocumentID, offset: int = 0) -> list[str]:
+    """
+    Retrieves all text blocks associated with a document
+    
+    In vespa terminology this means all document_passages for a given family_document
+    """
+    vespa_family_doc_id = f"id:{_NAMESPACE}:family_document::{family_doc_id}"
+    max_hits = 5000
+
+    existing_ids = []
+    response = vespa.query(
+        body = {
+            "yql": """
+                select documentid from sources document_passage
+                where family_document_ref contains phrase(@family_doc_id)
+            """,
+            "family_doc_id": vespa_family_doc_id,
+            "hits": max_hits,
+            "offset": offset,
+            "queryProfile": "default",
+        },
+    )
+    for hit in response.hits:
+        passage_id = hit["id"].split("::")[-1]
+        existing_ids.append(passage_id)
+
+    if len(response.hits) + offset < response.number_documents_retrieved:
+        # More to go
+        offset = offset + max_hits
+        existing_ids.extend(get_existing_passage_ids(vespa, family_doc_id, offset))
+
+    return existing_ids
+
+
+def determine_stray_ids(existing_doc_passage_ids: list[str], new_passage_ids: list[str]) -> list[str]:
+    return list(set(existing_doc_passage_ids) - set(new_passage_ids))
+
+
+def remove_ids(vespa: Vespa, stray_ids: list[str]):
+    _LOGGER.critical(f"Removing stray ids following doc changes: {stray_ids}")
+    for stray_id in stray_ids:
+        vespa.delete_data(
+            schema=DOCUMENT_PASSAGE_SCHEMA,
+            data_id=stray_id,
+            namespace=_NAMESPACE
+        )
+
+
 def get_document_generator(
+    vespa: Vespa,
     paths: Sequence[Union[S3Path, Path]],
     embedding_dir_as_path: Union[Path, S3Path],
 ) -> Generator[Tuple[SchemaName, DocumentID, dict], None, None]:
@@ -222,12 +271,20 @@ def get_document_generator(
             )
             text_blocks = task.get_text_blocks()
 
+        existing_doc_passage_ids = get_existing_passage_ids(vespa, family_document_id)
+
+        new_passage_ids = []
         for document_passage_idx, (text_block, embedding) in enumerate(
             zip(text_blocks, embeddings[1:, :])
         ):
             document_psg_id = DocumentID(f"{task.document_id}.{document_passage_idx}")
+            new_passage_ids.append(document_psg_id)
             document_passage = build_vespa_document_passage(family_document_id, search_weights_ref, text_block, embedding)
             yield DOCUMENT_PASSAGE_SCHEMA, document_psg_id, document_passage.model_dump()
+        # Cleanup stray docs
+        stray_ids = determine_stray_ids(existing_doc_passage_ids, new_passage_ids)
+        if stray_ids:
+            remove_ids(vespa, stray_ids)
 
     _LOGGER.info(
         f"Document generator processed {physical_document_count} physical documents"
@@ -340,6 +397,7 @@ def populate_vespa(
     document_generator = get_document_generator(
         paths=paths,
         embedding_dir_as_path=embedding_dir_as_path,
+        vespa=vespa,
     )
 
     # Process documents into Vespa in sized groups (bulk ingest operates on documents

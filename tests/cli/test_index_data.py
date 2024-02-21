@@ -1,6 +1,7 @@
 from pathlib import Path
 
 import pytest
+from vespa.application import Vespa
 
 from src.index.vespa_ import (
     _NAMESPACE,
@@ -17,6 +18,7 @@ def test_input_dir() -> Path:
 
 
 def test_vespa_document_generator(
+    test_vespa: Vespa,
     test_input_dir: Path,
 ):
     """Test that the document generator returns documents in the correct format."""
@@ -25,6 +27,7 @@ def test_vespa_document_generator(
     assert len(paths) > 0
 
     doc_generator = get_document_generator(
+        vespa=test_vespa,
         paths=paths,
         embedding_dir_as_path=test_input_dir,
     )
