@@ -43,14 +43,14 @@ def test_build_vespa_document_passage():
     VespaDocumentPassage.model_validate(model)
 
 
-@pytest.mark.usefixtures("cleanup_test_vespa_after")
+@pytest.mark.usefixtures("cleanup_test_vespa_before", "cleanup_test_vespa_after")
 def test_get_existing_passage_ids__new_doc(test_vespa):
     new_id = "CCLW.executive.10014.111"
     existing_ids = get_existing_passage_ids(vespa=test_vespa, family_doc_id=new_id)
     assert not existing_ids
 
 
-@pytest.mark.usefixtures("preload_fixtures", "cleanup_test_vespa_after")
+@pytest.mark.usefixtures("cleanup_test_vespa_before", "cleanup_test_vespa_after")
 def test_get_existing_passage_ids__existing_doc(test_vespa):
     family_doc_id = "CCLW.executive.10014.4470"
     start = get_existing_passage_ids(vespa=test_vespa, family_doc_id=family_doc_id)
@@ -88,6 +88,7 @@ def test_determine_stray_ids():
     assert sorted(stray_ids) == ["C.1.4", "C.1.5"]
 
 
+@pytest.mark.usefixtures("cleanup_test_vespa_before", "cleanup_test_vespa_after")
 def test_get_document_generator(test_vespa):
     """Assert that the vespa document generator works as expected."""
     embedding_dir_as_path = FIXTURE_DIR / "s3_files"
