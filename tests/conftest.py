@@ -123,3 +123,37 @@ def test_document_data() -> tuple[ParserOutput, Any]:
     )
 
     return (parser_output_path, embeddings)
+
+
+@pytest.fixture
+def test_vespa():
+    yield Vespa(
+        url="http://localhost",
+        port=8080
+    )
+
+
+@pytest.fixture
+def preload_fixtures(test_vespa):   
+    for schema in _SCHEMAS_TO_PROCESS:
+        fixture_path = FIXTURE_DIR / "vespa_documents" / f"{schema}.json"
+        with open(fixture_path) as docs_file:
+            batch = json.load(docs_file)
+        try:
+            test_vespa.feed_batch(
+                batch=batch,
+                schema=schema,
+            )
+        except RetryError as e:
+            pytest.exit(reason=e.last_attempt.exception())
+
+@pytest.fixture
+def cleanup_test_vespa_after(test_vespa):
+    yield
+    for schema in _SCHEMAS_TO_PROCESS:
+        test_vespa.delete_all_docs(
+            content_cluster_name="family-document-passage",
+            schema=schema,
+            namespace=_NAMESPACE,
+
+        )
