@@ -153,7 +153,6 @@ def cleanup_test_vespa(test_vespa):
         test_vespa.delete_all_docs(
             content_cluster_name="family-document-passage",
             schema=schema,
-            namespace=_NAMESPACE,
         )
 
 
