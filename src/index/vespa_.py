@@ -274,8 +274,11 @@ def get_document_generator(
         existing_doc_passage_ids = get_existing_passage_ids(vespa, family_document_id)
 
         new_passage_ids = []
+        
+        # Note that the first embedding item is the doc description
+        # The rest are text blocks
         for document_passage_idx, (text_block, embedding) in enumerate(
-            zip(text_blocks, embeddings[1:, :])
+            zip(text_blocks, embeddings[1:, :]) 
         ):
             document_psg_id = DocumentID(f"{task.document_id}.{document_passage_idx}")
             new_passage_ids.append(document_psg_id)
