@@ -147,13 +147,23 @@ def preload_fixtures(test_vespa):
         except RetryError as e:
             pytest.exit(reason=e.last_attempt.exception())
 
-@pytest.fixture
-def cleanup_test_vespa_after(test_vespa):
-    yield
+
+def cleanup_test_vespa(test_vespa):
     for schema in _SCHEMAS_TO_PROCESS:
         test_vespa.delete_all_docs(
             content_cluster_name="family-document-passage",
             schema=schema,
             namespace=_NAMESPACE,
-
         )
+
+
+@pytest.fixture
+def cleanup_test_vespa_after(test_vespa):
+    yield
+    cleanup_test_vespa(test_vespa)
+
+
+@pytest.fixture
+def cleanup_test_vespa_before(test_vespa):
+    cleanup_test_vespa(test_vespa)
+    yield
