@@ -138,11 +138,12 @@ def preload_fixtures(test_vespa):
     for schema in _SCHEMAS_TO_PROCESS:
         fixture_path = FIXTURE_DIR / "vespa_documents" / f"{schema}.json"
         with open(fixture_path) as docs_file:
-            batch = json.load(docs_file)
+            batch = json.loads(docs_file.read())
         try:
             test_vespa.feed_batch(
                 batch=batch,
                 schema=schema,
+                namespace=_NAMESPACE
             )
         except RetryError as e:
             pytest.exit(reason=e.last_attempt.exception())
@@ -150,10 +151,12 @@ def preload_fixtures(test_vespa):
 
 def cleanup_test_vespa(test_vespa):
     for schema in _SCHEMAS_TO_PROCESS:
-        test_vespa.delete_all_docs(
+        r = test_vespa.delete_all_docs(
             content_cluster_name="family-document-passage",
             schema=schema,
+            namespace=_NAMESPACE
         )
+        r.raise_for_status()
 
 
 @pytest.fixture

@@ -17,6 +17,7 @@ def test_input_dir() -> Path:
     return (Path(__file__).parent / "test_data" / "index_data_input").resolve()
 
 
+@pytest.mark.usefixtures("cleanup_test_vespa_before", "cleanup_test_vespa_after")
 def test_vespa_document_generator(
     test_vespa: Vespa,
     test_input_dir: Path,
