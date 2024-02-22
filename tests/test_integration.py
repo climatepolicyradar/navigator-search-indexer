@@ -1,3 +1,4 @@
+from unittest.mock import patch
 from pathlib import Path
 from tempfile import TemporaryDirectory
 import json
@@ -9,7 +10,8 @@ import pytest
 from vespa.application import Vespa
 
 from cli.index_data import run_as_cli
-from conftest import FIXTURE_DIR
+from conftest import FIXTURE_DIR, VESPA_TEST_ENDPOINT
+from src import config
 from src.index.vespa_ import (
     SEARCH_WEIGHTS_SCHEMA,
     FAMILY_DOCUMENT_SCHEMA,
@@ -54,7 +56,8 @@ def prepare_temp_dir(doc_id: str, incremental_update_dir: str, limit):
 
     return doc_id
 
-
+@patch.object(config, "VESPA_INSTANCE_URL", new=VESPA_TEST_ENDPOINT)
+@patch.object(config, "DEVELOPMENT_MODE", new="true")
 @pytest.mark.usefixtures("cleanup_test_vespa_before", "cleanup_test_vespa_after")
 def test_integration(test_vespa):
     """
@@ -62,7 +65,8 @@ def test_integration(test_vespa):
 
         First run: on the fixture dir
         Second run: on a single fixture shortened to test incremental runs with shorter docs
-        Third run: on the single, original document pre shortening
+        Third run: on the same fixture, shortened but less
+        Fourth Run: on the same fixture but at its original state pre shortening
     """
     
     runner = CliRunner()
@@ -80,6 +84,7 @@ def test_integration(test_vespa):
             "vespa",
         ],
     )
+
     assert result.exit_code == 0, (
         f"Exception: {result.exception if result.exception else None}\n"
         f"Stdout: {result.stdout}"
