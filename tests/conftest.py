@@ -3,9 +3,7 @@ import pytest as pytest
 import os
 from cloudpathlib import S3Path
 
-from typing import Any
 from pathlib import Path
-import numpy as np
 from datetime import datetime
 
 from vespa.application import Vespa
@@ -32,17 +30,6 @@ def pytest_configure(config):
             f"Vespa instance url looks like a cloud url: {VESPA_INSTANCE_URL} "
             "Has something been misconfigured?"
         )
-
-def read_local_json_file(file_path: str) -> dict:
-    """Read a local json file and return the data."""
-    with open(file_path) as json_file:
-        data = json.load(json_file)
-    return data
-
-
-def read_local_npy_file(file_path: str) -> Any:
-    """Read a local npy file and return the data."""
-    return np.load(file_path)
 
 
 def get_parser_output(document_id: int, family_id: int) -> ParserOutput:
@@ -111,18 +98,6 @@ def embeddings_dir_as_path(
     return S3Path(
         os.path.join("s3://", s3_bucket_and_region["bucket"], indexer_input_prefix)
     )
-
-
-@pytest.fixture
-def test_document_data() -> tuple[ParserOutput, Any]:
-    parser_output_path = FIXTURE_DIR / "s3_files" / "CCLW.executive.10002.4495.json"
-    embeddings = read_local_npy_file(
-        str(
-            FIXTURE_DIR / "s3_files" / "CCLW.executive.10002.4495.npy"
-        )
-    )
-
-    return (parser_output_path, embeddings)
 
 
 @pytest.fixture
