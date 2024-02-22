@@ -22,12 +22,15 @@ from src.config import VESPA_INSTANCE_URL
 
 
 FIXTURE_DIR = Path(__file__).parent / "fixtures"
+VESPA_TEST_ENDPOINT = os.getenv("VESPA_INSTANCE_URL", "http://localhost:8080")
 
 
 def pytest_configure(config):
-    if "vespa-app.cloud" in VESPA_INSTANCE_URL:
+    cloud_url_substring = "vespa-app.cloud"
+    if cloud_url_substring in VESPA_INSTANCE_URL or cloud_url_substring in VESPA_TEST_ENDPOINT:
         pytest.exit(
-            f"Vespa instance url looks like a cloud url: {VESPA_INSTANCE_URL} "
+            f"Vespa instance url looks like a cloud url: "
+            "{VESPA_INSTANCE_URL} | {VESPA_TEST_ENDPOINT} "
             "Has something been misconfigured?"
         )
 
@@ -103,8 +106,7 @@ def embeddings_dir_as_path(
 @pytest.fixture
 def test_vespa():
     yield Vespa(
-        url="http://localhost",
-        port=8080
+        url=VESPA_TEST_ENDPOINT
     )
 
 
