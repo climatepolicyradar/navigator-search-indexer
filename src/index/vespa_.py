@@ -355,7 +355,7 @@ def _handle_feed_error(response: VespaResponse, id: str):
         raise VespaIndexError(f"Indexing Failed on document with id: {id}, body: {response.json}")
 
 
-@retry(retry=retry_if_exception_type(VespaIndexError), wait=wait_exponential(multiplier=10), stop=stop_after_attempt(10))
+@retry(wait=wait_exponential(multiplier=10), stop=stop_after_attempt(10))
 def _batch_ingest(vespa: Vespa, to_process: Mapping[SchemaName, list]):
     for schema in _SCHEMAS_TO_PROCESS:
         documents = to_process[schema]
