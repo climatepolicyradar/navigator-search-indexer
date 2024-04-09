@@ -1,4 +1,3 @@
-import copy
 from collections import defaultdict
 import logging
 from pathlib import Path
@@ -350,37 +349,26 @@ def _get_vespa_instance() -> Vespa:
         cert=cert_location,
     )
 
-@retry(retry=retry_if_exception_type(VespaIndexError), wait=wait_exponential(multiplier=3), stop=stop_after_attempt(5))
-def _batch_ingest(vespa: Vespa, to_process: Mapping[SchemaName, list]):
-    responses: list[VespaResponse] = []
-    for schema in _SCHEMAS_TO_PROCESS:
-        if to_process[schema]:
-            documents = copy.deepcopy(to_process[schema])
-            _LOGGER.info(f"Processing {schema}, with {len(documents)} documents")
-            responses.extend(
-                vespa.feed_batch(
-                    batch=list(documents),
-                    schema=str(schema),
-                    namespace=_NAMESPACE,
-                    asynchronous=True,
-                    connections=config.VESPA_CONNECTIONS,
-                    batch_size=config.VESPA_DOCUMENT_BATCH_SIZE,
-                )
-            )
 
-            errors = [(r.status_code, r.json) for r in responses if r.status_code >= 300]
-            if errors:
-                _LOGGER.error(
-                    "Indexing Failed",
-                    extra={
-                        "props": {
-                            "error_responses": errors,
-                            "document_counts": f"{schema}: {[len(i) for i in to_process.values()]}",
-                            "schema": schema,
-                            },
-                    }
-                )
-                raise VespaIndexError("Indexing Failed")
+def _handle_feed_error(response: VespaResponse, id: str):
+    if not response.is_successful():
+        raise VespaIndexError(f"Indexing Failed on document with id: {id}, body: {response.json}")
+
+
+@retry(retry=retry_if_exception_type(VespaIndexError), wait=wait_exponential(multiplier=10), stop=stop_after_attempt(10))
+def _batch_ingest(vespa: Vespa, to_process: Mapping[SchemaName, list]):
+    for schema in _SCHEMAS_TO_PROCESS:
+        documents = to_process[schema]
+        if documents:
+            _LOGGER.info(f"Processing {schema}, with {len(documents)} documents")
+            vespa.feed_iterable(
+                iter=documents,
+                schema=str(schema),
+                namespace=_NAMESPACE,
+                callback=_handle_feed_error,
+                max_queue_size=(config.VESPA_DOCUMENT_BATCH_SIZE + 1),
+                max_connections=config.VESPA_CONNECTIONS,
+            )
 
 
 def populate_vespa(

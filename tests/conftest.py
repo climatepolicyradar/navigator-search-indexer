@@ -29,8 +29,8 @@ def pytest_configure(config):
     cloud_url_substring = "vespa-app.cloud"
     if cloud_url_substring in VESPA_INSTANCE_URL or cloud_url_substring in VESPA_TEST_ENDPOINT:
         pytest.exit(
-            f"Vespa instance url looks like a cloud url: "
-            "{VESPA_INSTANCE_URL} | {VESPA_TEST_ENDPOINT} "
+            "Vespa instance url looks like a cloud url: "
+            f"{VESPA_INSTANCE_URL} | {VESPA_TEST_ENDPOINT} "
             "Has something been misconfigured?"
         )
 
@@ -117,8 +117,8 @@ def preload_fixtures(test_vespa):
         with open(fixture_path) as docs_file:
             batch = json.loads(docs_file.read())
         try:
-            test_vespa.feed_batch(
-                batch=batch,
+            test_vespa.feed_iterable(
+                iter=batch,
                 schema=schema,
                 namespace=_NAMESPACE
             )
@@ -128,12 +128,11 @@ def preload_fixtures(test_vespa):
 
 def cleanup_test_vespa(test_vespa):
     for schema in _SCHEMAS_TO_PROCESS:
-        r = test_vespa.delete_all_docs(
+        test_vespa.delete_all_docs(
             content_cluster_name="family-document-passage",
             schema=schema,
             namespace=_NAMESPACE
         )
-        r.raise_for_status()
 
 
 @pytest.fixture
