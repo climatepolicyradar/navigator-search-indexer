@@ -350,7 +350,8 @@ def _get_vespa_instance() -> Vespa:
     )
 
 
-def _handle_feed_error(response: VespaResponse, id: str):
+def _handle_feed_error(response: VespaResponse, id: str) -> None:
+    """Callback for vespa feed"""
     if not response.is_successful():
         raise VespaIndexError(f"Indexing Failed on document with id: {id}, body: {response.json}")
 
