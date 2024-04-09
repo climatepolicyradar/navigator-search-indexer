@@ -2,6 +2,7 @@ from unittest.mock import patch
 from pathlib import Path
 from tempfile import TemporaryDirectory
 import json
+import traceback
 
 from click.testing import CliRunner
 from cpr_data_access.parser_models import ParserOutput
@@ -84,10 +85,10 @@ def test_integration(test_vespa):
             "vespa",
         ],
     )
-
     assert result.exit_code == 0, (
         f"Exception: {result.exception if result.exception else None}\n"
         f"Stdout: {result.stdout}"
+        f"Trace: {traceback.print_exception(*result.exc_info)}"
     )
     search_weights_1 = get_vespa_data(test_vespa, SEARCH_WEIGHTS_SCHEMA, "default_weights")
     no_change_family_1 = get_vespa_data(test_vespa, FAMILY_DOCUMENT_SCHEMA, NO_CHANGE_FAMILY)
