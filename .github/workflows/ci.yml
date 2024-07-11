@@ -15,10 +15,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Build
-        run:  |
-          cp .env.example .env
-          make build
+      - name: Set up and build
+        run: make setup build
 
       - name: Install latest Vespa CLI
         env:

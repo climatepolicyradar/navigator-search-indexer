@@ -5,7 +5,7 @@ from cloudpathlib import S3Path
 import pytest
 from pydantic import AnyHttpUrl
 
-from cpr_data_access.parser_models import (
+from cpr_sdk.parser_models import (
     BlockType,
     ParserOutput,
     BackendDocument,

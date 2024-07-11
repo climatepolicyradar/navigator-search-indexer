@@ -5,7 +5,7 @@ import json
 import traceback
 
 from click.testing import CliRunner
-from cpr_data_access.parser_models import ParserOutput
+from cpr_sdk.parser_models import ParserOutput
 import numpy as np
 import pytest
 from vespa.application import Vespa

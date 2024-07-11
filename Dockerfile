@@ -1,4 +1,4 @@
-FROM python:3.9
+FROM python:3.10
 ENV PYTHONPATH "${PYTHONPATH}:/app"
 
 RUN mkdir /app
@@ -8,7 +8,7 @@ RUN apt-get update
 
 # Install pip and poetry
 RUN pip install --upgrade pip
-RUN pip install "poetry==1.2.2"
+RUN pip install poetry
 
 # Create layer for dependencies
 COPY ./poetry.lock ./pyproject.toml ./

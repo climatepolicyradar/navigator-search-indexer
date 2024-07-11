@@ -6,10 +6,10 @@ authors = ["CPR Tech <tech@climatepolicyradar.org>"]
 packages = [{include = "src"}]
 
 [tool.poetry.dependencies]
-python = "~3.9"
+python = "~3.10"
 click = "^8.0.4"
 cloudpathlib = {version = "^0.18.1", extras = ["s3"]}
-cpr-data-access = {git = "https://github.com/climatepolicyradar/data-access.git", tag = "0.4.0"}
+cpr-sdk = "^1.1.6"
 huggingface_hub = ">=0.14.0,<1.0.0"
 pydantic = "^2.4.0"
 python-json-logger = "^2.0.4"
