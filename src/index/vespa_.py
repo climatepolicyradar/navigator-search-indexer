@@ -16,7 +16,11 @@ from typing import (
 from cloudpathlib import S3Path
 from cpr_data_access.parser_models import ParserOutput, PDFTextBlock, VerticalFlipError
 from pydantic import BaseModel, Field
-from tenacity import retry, retry_if_exception_type, wait_exponential, stop_after_attempt
+from tenacity import (
+    retry,
+    wait_exponential,
+    stop_after_attempt,
+)
 from vespa.application import Vespa
 from vespa.io import VespaResponse
 
@@ -104,40 +108,37 @@ class VespaFamilyDocument(BaseModel):
 
 
 def build_vespa_family_document(
-        task,
-        embeddings,
-        search_weights_ref,
-    ) -> VespaFamilyDocument:
+    task,
+    embeddings,
+    search_weights_ref,
+) -> VespaFamilyDocument:
     return VespaFamilyDocument(
-            search_weights_ref=search_weights_ref,
-            family_name=task.document_name,
-            family_name_index=task.document_name,
-            family_description=task.document_description,
-            family_description_index=task.document_description,
-            family_description_embedding=embeddings[0].tolist(),
-            family_import_id=task.document_metadata.family_import_id,
-            family_slug=task.document_metadata.family_slug,
-            family_publication_ts=task.document_metadata.publication_ts.isoformat(),
-            family_publication_year=task.document_metadata.publication_ts.year,
-            family_category=task.document_metadata.category,
-            family_geography=task.document_metadata.geography,
-            family_source=task.document_metadata.source,
-            document_import_id=task.document_id,
-            document_slug=task.document_slug,
-            document_languages=task.document_metadata.languages,
-            document_md5_sum=task.document_md5_sum,
-            document_content_type=task.document_content_type,
-            document_cdn_object=task.document_cdn_object,
-            document_source_url=task.document_metadata.source_url,
-        )
+        search_weights_ref=search_weights_ref,
+        family_name=task.document_name,
+        family_name_index=task.document_name,
+        family_description=task.document_description,
+        family_description_index=task.document_description,
+        family_description_embedding=embeddings[0].tolist(),
+        family_import_id=task.document_metadata.family_import_id,
+        family_slug=task.document_metadata.family_slug,
+        family_publication_ts=task.document_metadata.publication_ts.isoformat(),
+        family_publication_year=task.document_metadata.publication_ts.year,
+        family_category=task.document_metadata.category,
+        family_geography=task.document_metadata.geography,
+        family_source=task.document_metadata.source,
+        document_import_id=task.document_id,
+        document_slug=task.document_slug,
+        document_languages=task.document_metadata.languages,
+        document_md5_sum=task.document_md5_sum,
+        document_content_type=task.document_content_type,
+        document_cdn_object=task.document_cdn_object,
+        document_source_url=task.document_metadata.source_url,
+    )
 
 
 def build_vespa_document_passage(
-        family_document_id,
-        search_weights_ref,
-        text_block,
-        embedding
-    ) -> VespaDocumentPassage:
+    family_document_id, search_weights_ref, text_block, embedding
+) -> VespaDocumentPassage:
     fam_doc_ref = f"id:{_NAMESPACE}:family_document::{family_document_id}"
     return VespaDocumentPassage(
         family_document_ref=fam_doc_ref,
@@ -146,9 +147,7 @@ def build_vespa_document_passage(
         text_block_id=text_block.text_block_id,
         text_block_type=str(text_block.type),
         text_block_page=(
-            text_block.page_number
-            if isinstance(text_block, PDFTextBlock)
-            else None
+            text_block.page_number if isinstance(text_block, PDFTextBlock) else None
         ),
         text_block_coords=(
             text_block.coords if isinstance(text_block, PDFTextBlock) else None
@@ -157,10 +156,12 @@ def build_vespa_document_passage(
     )
 
 
-def get_existing_passage_ids(vespa: Vespa, family_doc_id: DocumentID, offset: int = 0) -> list[str]:
+def get_existing_passage_ids(
+    vespa: Vespa, family_doc_id: DocumentID, offset: int = 0
+) -> list[str]:
     """
     Retrieves all text blocks associated with a document
-    
+
     In vespa terminology this means all document_passages for a given family_document
     """
     vespa_family_doc_id = f"id:{_NAMESPACE}:family_document::{family_doc_id}"
@@ -168,7 +169,7 @@ def get_existing_passage_ids(vespa: Vespa, family_doc_id: DocumentID, offset: in
 
     existing_ids = []
     response = vespa.query(
-        body = {
+        body={
             "yql": """
                 select documentid from sources document_passage
                 where family_document_ref contains phrase(@family_doc_id)
@@ -191,7 +192,9 @@ def get_existing_passage_ids(vespa: Vespa, family_doc_id: DocumentID, offset: in
     return existing_ids
 
 
-def determine_stray_ids(existing_doc_passage_ids: list[str], new_passage_ids: list[str]) -> list[str]:
+def determine_stray_ids(
+    existing_doc_passage_ids: list[str], new_passage_ids: list[str]
+) -> list[str]:
     return list(set(existing_doc_passage_ids) - set(new_passage_ids))
 
 
@@ -199,9 +202,7 @@ def remove_ids(vespa: Vespa, stray_ids: list[str]):
     _LOGGER.critical(f"Removing stray ids following doc changes: {stray_ids}")
     for stray_id in stray_ids:
         vespa.delete_data(
-            schema=DOCUMENT_PASSAGE_SCHEMA,
-            data_id=stray_id,
-            namespace=_NAMESPACE
+            schema=DOCUMENT_PASSAGE_SCHEMA, data_id=stray_id, namespace=_NAMESPACE
         )
 
 
@@ -240,7 +241,7 @@ def get_document_generator(
     physical_document_count = 0
     for path in paths:
         task = ParserOutput.model_validate_json(path.read_text())
- 
+
         task = filter_on_block_type(
             input=task, remove_block_types=config.BLOCKS_TO_FILTER
         )
@@ -251,7 +252,9 @@ def get_document_generator(
         embeddings = read_npy_file(task_array_file_path)
 
         family_document_id = DocumentID(task.document_metadata.import_id)
-        family_document = build_vespa_family_document(task, embeddings, search_weights_ref)
+        family_document = build_vespa_family_document(
+            task, embeddings, search_weights_ref
+        )
 
         yield FAMILY_DOCUMENT_SCHEMA, family_document_id, family_document.model_dump()
         physical_document_count += 1
@@ -273,15 +276,17 @@ def get_document_generator(
         existing_doc_passage_ids = get_existing_passage_ids(vespa, family_document_id)
 
         new_passage_ids = []
-        
+
         # Note that the first embedding item is the doc description
         # The rest are text blocks
         for document_passage_idx, (text_block, embedding) in enumerate(
-            zip(text_blocks, embeddings[1:, :]) 
+            zip(text_blocks, embeddings[1:, :])
         ):
             document_psg_id = DocumentID(f"{task.document_id}.{document_passage_idx}")
             new_passage_ids.append(document_psg_id)
-            document_passage = build_vespa_document_passage(family_document_id, search_weights_ref, text_block, embedding)
+            document_passage = build_vespa_document_passage(
+                family_document_id, search_weights_ref, text_block, embedding
+            )
             yield DOCUMENT_PASSAGE_SCHEMA, document_psg_id, document_passage.model_dump()
         # Cleanup stray docs
         stray_ids = determine_stray_ids(existing_doc_passage_ids, new_passage_ids)
@@ -324,6 +329,7 @@ def _check_vespa_certs():
 
     return str(key_location), str(cert_location)
 
+
 def _get_vespa_instance() -> Vespa:
     """
     Creates a Vespa instance based on validated config values.
@@ -341,7 +347,7 @@ def _get_vespa_instance() -> Vespa:
         _LOGGER.info("Running in dev mode, authentication will not be used")
     else:
         key_location, cert_location = _check_vespa_certs()
-    
+
     _LOGGER.info(f"Indexing into: {config.VESPA_INSTANCE_URL}")
     return Vespa(
         url=config.VESPA_INSTANCE_URL,
@@ -353,7 +359,9 @@ def _get_vespa_instance() -> Vespa:
 def _handle_feed_error(response: VespaResponse, id: str) -> None:
     """Callback for vespa feed"""
     if not response.is_successful():
-        raise VespaIndexError(f"Indexing Failed on document with id: {id}, body: {response.json}")
+        raise VespaIndexError(
+            f"Indexing Failed on document with id: {id}, body: {response.json}"
+        )
 
 
 @retry(wait=wait_exponential(multiplier=10), stop=stop_after_attempt(10))

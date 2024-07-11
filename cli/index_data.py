@@ -75,7 +75,7 @@ def run_as_cli(
         sys.exit(1)
     elif index_type.lower() == "vespa":
         _LOGGER.warning("Vespa indexing still experimental")
-        
+
         indexer_input_path = build_indexer_input_path(indexer_input_dir, s3)
         paths = get_index_paths(indexer_input_path, files_to_index, limit)
 

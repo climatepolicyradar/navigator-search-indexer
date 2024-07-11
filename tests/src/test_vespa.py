@@ -50,7 +50,9 @@ def test_get_existing_passage_ids__new_doc(test_vespa):
     assert not existing_ids
 
 
-@pytest.mark.usefixtures("cleanup_test_vespa_before", "preload_fixtures", "cleanup_test_vespa_after")
+@pytest.mark.usefixtures(
+    "cleanup_test_vespa_before", "preload_fixtures", "cleanup_test_vespa_after"
+)
 def test_get_existing_passage_ids__existing_doc(test_vespa):
     family_doc_id = "CCLW.executive.10014.4470"
     start = get_existing_passage_ids(vespa=test_vespa, family_doc_id=family_doc_id)
@@ -112,7 +114,6 @@ def test_get_document_generator(test_vespa):
     assert EXPECTED_DOCUMENTS == len(paths)
     assert EXPECTED_PASSAGES == len(fixture_text_blocks)
 
-
     schemas = []
     ids = []
     document_passage_ids = []
@@ -134,7 +135,6 @@ def test_get_document_generator(test_vespa):
             VespaFamilyDocument.model_validate(data)
         else:
             pytest.exit(f"Unexpected schema: {schema}")
-
 
     # Test schemas
     assert len(set(schemas)) == len(_SCHEMAS_TO_PROCESS)

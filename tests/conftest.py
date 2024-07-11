@@ -27,7 +27,10 @@ VESPA_TEST_ENDPOINT = os.getenv("VESPA_INSTANCE_URL", "http://localhost:8080")
 
 def pytest_configure(config):
     cloud_url_substring = "vespa-app.cloud"
-    if cloud_url_substring in VESPA_INSTANCE_URL or cloud_url_substring in VESPA_TEST_ENDPOINT:
+    if (
+        cloud_url_substring in VESPA_INSTANCE_URL
+        or cloud_url_substring in VESPA_TEST_ENDPOINT
+    ):
         pytest.exit(
             "Vespa instance url looks like a cloud url: "
             f"{VESPA_INSTANCE_URL} | {VESPA_TEST_ENDPOINT} "
@@ -105,23 +108,17 @@ def embeddings_dir_as_path(
 
 @pytest.fixture
 def test_vespa():
-    yield Vespa(
-        url=VESPA_TEST_ENDPOINT
-    )
+    yield Vespa(url=VESPA_TEST_ENDPOINT)
 
 
 @pytest.fixture
-def preload_fixtures(test_vespa):   
+def preload_fixtures(test_vespa):
     for schema in _SCHEMAS_TO_PROCESS:
         fixture_path = FIXTURE_DIR / "vespa_documents" / f"{schema}.json"
         with open(fixture_path) as docs_file:
             batch = json.loads(docs_file.read())
         try:
-            test_vespa.feed_iterable(
-                iter=batch,
-                schema=schema,
-                namespace=_NAMESPACE
-            )
+            test_vespa.feed_iterable(iter=batch, schema=schema, namespace=_NAMESPACE)
         except RetryError as e:
             pytest.exit(reason=e.last_attempt.exception())
 
@@ -131,7 +128,7 @@ def cleanup_test_vespa(test_vespa):
         test_vespa.delete_all_docs(
             content_cluster_name="family-document-passage",
             schema=schema,
-            namespace=_NAMESPACE
+            namespace=_NAMESPACE,
         )
 
 
