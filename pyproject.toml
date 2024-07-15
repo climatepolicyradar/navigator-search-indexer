@@ -8,7 +8,7 @@ packages = [{include = "src"}]
 [tool.poetry.dependencies]
 python = "~3.9"
 click = "^8.0.4"
-cloudpathlib = {version = "^0.17.0", extras = ["s3"]}
+cloudpathlib = {version = "^0.18.1", extras = ["s3"]}
 cpr-data-access = {git = "https://github.com/climatepolicyradar/data-access.git", tag = "0.4.0"}
 huggingface_hub = ">=0.14.0,<1.0.0"
 pydantic = "^2.4.0"
