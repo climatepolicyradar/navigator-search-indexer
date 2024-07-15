@@ -439,13 +439,13 @@ colorama = {version = "*", markers = "platform_system == \"Windows\""}
 
 [[package]]
 name = "cloudpathlib"
-version = "0.17.0"
+version = "0.18.1"
 description = "pathlib-style classes for cloud storage services."
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "cloudpathlib-0.17.0-py3-none-any.whl", hash = "sha256:8051854fc8bc52d1fd8775d68f235a781e38c1354b4776643e5ef87dd0b36742"},
-    {file = "cloudpathlib-0.17.0.tar.gz", hash = "sha256:097c94926d0e8b76df61fec12ba1b725728c6a77071ca7e6565be93fb4496ff9"},
+    {file = "cloudpathlib-0.18.1-py3-none-any.whl", hash = "sha256:20efd5d772c75df91bb2ac52e053be53fd9000f5e9755fd92375a2a9fe6005e0"},
+    {file = "cloudpathlib-0.18.1.tar.gz", hash = "sha256:ffd22f324bfbf9c3f2bc1bec6e8372cb372a0feef17c7f2b48030cd6810ea859"},
 ]
 
 [package.dependencies]
@@ -2226,4 +2226,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "~3.9"
-content-hash = "aa755e7626b7f1d363f676284f25416c4eb5ca2b7d846e94020dec7da12bdf10"
+content-hash = "bfcb2815d0b668f52c5b3ca43c5bea246ff565880e218e7559357851d7f31d12"
