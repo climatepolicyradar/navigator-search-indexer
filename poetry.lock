@@ -1658,12 +1658,13 @@ files = [
 
 [[package]]
 name = "pyvespa"
-version = "0.40.0"
+version = "0.41.0"
 description = "Python API for vespa.ai"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "pyvespa-0.40.0-py3-none-any.whl", hash = "sha256:0b8e55cc53f659d8b2baef8c155f33f6dfe8917189da97a54762a9031c3808bb"},
+    {file = "pyvespa-0.41.0-py3-none-any.whl", hash = "sha256:226d7b1aa065fd40f637942e25fc227407e3bb735942f661f858a127e7cc4548"},
+    {file = "pyvespa-0.41.0.tar.gz", hash = "sha256:ddf3a605fab6517d4f9d4780e004caa63c264faff7c07dabf74af5334325f704"},
 ]
 
 [package.dependencies]
@@ -1677,7 +1678,8 @@ tenacity = "*"
 typing-extensions = "*"
 
 [package.extras]
-dev = ["datasets", "nbconvert", "notebook", "pytest", "requests-mock", "runnb"]
+build = ["build (==1.0.3)", "requests (>=2.26.0,<2.27.0)", "ruff", "setuptools (==69.0.3)", "toml (==0.10.2)", "twine (==4.0.1)"]
+dev = ["datasets", "nbconvert", "notebook", "pre-commit", "pytest", "requests-mock", "ruff", "runnb"]
 
 [[package]]
 name = "pywin32"
@@ -2228,4 +2230,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "~3.9"
-content-hash = "bfcb2815d0b668f52c5b3ca43c5bea246ff565880e218e7559357851d7f31d12"
+content-hash = "9495dbec7a1c1c660e6fb1869e8c520a4ff9cac47f3df08b832f361d0120767f"
