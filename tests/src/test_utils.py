@@ -24,12 +24,12 @@ from tests.conftest import FIXTURE_DIR
 
 
 @pytest.mark.parametrize(
-        "value, want",
-        [
-            (None, []),
-            ("[]", []),
-            ('["doc.1", "doc.2"]', ["doc.1","doc.2"]),
-        ]
+    "value, want",
+    [
+        (None, []),
+        ("[]", []),
+        ('["doc.1", "doc.2"]', ["doc.1", "doc.2"]),
+    ],
 )
 def test_parse_files_to_index(value, want):
     got = parse_files_to_index(value)
@@ -41,7 +41,7 @@ def test_parse_files_to_index(value, want):
     [
         ("local/path", False, Path("local/path")),
         ("s3://bucket/path", True, S3Path("s3://bucket/path")),
-    ]
+    ],
 )
 def test_build_indexer_input_path(dir, use_s3, want):
     got = build_indexer_input_path(dir, use_s3)
@@ -54,7 +54,7 @@ def test_build_indexer_input_path(dir, use_s3, want):
         (None, None, 3),
         (None, 1, 1),
         ('["CCLW.executive.10014.4470"]', None, 1),
-    ]
+    ],
 )
 def test_get_index_paths(files, limit, count):
     path = FIXTURE_DIR / "s3_files"

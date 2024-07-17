@@ -8,6 +8,7 @@ class ConfigError(Exception):
 
     pass
 
+
 # General config
 BLOCKS_TO_FILTER = os.getenv("BLOCKS_TO_FILTER", "Table,Figure").split(",")
 
