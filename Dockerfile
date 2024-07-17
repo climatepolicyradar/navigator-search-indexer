@@ -6,6 +6,9 @@ WORKDIR /app
 
 RUN apt-get update
 
+# Copy the src module here so that poetry can install it as a package
+COPY ./src ./src
+
 # Install pip and poetry
 RUN pip install --upgrade pip
 RUN pip install poetry
@@ -18,13 +21,13 @@ RUN poetry config virtualenvs.create false
 RUN poetry install --no-interaction --no-root
 
 # Copy files to image
-COPY ./src ./src
 COPY ./cli ./cli
 COPY ./tests ./tests
-RUN poetry install --no-interaction
+COPY ./.git ./.git
+COPY ./.pre-commit-config.yaml ./.flake8 ./.gitignore ./
 
 # Pre-download the model
 ENV PYTHONPATH "${PYTHONPATH}:/app"
 
 # Run the indexer on the input s3 directory
-ENTRYPOINT [ "sh", "./cli/run.sh" ]
+CMD [ "sh", "./cli/run.sh" ]

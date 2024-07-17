@@ -15,8 +15,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up and build
+      - name: Set up and build image
         run: make setup build
+
+      - name: Run pre-commit checks
+        run: make pre-commit-checks-all-files
 
       - name: Install latest Vespa CLI
         env:
