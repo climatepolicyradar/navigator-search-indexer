@@ -1,6 +1,6 @@
 -include .env
 
-.PHONY: build test dev_install
+.PHONY: build test dev_install pre-commit-checks-all-files
 
 setup:
 	cp .env.example .env
@@ -16,6 +16,9 @@ test:
 
 dev_install:
 	poetry install && poetry run pre-commit install
+
+pre-commit-checks-all-files:
+	docker run --rm navigator-search-indexer pre-commit run --all-files
 
 # setup dev/test vespa
 vespa_confirm_cli_installed:
