@@ -14,7 +14,7 @@ from typing import (
 )
 
 from cloudpathlib import S3Path
-from cpr_data_access.parser_models import ParserOutput, PDFTextBlock, VerticalFlipError
+from cpr_sdk.parser_models import ParserOutput, PDFTextBlock, VerticalFlipError
 from pydantic import BaseModel, Field
 from tenacity import (
     retry,

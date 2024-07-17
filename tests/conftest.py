@@ -9,7 +9,7 @@ from datetime import datetime
 from vespa.application import Vespa
 from tenacity import RetryError
 
-from cpr_data_access.parser_models import (
+from cpr_sdk.parser_models import (
     ParserOutput,
     BackendDocument,
     PDFData,

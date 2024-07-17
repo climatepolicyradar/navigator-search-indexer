@@ -7,7 +7,7 @@ from typing import Any, Optional, Sequence, Union, cast
 import numpy as np
 
 from cloudpathlib import S3Path
-from cpr_data_access.parser_models import BlockType, ParserOutput, TextBlock
+from cpr_sdk.parser_models import BlockType, ParserOutput, TextBlock
 
 _LOGGER = logging.getLogger(__name__)
 
