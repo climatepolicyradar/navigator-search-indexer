@@ -1,4 +1,4 @@
-include .env
+-include .env
 
 .PHONY: build test dev_install
 
