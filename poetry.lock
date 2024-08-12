@@ -2182,13 +2182,13 @@ files = [
 
 [[package]]
 name = "pyvespa"
-version = "0.41.0"
+version = "0.45.0"
 description = "Python API for vespa.ai"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "pyvespa-0.41.0-py3-none-any.whl", hash = "sha256:226d7b1aa065fd40f637942e25fc227407e3bb735942f661f858a127e7cc4548"},
-    {file = "pyvespa-0.41.0.tar.gz", hash = "sha256:ddf3a605fab6517d4f9d4780e004caa63c264faff7c07dabf74af5334325f704"},
+    {file = "pyvespa-0.45.0-py3-none-any.whl", hash = "sha256:ed4f6927a600c2d83804b699b7fd61bba617851a0a04efdd95655b367f28324f"},
+    {file = "pyvespa-0.45.0.tar.gz", hash = "sha256:0cd5a54651bacd1c06418e3816e7c0d9d92fa19882e15ff075538df9aa0891de"},
 ]
 
 [package.dependencies]
@@ -2196,14 +2196,16 @@ aiohttp = "*"
 cryptography = "*"
 docker = "*"
 jinja2 = "*"
-requests = "*"
+python-dateutil = "*"
+requests = ">=2.32.0"
 requests-toolbelt = "*"
-tenacity = "*"
+tenacity = ">=8.4.1"
 typing-extensions = "*"
 
 [package.extras]
-build = ["build (==1.0.3)", "requests (>=2.26.0,<2.27.0)", "ruff", "setuptools (==69.0.3)", "toml (==0.10.2)", "twine (==4.0.1)"]
-dev = ["datasets", "nbconvert", "notebook", "pre-commit", "pytest", "requests-mock", "ruff", "runnb"]
+build = ["build (==1.0.3)", "requests (>=2.32.0,<2.33.0)", "ruff", "setuptools (==69.0.3)", "toml (==0.10.2)", "twine (==5.1.1)"]
+dev = ["datasets", "nbconvert", "notebook", "pre-commit", "pytest", "requests-mock", "ruff", "runnb", "vespacli"]
+vespacli = ["vespacli"]
 
 [[package]]
 name = "pywin32"
@@ -2992,4 +2994,4 @@ test = ["big-O", "importlib-resources", "jaraco.functools", "jaraco.itertools", 
 [metadata]
 lock-version = "2.0"
 python-versions = "~3.10"
-content-hash = "adcc52eadc762385c4542be8ca984c2672b55d0ccc806c4125393c7757b89e48"
+content-hash = "d7d3d6427f425472c1c1ea5f4ff859bf0e5e615e12f9dc9aa64282fb1d344ab7"
