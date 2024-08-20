@@ -5,10 +5,12 @@
             "family_source": "CCLW",
             "search_weights_ref": "id:doc_search:search_weights::default_weights",
             "family_name": "Climate Change Adaptation and Low Emissions Growth Strategy by 2035",
+            "document_title": "Climate Change Adaptation and Low Emissions Growth Strategy by 2035",
             "document_content_type": "text/html",
             "family_slug": "climate-change-adaptation-and-low-emissions-growth-strategy-by-2035_75e3",
             "document_source_url": "https://unfccc.int/sites/default/files/resource/ENG_CC%20adaptation%20and%20Low%20emission%20development%20Strategy%20BiH%202020-2030.pdf",
             "family_geography": "BIH",
+            "family_geographies": ["BIH"],
             "family_category": "Executive",
             "family_name_index": "Climate Change Adaptation and Low Emissions Growth Strategy by 2035",
             "document_languages": [
@@ -793,7 +795,21 @@
             "family_publication_year": 2020,
             "family_publication_ts": "2020-12-01T00:00:00+00:00",
             "family_description_index": "<p><span style=\"font-size: 10pt;font-family: Arial;\">This strategy upgrades the 2013 strategy on Climate Change Adaptation. It identifies six priority sectors for climate change adaptation action, namely agriculture, water management/water resources, forestry and forest resources, biodiversity and sensitive ecosystems, tourism, human health, and energy, and six priority sectors for low emissions growth, namely electricity generation, building and housing, transport, agriculture, forestry and waste. It summarises the key impacts of climate change in BiH, and outlines strategies for the transformation of BiH to a green economy, focusing on social inclusivity and gender equity.</span></p>",
-            "family_import_id": "CCLW.family.i00000003.n0000"
+            "family_import_id": "CCLW.family.i00000003.n0000",
+            "corpus_import_id": "CCLW.corpus.i00000003.n0000",
+            "corpus_type_name": "UNFCCC Submissions",
+            "collection_title": "collection one",
+            "collection_summary": "Sample collection used for tests",
+            "metadata": [
+                {
+                    "name": "sector",
+                    "value": "Price"
+                },
+                {
+                    "name": "sector",
+                    "value": "Government"
+                }
+            ]
         }
     },
     {
@@ -802,10 +818,12 @@
             "family_source": "CCLW",
             "search_weights_ref": "id:doc_search:search_weights::default_weights",
             "family_name": "Environmental Strategy for 2014-2023",
+            "document_title": "Environmental Strategy for 2014-2023",
             "document_content_type": "application/pdf",
             "family_slug": "environmental-strategy-for-2014-2023_9f8e",
             "document_source_url": "https://wedocs.unep.org/bitstream/handle/20.500.11822/9507/-Environmental_Strategy_for_the_years_2014-2023-2014Moldova_EnvironmentalStrategy_2014-202.pdf?sequence=3&isAllowed=y",
             "family_geography": "MDA",
+            "family_geographies": ["MDA"],
             "family_category": "Executive",
             "document_md5_sum": "bea7a05dae73fbbd629e687a71a15b95",
             "family_name_index": "Environmental Strategy for 2014-2023",
@@ -1592,7 +1610,29 @@
             "family_publication_ts": "2014-04-24T00:00:00+00:00",
             "family_description_index": "The Environment Strategy for Moldova for 2014-2023 was adopted by the Moldovan Government via decision No. 301 of 24.04.2014. The second of the strategy's key objectives includes the integration of \"environmental protection, sustainable development, and green economy principles, of climate change adaptation principles into all sectors of the national economy\". The strategy includes an emissions reduction target of 20% by 2020 and sets out a number of actions with regard to the institutional management of environmental matters and knowledge dissemination activities.<br><br><br><br>",
             "document_cdn_object": "MDA/2014/environmental-strategy-for-2014-2023_bea7a05dae73fbbd629e687a71a15b95.pdf",
-            "family_import_id": "CCLW.family.10014.0"
+            "family_import_id": "CCLW.family.10014.0",
+            "corpus_import_id": "CCLW.corpus.i00000003.n0001",
+            "corpus_type_name": "Laws and Policies",
+            "collection_title": "collection two",
+            "collection_summary": "Sample collection used for tests",
+            "metadata": [
+                {
+                    "name": "sector",
+                    "value": "Price"
+                },
+                {
+                    "name": "sector",
+                    "value": "Government"
+                },
+                {
+                    "name": "topic",
+                    "value": "Mitigation"
+                },
+                {
+                    "name": "instrument",
+                    "value": "Capacity building"
+                }
+            ]
         }
     }
 ]
