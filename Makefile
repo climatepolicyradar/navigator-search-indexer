@@ -11,8 +11,8 @@ build:
 vespa_setup: vespa_confirm_cli_installed vespa_dev_start vespa_healthy vespa_deploy_schema
 
 test:
-	docker-compose -f docker-compose.dev.yml build
-	docker-compose -f docker-compose.dev.yml run --rm navigator-search-indexer python -m pytest -vvv
+	docker compose -f docker-compose.dev.yml build
+	docker compose -f docker-compose.dev.yml run --rm navigator-search-indexer python -m pytest -vvv
 
 dev_install:
 	poetry install && poetry run pre-commit install
