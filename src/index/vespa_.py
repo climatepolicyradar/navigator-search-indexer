@@ -82,6 +82,9 @@ class VespaDocumentPassage(BaseModel):
 
 class VespaFamilyDocument(BaseModel):
     """Family-Document combined data useful for search"""
+    class MetadataItem(BaseModel):
+        name: str
+        value: str
 
     search_weights_ref: str
     family_name: str
@@ -111,6 +114,17 @@ class VespaFamilyDocument(BaseModel):
     corpus_type_name: Optional[str] = None
     collection_title: Optional[str] = None
     collection_summary: Optional[str] = None
+    metadata: list[MetadataItem]
+
+
+def reshape_metadata(metadata: dict[str, list[str]]) -> list[VespaFamilyDocument.MetadataItem]:
+    metadata_items = []
+    for key, values in metadata.items():
+        metadata_items.extend([
+            VespaFamilyDocument.MetadataItem(name=key, value=value)
+            for value in values
+        ])
+    return metadata_items
 
 
 def build_vespa_family_document(
@@ -145,6 +159,7 @@ def build_vespa_family_document(
         corpus_type_name=task.document_metadata.corpus_type_name,
         collection_title=task.document_metadata.collection_title,
         collection_summary=task.document_metadata.collection_summary,
+        metadata=reshape_metadata(task.document_metadata.metadata),
     )
 
 

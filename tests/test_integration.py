@@ -120,6 +120,12 @@ def test_integration(test_vespa):
         assert vespa_data["fields"]["corpus_type_name"] == s3_data.document_metadata.corpus_type_name
         assert vespa_data["fields"]["collection_title"] == s3_data.document_metadata.collection_title
         assert vespa_data["fields"]["collection_summary"] == s3_data.document_metadata.collection_summary
+        
+        # We expect metadata but it won't be the same shape as it is in s3
+        assert isinstance(vespa_data["fields"]["metadata"], list)
+        assert len(vespa_data["fields"]["metadata"]) > 0
+        for metadata_item in vespa_data["fields"]["metadata"]:
+            assert sorted(list(metadata_item.keys())) == ["name", "value"]
 
 
 @patch.object(config, "VESPA_INSTANCE_URL", new=VESPA_TEST_ENDPOINT)
