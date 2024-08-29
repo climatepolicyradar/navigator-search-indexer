@@ -49,6 +49,7 @@ from tests.conftest import get_parser_output, FIXTURE_DIR
                 VespaFamilyDocument.MetadataItem(name="sector", value="Water"),
             ],
         ),
+        (None, None),
     ],
 )
 def test_reshape_metadata(metadata, expected):

@@ -117,12 +117,15 @@ class VespaFamilyDocument(BaseModel):
     corpus_type_name: Optional[str] = None
     collection_title: Optional[str] = None
     collection_summary: Optional[str] = None
-    metadata: list[MetadataItem]
+    metadata: Optional[list[MetadataItem]] = None
 
 
 def reshape_metadata(
-    metadata: dict[str, list[str]]
-) -> list[VespaFamilyDocument.MetadataItem]:
+    metadata: Optional[dict[str, list[str]]]
+) -> Optional[list[VespaFamilyDocument.MetadataItem]]:
+    if metadata is None:
+        return None
+
     metadata_items = []
     for key, values in metadata.items():
         metadata_items.extend(
