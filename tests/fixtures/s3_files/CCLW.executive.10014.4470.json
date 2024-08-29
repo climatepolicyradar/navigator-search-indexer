@@ -2,6 +2,7 @@
   "document_id": "CCLW.executive.10014.4470",
   "document_metadata": {
     "name": "Environmental Strategy for 2014-2023",
+    "document_title": "Environmental Strategy for 2014-2023",
     "description": "The Environment Strategy for Moldova for 2014-2023 was adopted by the Moldovan Government via decision No. 301 of 24.04.2014. The second of the strategy's key objectives includes the integration of \"environmental protection, sustainable development, and green economy principles, of climate change adaptation principles into all sectors of the national economy\". The strategy includes an emissions reduction target of 20% by 2020 and sets out a number of actions with regard to the institutional management of environmental matters and knowledge dissemination activities.<br><br><br><br>",
     "import_id": "CCLW.executive.10014.4470",
     "slug": "environmental-strategy-for-2014-2023_0017",
@@ -15,6 +16,11 @@
     "source": "CCLW",
     "category": "Executive",
     "geography": "MDA",
+    "geographies": ["MDA"],
+    "corpus_import_id": "CCLW.corpus.i00000003.n0000",
+    "corpus_type_name": "UNFCCC Submissions",
+    "collection_title": "collection one",
+    "collection_summary": "Sample collection used for tests",
     "languages": [
       "English"
     ],
