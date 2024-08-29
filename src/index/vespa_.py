@@ -82,7 +82,10 @@ class VespaDocumentPassage(BaseModel):
 
 class VespaFamilyDocument(BaseModel):
     """Family-Document combined data useful for search"""
+
     class MetadataItem(BaseModel):
+        """A single metadata object"""
+
         name: str
         value: str
 
@@ -117,13 +120,17 @@ class VespaFamilyDocument(BaseModel):
     metadata: list[MetadataItem]
 
 
-def reshape_metadata(metadata: dict[str, list[str]]) -> list[VespaFamilyDocument.MetadataItem]:
+def reshape_metadata(
+    metadata: dict[str, list[str]]
+) -> list[VespaFamilyDocument.MetadataItem]:
     metadata_items = []
     for key, values in metadata.items():
-        metadata_items.extend([
-            VespaFamilyDocument.MetadataItem(name=key, value=value)
-            for value in values
-        ])
+        metadata_items.extend(
+            [
+                VespaFamilyDocument.MetadataItem(name=key, value=value)
+                for value in values
+            ]
+        )
     return metadata_items
 
 

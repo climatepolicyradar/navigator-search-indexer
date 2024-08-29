@@ -26,26 +26,32 @@ from tests.conftest import get_parser_output, FIXTURE_DIR
     ("metadata", "expected"),
     [
         ({}, []),
-        ({"topic": ["Adaptation"]},[VespaFamilyDocument.MetadataItem(name="topic", value="Adaptation")]),
-        ({
-            "hazard": [],
-            "sector": [
-                "Adaptation",
-                "Economy-wide",
-                "Waste",
-                "Agriculture",
-                "Water"
-            ]
-        }, [
-            VespaFamilyDocument.MetadataItem(name='sector', value='Adaptation'),
-            VespaFamilyDocument.MetadataItem(name='sector', value='Economy-wide'),
-            VespaFamilyDocument.MetadataItem(name='sector', value='Waste'),
-            VespaFamilyDocument.MetadataItem(name='sector', value='Agriculture'),
-            VespaFamilyDocument.MetadataItem(name='sector', value='Water'),
-        ])
-    ]
+        (
+            {"topic": ["Adaptation"]},
+            [VespaFamilyDocument.MetadataItem(name="topic", value="Adaptation")],
+        ),
+        (
+            {
+                "hazard": [],
+                "sector": [
+                    "Adaptation",
+                    "Economy-wide",
+                    "Waste",
+                    "Agriculture",
+                    "Water",
+                ],
+            },
+            [
+                VespaFamilyDocument.MetadataItem(name="sector", value="Adaptation"),
+                VespaFamilyDocument.MetadataItem(name="sector", value="Economy-wide"),
+                VespaFamilyDocument.MetadataItem(name="sector", value="Waste"),
+                VespaFamilyDocument.MetadataItem(name="sector", value="Agriculture"),
+                VespaFamilyDocument.MetadataItem(name="sector", value="Water"),
+            ],
+        ),
+    ],
 )
-def test_reshape_metadata(metadata, expected):    
+def test_reshape_metadata(metadata, expected):
     result = reshape_metadata(metadata)
     assert result == expected
 

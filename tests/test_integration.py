@@ -87,40 +87,45 @@ def test_integration(test_vespa):
     )
 
     for doc_id in family_documents:
-        vespa_data = get_vespa_data(
-            test_vespa, FAMILY_DOCUMENT_SCHEMA, doc_id
-        )
+        vespa_data = get_vespa_data(test_vespa, FAMILY_DOCUMENT_SCHEMA, doc_id)
         fixture_path = FIXTURE_DIR / "s3_files" / f"{doc_id}.json"
         embeddings_path = FIXTURE_DIR / "s3_files" / f"{doc_id}.npy"
         s3_data = ParserOutput.model_validate_json(fixture_path.read_text())
         embeddings = np.load(embeddings_path)
 
-        assert vespa_data["fields"]["family_name"] == s3_data.document_name
-        assert vespa_data["fields"]["family_name_index"] == s3_data.document_name
-        assert vespa_data["fields"]["family_description"] == s3_data.document_description
-        assert vespa_data["fields"]["family_description_index"] == s3_data.document_description
-        assert vespa_data["fields"]["family_description_embedding"]["values"] == embeddings[0].tolist()
-        assert vespa_data["fields"]["family_import_id"] == s3_data.document_metadata.family_import_id
-        assert vespa_data["fields"]["family_slug"] == s3_data.document_metadata.family_slug
-        assert vespa_data["fields"]["family_publication_ts"] == s3_data.document_metadata.publication_ts.isoformat()
-        assert vespa_data["fields"]["family_publication_year"] == s3_data.document_metadata.publication_ts.year
-        assert vespa_data["fields"]["family_category"] == s3_data.document_metadata.category
-        assert vespa_data["fields"]["family_geography"] == s3_data.document_metadata.geography
-        assert vespa_data["fields"]["family_source"] == s3_data.document_metadata.source
-        assert vespa_data["fields"]["document_import_id"] == s3_data.document_id
-        assert vespa_data["fields"]["document_slug"] == s3_data.document_slug
-        assert vespa_data["fields"]["document_languages"] == s3_data.document_metadata.languages
-        assert vespa_data["fields"]["document_content_type"] == s3_data.document_content_type
-        assert vespa_data["fields"]["document_md5_sum"] == s3_data.document_md5_sum
-        assert vespa_data["fields"]["document_cdn_object"] == s3_data.document_cdn_object
-        assert vespa_data["fields"]["document_source_url"] == s3_data.document_metadata.source_url
-        assert vespa_data["fields"]["document_title"] == s3_data.document_metadata.document_title
-        assert vespa_data["fields"]["family_geographies"] == s3_data.document_metadata.geographies
-        assert vespa_data["fields"]["corpus_import_id"] == s3_data.document_metadata.corpus_import_id
-        assert vespa_data["fields"]["corpus_type_name"] == s3_data.document_metadata.corpus_type_name
-        assert vespa_data["fields"]["collection_title"] == s3_data.document_metadata.collection_title
-        assert vespa_data["fields"]["collection_summary"] == s3_data.document_metadata.collection_summary
-        
+        vf = vespa_data["fields"]
+        assert vf["family_name"] == s3_data.document_name
+        assert vf["family_name_index"] == s3_data.document_name
+        assert vf["family_description"] == s3_data.document_description
+        assert vf["family_description_index"] == s3_data.document_description
+        assert vf["family_description_embedding"]["values"] == embeddings[0].tolist()
+        assert vf["family_import_id"] == s3_data.document_metadata.family_import_id
+        assert vf["family_slug"] == s3_data.document_metadata.family_slug
+        assert (
+            vf["family_publication_ts"]
+            == s3_data.document_metadata.publication_ts.isoformat()
+        )
+        assert (
+            vf["family_publication_year"]
+            == s3_data.document_metadata.publication_ts.year
+        )
+        assert vf["family_category"] == s3_data.document_metadata.category
+        assert vf["family_geography"] == s3_data.document_metadata.geography
+        assert vf["family_source"] == s3_data.document_metadata.source
+        assert vf["document_import_id"] == s3_data.document_id
+        assert vf["document_slug"] == s3_data.document_slug
+        assert vf["document_languages"] == s3_data.document_metadata.languages
+        assert vf["document_content_type"] == s3_data.document_content_type
+        assert vf["document_md5_sum"] == s3_data.document_md5_sum
+        assert vf["document_cdn_object"] == s3_data.document_cdn_object
+        assert vf["document_source_url"] == s3_data.document_metadata.source_url
+        assert vf["document_title"] == s3_data.document_metadata.document_title
+        assert vf["family_geographies"] == s3_data.document_metadata.geographies
+        assert vf["corpus_import_id"] == s3_data.document_metadata.corpus_import_id
+        assert vf["corpus_type_name"] == s3_data.document_metadata.corpus_type_name
+        assert vf["collection_title"] == s3_data.document_metadata.collection_title
+        assert vf["collection_summary"] == s3_data.document_metadata.collection_summary
+
         # We expect metadata but it won't be the same shape as it is in s3
         assert isinstance(vespa_data["fields"]["metadata"], list)
         assert len(vespa_data["fields"]["metadata"]) > 0
