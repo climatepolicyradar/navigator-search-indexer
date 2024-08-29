@@ -2,6 +2,7 @@
     "document_id": "CCLW.executive.10002.4495",
     "document_metadata": {
         "name": "National Adaptation Plan 2015-2030",
+        "document_title": "National Adaptation Plan 2015-2030",
         "description": "This document identifies Kenya's vulnerabilities to the effect of climate change, adaptation actions and implementation strategies.",
         "import_id": "CCLW.executive.10002.4495",
         "slug": "national-adaptation-plan-2015-2030_7788",
@@ -15,6 +16,11 @@
         "source": "CCLW",
         "category": "Executive",
         "geography": "KEN",
+        "geographies": ["KEN"],
+        "corpus_import_id": "CCLW.corpus.i00000003.n0000",
+        "corpus_type_name": "UNFCCC Submissions",
+        "collection_title": "collection one",
+        "collection_summary": "Sample collection used for tests",
         "languages": [
             "English"
         ],

@@ -62,6 +62,70 @@ def prepare_temp_dir(doc_id: str, incremental_update_dir: str, limit):
 @patch.object(config, "DEVELOPMENT_MODE", new="true")
 @pytest.mark.usefixtures("cleanup_test_vespa_before", "cleanup_test_vespa_after")
 def test_integration(test_vespa):
+    """Run a single indexing and ensure all fields are populated"""
+    runner = CliRunner()
+    s3_fixture_dir = str(FIXTURE_DIR / "s3_files")
+
+    family_documents = [
+        "CCLW.executive.10014.4470",
+        "CCLW.executive.10002.4495",
+        "CCLW.document.i00000004.n0000",
+    ]
+
+    result = runner.invoke(
+        run_as_cli,
+        args=[
+            s3_fixture_dir,
+            "--index-type",
+            "vespa",
+        ],
+    )
+    assert result.exit_code == 0, (
+        f"Exception: {result.exception if result.exception else None}\n"
+        f"Stdout: {result.stdout}"
+        f"Trace: {traceback.print_exception(*result.exc_info)}"
+    )
+
+    for doc_id in family_documents:
+        vespa_data = get_vespa_data(
+            test_vespa, FAMILY_DOCUMENT_SCHEMA, doc_id
+        )
+        fixture_path = FIXTURE_DIR / "s3_files" / f"{doc_id}.json"
+        embeddings_path = FIXTURE_DIR / "s3_files" / f"{doc_id}.npy"
+        s3_data = ParserOutput.model_validate_json(fixture_path.read_text())
+        embeddings = np.load(embeddings_path)
+
+        assert vespa_data["fields"]["family_name"] == s3_data.document_name
+        assert vespa_data["fields"]["family_name_index"] == s3_data.document_name
+        assert vespa_data["fields"]["family_description"] == s3_data.document_description
+        assert vespa_data["fields"]["family_description_index"] == s3_data.document_description
+        assert vespa_data["fields"]["family_description_embedding"]["values"] == embeddings[0].tolist()
+        assert vespa_data["fields"]["family_import_id"] == s3_data.document_metadata.family_import_id
+        assert vespa_data["fields"]["family_slug"] == s3_data.document_metadata.family_slug
+        assert vespa_data["fields"]["family_publication_ts"] == s3_data.document_metadata.publication_ts.isoformat()
+        assert vespa_data["fields"]["family_publication_year"] == s3_data.document_metadata.publication_ts.year
+        assert vespa_data["fields"]["family_category"] == s3_data.document_metadata.category
+        assert vespa_data["fields"]["family_geography"] == s3_data.document_metadata.geography
+        assert vespa_data["fields"]["family_source"] == s3_data.document_metadata.source
+        assert vespa_data["fields"]["document_import_id"] == s3_data.document_id
+        assert vespa_data["fields"]["document_slug"] == s3_data.document_slug
+        assert vespa_data["fields"]["document_languages"] == s3_data.document_metadata.languages
+        assert vespa_data["fields"]["document_content_type"] == s3_data.document_content_type
+        assert vespa_data["fields"]["document_md5_sum"] == s3_data.document_md5_sum
+        assert vespa_data["fields"]["document_cdn_object"] == s3_data.document_cdn_object
+        assert vespa_data["fields"]["document_source_url"] == s3_data.document_metadata.source_url
+        assert vespa_data["fields"]["document_title"] == s3_data.document_metadata.document_title
+        assert vespa_data["fields"]["family_geographies"] == s3_data.document_metadata.geographies
+        assert vespa_data["fields"]["corpus_import_id"] == s3_data.document_metadata.corpus_import_id
+        assert vespa_data["fields"]["corpus_type_name"] == s3_data.document_metadata.corpus_type_name
+        assert vespa_data["fields"]["collection_title"] == s3_data.document_metadata.collection_title
+        assert vespa_data["fields"]["collection_summary"] == s3_data.document_metadata.collection_summary
+
+
+@patch.object(config, "VESPA_INSTANCE_URL", new=VESPA_TEST_ENDPOINT)
+@patch.object(config, "DEVELOPMENT_MODE", new="true")
+@pytest.mark.usefixtures("cleanup_test_vespa_before", "cleanup_test_vespa_after")
+def test_repeated_integration(test_vespa):
     """
     Run repeated integration tests
 
