@@ -40,6 +40,7 @@ def assert_expected_document_fields_are_present(doc):
         "corpus_type_name",
         "collection_title",
         "collection_summary",
+        "metadata",
     ]
     for field in expected_fields:
         assert doc.get(field) is not None, f"{field} was None"

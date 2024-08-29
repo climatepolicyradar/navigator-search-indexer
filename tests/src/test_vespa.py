@@ -6,6 +6,7 @@ from src.index.vespa_ import (
     build_vespa_family_document,
     build_vespa_document_passage,
     get_existing_passage_ids,
+    reshape_metadata,
     remove_ids,
     determine_stray_ids,
     get_document_generator,
@@ -19,6 +20,34 @@ from src.index.vespa_ import (
 )
 
 from tests.conftest import get_parser_output, FIXTURE_DIR
+
+
+@pytest.mark.parametrize(
+    ("metadata", "expected"),
+    [
+        ({}, []),
+        ({"topic": ["Adaptation"]},[VespaFamilyDocument.MetadataItem(name="topic", value="Adaptation")]),
+        ({
+            "hazard": [],
+            "sector": [
+                "Adaptation",
+                "Economy-wide",
+                "Waste",
+                "Agriculture",
+                "Water"
+            ]
+        }, [
+            VespaFamilyDocument.MetadataItem(name='sector', value='Adaptation'),
+            VespaFamilyDocument.MetadataItem(name='sector', value='Economy-wide'),
+            VespaFamilyDocument.MetadataItem(name='sector', value='Waste'),
+            VespaFamilyDocument.MetadataItem(name='sector', value='Agriculture'),
+            VespaFamilyDocument.MetadataItem(name='sector', value='Water'),
+        ])
+    ]
+)
+def test_reshape_metadata(metadata, expected):    
+    result = reshape_metadata(metadata)
+    assert result == expected
 
 
 def test_build_vespa_family_document():
