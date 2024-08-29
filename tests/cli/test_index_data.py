@@ -17,6 +17,34 @@ def test_input_dir() -> Path:
     return (Path(__file__).parent / "test_data" / "index_data_input").resolve()
 
 
+def assert_expected_document_fields_are_present(doc):
+    expected_fields = [
+        "search_weights_ref",
+        "family_name",
+        "family_name_index",
+        "family_description",
+        "family_description_index",
+        "family_description_embedding",
+        "family_import_id",
+        "family_slug",
+        "family_publication_ts",
+        "family_publication_year",
+        "family_category",
+        "family_geography",
+        "family_source",
+        "document_import_id",
+        "document_slug",
+        "document_title",
+        "family_geographies",
+        "corpus_import_id",
+        "corpus_type_name",
+        "collection_title",
+        "collection_summary",
+    ]
+    for field in expected_fields:
+        assert doc.get(field) is not None, f"{field} was None"
+
+
 @pytest.mark.usefixtures("cleanup_test_vespa_before", "cleanup_test_vespa_after")
 def test_vespa_document_generator(
     test_vespa: Vespa,
@@ -48,6 +76,7 @@ def test_vespa_document_generator(
             assert doc.get("search_weights_ref") is not None
             assert doc.get("search_weights_ref") == search_weights_ref
             last_family_ref = f"{id_start_string}:{schema_type}::{idx}"
+            assert_expected_document_fields_are_present(doc)
             continue
 
         if schema_type == DOCUMENT_PASSAGE_SCHEMA:
