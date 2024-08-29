@@ -105,10 +105,16 @@ class VespaFamilyDocument(BaseModel):
     document_content_type: Optional[str] = None
     document_cdn_object: Optional[str] = None
     document_source_url: Optional[str] = None
+    document_title: Optional[str] = None
+    family_geographies: Optional[list[str]] = None
+    corpus_import_id: Optional[str] = None
+    corpus_type_name: Optional[str] = None
+    collection_title: Optional[str] = None
+    collection_summary: Optional[str] = None
 
 
 def build_vespa_family_document(
-    task,
+    task: ParserOutput,
     embeddings,
     search_weights_ref,
 ) -> VespaFamilyDocument:
@@ -133,6 +139,12 @@ def build_vespa_family_document(
         document_content_type=task.document_content_type,
         document_cdn_object=task.document_cdn_object,
         document_source_url=task.document_metadata.source_url,
+        document_title=task.document_metadata.document_title,
+        family_geographies=task.document_metadata.geographies,
+        corpus_import_id=task.document_metadata.corpus_import_id,
+        corpus_type_name=task.document_metadata.corpus_type_name,
+        collection_title=task.document_metadata.collection_title,
+        collection_summary=task.document_metadata.collection_summary,
     )
 
 

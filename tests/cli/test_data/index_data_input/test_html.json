@@ -2,6 +2,7 @@
   "document_id": "test_html",
   "document_metadata": {
     "name": "test_name",
+    "document_title": "test_name",
     "description": "test_description",
     "import_id": "test_id",
     "slug": "test_name_slug",
@@ -13,9 +14,14 @@
     "source_url": null,
     "download_url": null,
     "geography": "test_geo",
+    "geographies": ["test_geo"],
     "category": "test_category",
     "source": "test_source",
     "type": "test_type",
+    "corpus_import_id": "CCLW.corpus.i00000003.n0000",
+    "corpus_type_name": "UNFCCC Submissions",
+    "collection_title": "collection one",
+    "collection_summary": "Sample collection used for tests",
     "metadata": {
       "sectors": [
         "sector1",
