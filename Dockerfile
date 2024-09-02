@@ -30,4 +30,4 @@ COPY ./.pre-commit-config.yaml ./.flake8 ./.gitignore ./
 ENV PYTHONPATH "${PYTHONPATH}:/app"
 
 # Run the indexer on the input s3 directory
-CMD [ "sh", "./cli/run.sh" ]
+ENTRYPOINT [ "sh", "./cli/run.sh" ]

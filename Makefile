@@ -12,13 +12,13 @@ vespa_setup: vespa_confirm_cli_installed vespa_dev_start vespa_healthy vespa_dep
 
 test:
 	docker compose -f docker-compose.dev.yml build
-	docker compose -f docker-compose.dev.yml run --rm navigator-search-indexer python -m pytest -vvv
+	docker compose -f docker-compose.dev.yml run --rm --entrypoint python navigator-search-indexer -m pytest -vvv
 
 dev_install:
 	poetry install && poetry run pre-commit install
 
 pre-commit-checks-all-files:
-	docker run --rm navigator-search-indexer pre-commit run --all-files
+	docker run --rm --entrypoint pre-commit navigator-search-indexer run --all-files
 
 # setup dev/test vespa
 vespa_confirm_cli_installed:
