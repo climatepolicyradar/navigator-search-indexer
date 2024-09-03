@@ -17,7 +17,7 @@ pyvespa = "^0.47.0"
 tenacity = "^8.2.3"
 
 [tool.poetry.dev-dependencies]
-black = "^22.1.0"
+black = "^24.8.0"
 flake8 = "^7.1.0"
 mypy = "^1.11"
 pre-commit = "^3.8.0"
