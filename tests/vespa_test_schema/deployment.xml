@@ -1,0 +1,13 @@
+<deployment version="1.0">
+    <block-change version="false" revision="false" />
+    <instance id="pipeline-sandbox">
+        <prod>
+            <region>aws-eu-west-1a</region>
+        </prod>
+    </instance>
+    <instance id="app-staging">
+        <prod>
+            <region>aws-eu-west-1a</region>
+        </prod>
+    </instance>
+</deployment>

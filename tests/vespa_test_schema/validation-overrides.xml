@@ -1,0 +1,7 @@
+<validation-overrides>
+    <!-- Be very careful not to allow removal for longer than required as a simple safety net -->
+    <allow until="2024-05-30" comment="Rename and upgrade to new certificates for pipeline and backend.">certificate-removal</allow>
+    <allow until="2024-06-05" comment="Remove obselete staging instance that has partially indexed data.">deployment-removal</allow>
+    <allow until="2024-06-10" comment="Upgrade to new read only certificate for staging backend.">certificate-removal</allow>
+    <allow until="2024-07-18" comment="Clean up old certs">certificate-removal</allow>
+</validation-overrides>

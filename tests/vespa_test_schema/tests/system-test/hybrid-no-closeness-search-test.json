@@ -1,0 +1,34 @@
+{
+  "name": "Hybrid no closeness Query Test",
+  "comment": "Uses the hybrid-no-closeness search profile, doesn't require results to succeed",
+  "defaults": {
+    "cluster": "default",
+    "parameters": {
+      "timeout": "2s"
+    }
+  },
+  "steps": [
+    {
+      "name": "hybrid-no-closeness query",
+      "request": {
+        "method": "GET",
+        "uri": "/search/",
+        "parameters": {
+          "yql": "select * from sources family_document, document_passage where ( {\"targetHits\": 1000} weakAnd( family_name contains \"test\", family_description contains \"test\", text_block contains \"test\" )) limit 0 | all( group(family_import_id) max(150) each( max(10) each(output(summary(search_summary)) ) ) )",
+          "timeout": "20",
+          "ranking.softtimeout.factor": "0.7",
+          "ranking.profile": "hybrid_no_closeness"
+        },
+        "response": {
+          "body": {
+            "root": {
+              "fields": {
+                "totalCount": {}
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

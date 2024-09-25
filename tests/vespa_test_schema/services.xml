@@ -11,6 +11,13 @@
           - Reference: https://docs.vespa.ai/en/reference/services-container.html
     -->
     <container id="default" version="1.0">
+        <component id="msmarco-distilbert-dot-v5" type="hugging-face-embedder">
+            <transformer-model url="https://huggingface.co/onnx-models/msmarco-distilbert-dot-v5-onnx/resolve/main/model.onnx"/>
+            <tokenizer-model url="https://huggingface.co/onnx-models/msmarco-distilbert-dot-v5-onnx/resolve/main/tokenizer.json"/>
+            <transformer-token-type-ids/>
+            <transformer-output>token_embeddings</transformer-output>
+        </component>
+        
         <!--
             <document-api> tells the container that it should accept documents for indexing. Through the
             Document REST API you can PUT new documents, UPDATE existing documents, and DELETE documents
@@ -23,6 +30,26 @@
              - Reference: https://docs.vespa.ai/en/reference/services-container.html#document-api
              - Operations: https://docs.vespa.ai/en/document-v1-api-guide.html
         -->
+        <clients>
+            <client id="fred" permissions="read,write">
+                <certificate file="security/clients.pem"/>
+            </client>
+            <client id="pipeline_serve" permissions="read">
+                <certificate file="security/pipeline_serve.pem"/>
+            </client>
+            <client id="pipeline_full_access" permissions="read,write">
+                <certificate file="security/pipeline_full_access.pem"/>
+            </client>
+            <client id="backend_serve" permissions="read">
+                <certificate file="security/backend_serve.pem"/>
+            </client>
+            <client id="monitoring_serve" permissions="read">
+                <certificate file="security/monitoring_serve.pem"/>
+            </client>
+            <client id="jesse" permissions="read">
+                <certificate file="security/jesse_data_plane.pem"/>
+            </client>
+        </clients>
         <document-api/>
 
         <!--
@@ -58,11 +85,6 @@
           - Reference: https://docs.vespa.ai/en/reference/services-content.html
     -->
     <content id="family-document-passage" version="1.0">
-        <tuning>
-            <resource-limits>
-                <disk>0.95</disk>
-            </resource-limits>
-        </tuning>
         <min-redundancy>2</min-redundancy>
         <documents>
             <document type="search_weights" mode="index" global="true" />
@@ -70,13 +92,13 @@
             <document type="document_passage" mode="index" />
         </documents>
         <nodes deploy:environment="dev" count="1">
-            <resources vcpu="2" memory="16Gb" disk="300Gb"/>
+            <resources vcpu="2" memory="8Gb" disk="50Gb"/>
         </nodes>
-        <nodes deploy:environment="perf" count="[2, 4]">
-            <resources vcpu="[2, 8]" memory="[16Gb, 64Gb]" disk="[300Gb, 1Tb]"/>
+        <nodes deploy:environment="perf" count="[1, 4]">
+            <resources vcpu="[2, 4]" memory="[8Gb, 16Gb]" disk="[50Gb, 500Gb]"/>
         </nodes>
-        <nodes deploy:environment="prod" count="[2, 4]">
-            <resources vcpu="[2, 8]" memory="[16Gb, 64Gb]" disk="[300Gb, 1Tb]"/>
+        <nodes deploy:environment="prod" count="[1, 5]">
+            <resources vcpu="[2, 4]" memory="[16Gb, 32Gb]" disk="[50Gb, 500Gb]"/>
         </nodes>
     </content>
 
