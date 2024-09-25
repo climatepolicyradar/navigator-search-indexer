@@ -4,7 +4,7 @@
     <field name="maxOffset">500000</field>
     <field name="grouping.defaultMaxHits">-1</field>
     <field name="grouping.defaultMaxGroups">-1</field>
-    <field name="grouping.globalMaxGroups">-1</field>  
+    <field name="grouping.globalMaxGroups">-1</field>
     <field name="timeout">20</field>
     <field name="ranking.softtimeout.enable">true</field>
     <field name="ranking.softtimeout.factor">0.7</field>
