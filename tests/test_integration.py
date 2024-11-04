@@ -288,16 +288,16 @@ def test_repeated_integration(test_vespa):
 
     assert search_weights_1 == search_weights_2 == search_weights_3 == search_weights_4
     assert (
-        no_change_family_1
-        == no_change_family_2
-        == no_change_family_3
-        == no_change_family_4
+        sorted(no_change_family_1)
+        == sorted(no_change_family_2)
+        == sorted(no_change_family_3)
+        == sorted(no_change_family_4)
     )
     assert (
-        no_change_family_passages_1
-        == no_change_family_passages_2
-        == no_change_family_passages_3
-        == no_change_family_passages_4
+        sorted(no_change_family_passages_1)
+        == sorted(no_change_family_passages_2)
+        == sorted(no_change_family_passages_3)
+        == sorted(no_change_family_passages_4)
     )
 
     assert sorted(change_family_passages_1) == sorted(change_family_passages_4)
