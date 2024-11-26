@@ -10,6 +10,7 @@ class ConfigError(Exception):
 
 
 # General config
+# NOTE: Comparable list being maintained at https://github.com/climatepolicyradar/knowledge-graph/blob/83bda1919cea415b6fc0813bfb214a23662a060b/flows/inference.py#L29-L33
 BLOCKS_TO_FILTER = os.getenv("BLOCKS_TO_FILTER", "Table,Figure").split(",")
 
 # Vespa config
