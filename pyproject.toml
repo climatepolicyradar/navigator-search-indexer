@@ -9,7 +9,7 @@ packages = [{include = "src"}]
 python = "~3.10"
 click = "^8.0.4"
 cloudpathlib = {version = "^0.20.0", extras = ["s3"]}
-cpr-sdk = "^1.7.0"
+cpr-sdk = "^1.9.3"
 huggingface_hub = ">=0.14.0,<1.0.0"
 pydantic = "^2.9.2"
 python-json-logger = "^2.0.4"
