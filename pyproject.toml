@@ -11,7 +11,7 @@ click = "^8.0.4"
 cloudpathlib = {version = "^0.20.0", extras = ["s3"]}
 cpr-sdk = "^1.7.0"
 huggingface_hub = ">=0.14.0,<1.0.0"
-pydantic = "^2.9.2"
+pydantic = "^2.10.2"
 python-json-logger = "^2.0.4"
 pyvespa = "^0.50.0"
 tenacity = "^9.0.0"
@@ -21,9 +21,9 @@ black = "^24.10.0"
 flake8 = "^7.1.0"
 mypy = "^1.13"
 pre-commit = "^4.0.1"
-pytest = "^8.3.3"
+pytest = "^8.3.4"
 types-requests = "^2.32.0"
-moto = "^5.0.18"
+moto = "^5.0.21"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
