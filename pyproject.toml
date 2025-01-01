@@ -7,23 +7,23 @@ packages = [{include = "src"}]
 
 [tool.poetry.dependencies]
 python = "~3.10"
-click = "^8.0.4"
+click = "^8.1.8"
 cloudpathlib = {version = "^0.20.0", extras = ["s3"]}
 cpr-sdk = "^1.11.0"
 huggingface_hub = ">=0.14.0,<1.0.0"
-pydantic = "^2.10.2"
-python-json-logger = "^2.0.4"
-pyvespa = "^0.50.0"
+pydantic = "^2.10.4"
+python-json-logger = "^3.2.1"
+pyvespa = "^0.51.0"
 tenacity = "^9.0.0"
 
 [tool.poetry.dev-dependencies]
 black = "^24.10.0"
 flake8 = "^7.1.0"
-mypy = "^1.13"
+mypy = "^1.14"
 pre-commit = "^4.0.1"
 pytest = "^8.3.4"
 types-requests = "^2.32.0"
-moto = "^5.0.21"
+moto = "^5.0.25"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
