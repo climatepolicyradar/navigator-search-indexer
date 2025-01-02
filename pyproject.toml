@@ -13,7 +13,7 @@ cpr-sdk = "^1.11.0"
 huggingface_hub = ">=0.14.0,<1.0.0"
 pydantic = "^2.10.4"
 python-json-logger = "^3.2.1"
-pyvespa = "^0.51.0"
+pyvespa = "^0.50.0"
 tenacity = "^9.0.0"
 
 [tool.poetry.dev-dependencies]
