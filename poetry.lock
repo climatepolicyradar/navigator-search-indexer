@@ -630,14 +630,14 @@ markers = {main = "platform_system == \"Windows\" or os_name == \"nt\"", dev = "
 
 [[package]]
 name = "cpr-sdk"
-version = "1.17.0"
+version = "1.18.2"
 description = ""
 optional = false
 python-versions = "<4.0,>=3.10"
 groups = ["main"]
 files = [
-    {file = "cpr_sdk-1.17.0-py3-none-any.whl", hash = "sha256:e50b21357a3337de9876c2a5241ef92bf7d69062d7afc4409fd550a385c2dcee"},
-    {file = "cpr_sdk-1.17.0.tar.gz", hash = "sha256:f760246f39142852934816064821e69c566f15be7af0811284c25fc7f661e5bb"},
+    {file = "cpr_sdk-1.18.2-py3-none-any.whl", hash = "sha256:80cafb4f6b59b4d01670247c83f845bd03975b6391bee8a5996b0aa859138afe"},
+    {file = "cpr_sdk-1.18.2.tar.gz", hash = "sha256:244061687835a30854c136e5a875c91a587ea33170040295c82f1bbc1f85744b"},
 ]
 
 [package.dependencies]
@@ -655,6 +655,7 @@ tqdm = ">=4.66.5,<5.0.0"
 
 [package.extras]
 datasets = ["datasets (>=3.0.0,<4.0.0)"]
+orchestration = ["prefect[slack] (>=3.0.0)"]
 spacy = ["spacy (>=3.5.1,<4.0.0)"]
 vespa = ["pyvespa (>=0.45.0,<0.46.0)", "pyyaml (>=6.0.2,<7.0.0)"]
 
@@ -3347,4 +3348,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.1"
 python-versions = "~3.10"
-content-hash = "6d7ce4d261ba49b22f8380ce43b1b65aaf2be2df8807fec21cf903cff31ff3bc"
+content-hash = "8f5821fbad4a3b7b0a8b9024880489a5fcea41b2901bff89d0171c3be6d04484"
