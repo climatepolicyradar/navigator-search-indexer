@@ -139,6 +139,11 @@ def reshape_metadata(
 def reshape_concepts(
     concepts: list[dict[str, list[str]]],
 ) -> Optional[list[VespaFamilyDocument.MetadataItem]]:
+    # This is to try and match reshape_metadata
+    # but the mapper that produces these concepts always give s a list
+    if len(concepts) == 0:
+        return None
+
     metadata_items = []
     for concept in concepts:
         metadata_items.append(
@@ -154,6 +159,11 @@ def build_vespa_family_document(
     embeddings,
     search_weights_ref,
 ) -> VespaFamilyDocument:
+    metadata = reshape_metadata(task.document_metadata.metadata) or []
+    concepts = reshape_concepts(task.document_metadata.concepts) or []
+    metadata_and_concepts = metadata + concepts
+    family_metadata = metadata_and_concepts if len(metadata_and_concepts) else None
+
     return VespaFamilyDocument(
         search_weights_ref=search_weights_ref,
         family_name=task.document_name,
@@ -181,7 +191,7 @@ def build_vespa_family_document(
         corpus_type_name=task.document_metadata.corpus_type_name,
         collection_title=task.document_metadata.collection_title,
         collection_summary=task.document_metadata.collection_summary,
-        metadata=reshape_metadata(task.document_metadata.metadata),
+        metadata=family_metadata,
     )
 
 

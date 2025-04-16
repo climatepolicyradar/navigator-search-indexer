@@ -60,7 +60,7 @@ def test_reshape_metadata(metadata, expected):
 @pytest.mark.parametrize(
     ("concepts", "expected"),
     [
-        ([], []),
+        ([], None),
         (
             [
                 {
