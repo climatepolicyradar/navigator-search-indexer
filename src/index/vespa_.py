@@ -158,6 +158,8 @@ def build_vespa_family_document(
     embeddings,
     search_weights_ref,
 ) -> VespaFamilyDocument:
+    # This is a little more complicated that we might like
+    # but it's to do with list | None functionality i.e. empty list = []
     metadata = reshape_metadata(task.document_metadata.metadata) or []
     concepts = reshape_concepts(task.document_metadata.concepts) or []
     metadata_and_concepts = metadata + concepts
