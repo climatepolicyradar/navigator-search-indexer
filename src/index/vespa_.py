@@ -1,10 +1,11 @@
-from collections import defaultdict
 import logging
+from collections import defaultdict
 from pathlib import Path
 from typing import (
     Annotated,
     Generator,
     Mapping,
+    NamedTuple,
     NewType,
     Optional,
     Sequence,
@@ -18,16 +19,14 @@ from cpr_sdk.parser_models import ParserOutput, PDFTextBlock, VerticalFlipError
 from pydantic import BaseModel, Field
 from tenacity import (
     retry,
-    wait_exponential,
     stop_after_attempt,
+    wait_exponential,
 )
 from vespa.application import Vespa
 from vespa.io import VespaResponse
 
-
 from src import config
 from src.utils import filter_on_block_type, read_npy_file
-
 
 _LOGGER = logging.getLogger(__name__)
 SchemaName = NewType("SchemaName", str)
@@ -121,7 +120,7 @@ class VespaFamilyDocument(BaseModel):
 
 
 def reshape_metadata(
-    metadata: Optional[dict[str, list[str]]]
+    metadata: Optional[dict[str, list[str]]],
 ) -> Optional[list[VespaFamilyDocument.MetadataItem]]:
     if metadata is None:
         return None
@@ -133,6 +132,19 @@ def reshape_metadata(
                 VespaFamilyDocument.MetadataItem(name=key, value=value)
                 for value in values
             ]
+        )
+    return metadata_items
+
+
+def reshape_concepts(
+    concepts: list[dict[str, list[str]]],
+) -> Optional[list[VespaFamilyDocument.MetadataItem]]:
+    metadata_items = []
+    for concept in concepts:
+        metadata_items.append(
+            VespaFamilyDocument.MetadataItem(
+                name="concept.label", value=concept.get("preferred_label")
+            )
         )
     return metadata_items
 

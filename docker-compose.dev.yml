@@ -18,3 +18,6 @@ services:
     environment:
       VESPA_INSTANCE_URL: "http://vespaindexertest:8080/"
       DEVELOPMENT_MODE: "True"
+    volumes:
+      - .:/app
+    working_dir: /app

@@ -1,25 +1,25 @@
-from cpr_sdk.parser_models import ParserOutput
 import numpy as np
 import pytest
+from cpr_sdk.parser_models import ParserOutput
 
 from src.index.vespa_ import (
-    build_vespa_family_document,
-    build_vespa_document_passage,
-    get_existing_passage_ids,
-    reshape_metadata,
-    remove_ids,
-    determine_stray_ids,
-    get_document_generator,
+    _SCHEMAS_TO_PROCESS,
+    DOCUMENT_PASSAGE_SCHEMA,
+    FAMILY_DOCUMENT_SCHEMA,
+    SEARCH_WEIGHTS_SCHEMA,
     VespaDocumentPassage,
     VespaFamilyDocument,
     VespaSearchWeights,
-    SEARCH_WEIGHTS_SCHEMA,
-    FAMILY_DOCUMENT_SCHEMA,
-    DOCUMENT_PASSAGE_SCHEMA,
-    _SCHEMAS_TO_PROCESS,
+    build_vespa_document_passage,
+    build_vespa_family_document,
+    determine_stray_ids,
+    get_document_generator,
+    get_existing_passage_ids,
+    remove_ids,
+    reshape_concepts,
+    reshape_metadata,
 )
-
-from tests.conftest import get_parser_output, FIXTURE_DIR
+from tests.conftest import FIXTURE_DIR, get_parser_output
 
 
 @pytest.mark.parametrize(
@@ -54,6 +54,143 @@ from tests.conftest import get_parser_output, FIXTURE_DIR
 )
 def test_reshape_metadata(metadata, expected):
     result = reshape_metadata(metadata)
+    assert result == expected
+
+
+@pytest.mark.parametrize(
+    ("concepts", "expected"),
+    [
+        ([], []),
+        (
+            [
+                {
+                    "id": "Sao Paulo State Court",
+                    "ids": [],
+                    "type": "legal_entity",
+                    "preferred_label": "Sao Paulo State Court",
+                    "relation": "jurisdiction",
+                    "subconcept_of_labels": ["Sao Paulo"],
+                },
+                {
+                    "id": "Brazil",
+                    "ids": [],
+                    "type": "legal_entity",
+                    "preferred_label": "Brazil",
+                    "relation": "jurisdiction",
+                    "subconcept_of_labels": [],
+                },
+                {
+                    "id": "Sao Paulo",
+                    "ids": [],
+                    "type": "legal_entity",
+                    "preferred_label": "Sao Paulo",
+                    "relation": "jurisdiction",
+                    "subconcept_of_labels": ["Brazil"],
+                },
+                {
+                    "id": "Brazil",
+                    "ids": [],
+                    "type": "law",
+                    "preferred_label": "Brazil",
+                    "relation": "principal_law",
+                    "subconcept_of_labels": [],
+                },
+                {
+                    "id": "National Climate Change Policy (Law No. 12187 of 2009)",
+                    "ids": [],
+                    "type": "law",
+                    "preferred_label": "National Climate Change Policy (Law No. 12187 of 2009)",
+                    "relation": "principal_law",
+                    "subconcept_of_labels": ["Brazil"],
+                },
+                {
+                    "id": "National Environmental Policy Act (Law No. 6.938 of 1981)",
+                    "ids": [],
+                    "type": "law",
+                    "preferred_label": "National Environmental Policy Act (Law No. 6.938 of 1981)",
+                    "relation": "principal_law",
+                    "subconcept_of_labels": ["Brazil"],
+                },
+                {
+                    "id": "Constitution of 1988",
+                    "ids": [],
+                    "type": "law",
+                    "preferred_label": "Constitution of 1988",
+                    "relation": "principal_law",
+                    "subconcept_of_labels": ["Brazil"],
+                },
+                {
+                    "id": "Climate damage",
+                    "ids": [],
+                    "type": "legal_category",
+                    "preferred_label": "Climate damage",
+                    "relation": "category",
+                    "subconcept_of_labels": ["Corporations"],
+                },
+                {
+                    "id": "Corporations",
+                    "ids": [],
+                    "type": "legal_category",
+                    "preferred_label": "Corporations",
+                    "relation": "category",
+                    "subconcept_of_labels": ["Suits against corporations, individuals"],
+                },
+                {
+                    "id": "Suits against corporations, individuals",
+                    "ids": [],
+                    "type": "legal_category",
+                    "preferred_label": "Suits against corporations, individuals",
+                    "relation": "category",
+                    "subconcept_of_labels": [],
+                },
+                {
+                    "id": "GHG emissions reduction",
+                    "ids": [],
+                    "type": "legal_category",
+                    "preferred_label": "GHG emissions reduction",
+                    "relation": "category",
+                    "subconcept_of_labels": ["Corporations"],
+                },
+            ],
+            [
+                VespaFamilyDocument.MetadataItem(
+                    name="concept.label", value="Sao Paulo State Court"
+                ),
+                VespaFamilyDocument.MetadataItem(name="concept.label", value="Brazil"),
+                VespaFamilyDocument.MetadataItem(
+                    name="concept.label", value="Sao Paulo"
+                ),
+                VespaFamilyDocument.MetadataItem(name="concept.label", value="Brazil"),
+                VespaFamilyDocument.MetadataItem(
+                    name="concept.label",
+                    value="National Climate Change Policy (Law No. 12187 of 2009)",
+                ),
+                VespaFamilyDocument.MetadataItem(
+                    name="concept.label",
+                    value="National Environmental Policy Act (Law No. 6.938 of 1981)",
+                ),
+                VespaFamilyDocument.MetadataItem(
+                    name="concept.label", value="Constitution of 1988"
+                ),
+                VespaFamilyDocument.MetadataItem(
+                    name="concept.label", value="Climate damage"
+                ),
+                VespaFamilyDocument.MetadataItem(
+                    name="concept.label", value="Corporations"
+                ),
+                VespaFamilyDocument.MetadataItem(
+                    name="concept.label",
+                    value="Suits against corporations, individuals",
+                ),
+                VespaFamilyDocument.MetadataItem(
+                    name="concept.label", value="GHG emissions reduction"
+                ),
+            ],
+        ),
+    ],
+)
+def test_reshape_concepts(concepts, expected):
+    result = reshape_concepts(concepts)
     assert result == expected
 
 
