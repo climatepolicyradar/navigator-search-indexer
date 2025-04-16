@@ -5,7 +5,6 @@ from typing import (
     Annotated,
     Generator,
     Mapping,
-    NamedTuple,
     NewType,
     Optional,
     Sequence,
