@@ -96,6 +96,7 @@ class VespaFamilyDocument(BaseModel):
     family_geography: str
     family_source: str
     document_import_id: str
+    document_identifiers: Sequence[str]
     document_slug: str
     document_languages: Sequence[str]
     document_md5_sum: Optional[str] = None
@@ -146,6 +147,12 @@ def get_document_generator(
             embeddings = np.load(BytesIO(task_array_file_like.read()))
 
         family_document_id = DocumentID(task.document_metadata.family_import_id)
+        document_identifiers = [
+            family_document_id,
+            task.document_id,
+            task.document_metadata.family_slug,
+            task.document_slug,
+        ]
         family_document = VespaFamilyDocument(
             search_weights_ref=f"id:{_NAMESPACE}:search_weights::{search_weights_id}",
             family_name=task.document_name,
@@ -161,6 +168,7 @@ def get_document_generator(
             family_geography=task.document_metadata.geography,
             family_source=task.document_metadata.source,
             document_import_id=task.document_id,
+            document_identifiers=document_identifiers,
             document_slug=task.document_slug,
             document_languages=task.document_metadata.languages,
             document_md5_sum=task.document_md5_sum,
