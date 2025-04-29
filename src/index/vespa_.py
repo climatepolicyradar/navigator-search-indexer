@@ -1,5 +1,5 @@
-from collections import defaultdict
 import logging
+from collections import defaultdict
 from pathlib import Path
 from typing import (
     Annotated,
@@ -16,18 +16,12 @@ from typing import (
 from cloudpathlib import S3Path
 from cpr_sdk.parser_models import ParserOutput, PDFTextBlock, VerticalFlipError
 from pydantic import BaseModel, Field
-from tenacity import (
-    retry,
-    wait_exponential,
-    stop_after_attempt,
-)
+from tenacity import retry, stop_after_attempt, wait_exponential
 from vespa.application import Vespa
 from vespa.io import VespaResponse
 
-
 from src import config
 from src.utils import filter_on_block_type, read_npy_file
-
 
 _LOGGER = logging.getLogger(__name__)
 SchemaName = NewType("SchemaName", str)
@@ -105,6 +99,7 @@ class VespaFamilyDocument(BaseModel):
     family_geography: str
     family_source: str
     document_import_id: str
+    document_identifiers: Sequence[str]
     document_slug: str
     document_languages: Sequence[str]
     document_md5_sum: Optional[str] = None
@@ -121,7 +116,7 @@ class VespaFamilyDocument(BaseModel):
 
 
 def reshape_metadata(
-    metadata: Optional[dict[str, list[str]]]
+    metadata: Optional[dict[str, list[str]]],
 ) -> Optional[list[VespaFamilyDocument.MetadataItem]]:
     if metadata is None:
         return None
@@ -157,6 +152,12 @@ def build_vespa_family_document(
         family_geography=task.document_metadata.geography,
         family_source=task.document_metadata.source,
         document_import_id=task.document_id,
+        document_identifiers=[
+            task.document_metadata.family_import_id,
+            task.document_id,
+            task.document_metadata.family_slug,
+            task.document_slug,
+        ],
         document_slug=task.document_slug,
         document_languages=task.document_metadata.languages,
         document_md5_sum=task.document_md5_sum,
@@ -324,7 +325,11 @@ def get_document_generator(
             document_passage = build_vespa_document_passage(
                 family_document_id, search_weights_ref, text_block, embedding
             )
-            yield DOCUMENT_PASSAGE_SCHEMA, document_psg_id, document_passage.model_dump()
+            yield (
+                DOCUMENT_PASSAGE_SCHEMA,
+                document_psg_id,
+                document_passage.model_dump(),
+            )
         # Cleanup stray docs
         stray_ids = determine_stray_ids(existing_doc_passage_ids, new_passage_ids)
         if stray_ids:
