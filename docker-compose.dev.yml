@@ -1,0 +1,20 @@
+services:
+  vespaindexertest:
+    image: vespaengine/vespa:8.396.18
+    container_name: vespaindexertest
+    ports:
+      - 8080:8080
+      - 19071:19071
+    healthcheck:
+      test: curl -s -f http://vespaindexertest:19071/status.html >/dev/null || exit 1
+      interval: 5s
+      timeout: 3s
+      retries: 30
+      start_period: 20s
+  navigator-search-indexer:
+    build:
+      context: .
+    entrypoint: []
+    environment:
+      VESPA_INSTANCE_URL: "http://vespaindexertest:8080/"
+      DEVELOPMENT_MODE: "True"

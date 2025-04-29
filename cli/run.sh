@@ -2,6 +2,8 @@
 set -e
 
 echo Setting up for vespa
+args=$@
+echo Running with args: $args
 
 mkdir -p $(dirname $VESPA_KEY_LOCATION)
 mkdir -p $(dirname $VESPA_CERT_LOCATION)
@@ -11,4 +13,4 @@ mkdir -p $(dirname $VESPA_CERT_LOCATION)
 echo "${VESPA_PRIVATE_KEY}" | openssl base64 -d -a -A --out ${VESPA_KEY_LOCATION}
 echo "${VESPA_PUBLIC_CERT}" | openssl base64 -d -a -A --out ${VESPA_CERT_LOCATION}
 
-python -m cli.index_data --s3 "${INDEXER_INPUT_PREFIX}" --index-type vespa
+python -m cli.index_data $args
