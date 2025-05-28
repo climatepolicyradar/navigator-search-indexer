@@ -131,8 +131,8 @@ def reshape_metadata(
         metadata_items.extend(
             [
                 VespaFamilyDocument.MetadataItem(
-                    name=key, 
-                    value=str(value) if isinstance(value, int) else value)
+                    name=key, value=str(value) if isinstance(value, int) else value
+                )
                 for value in values
             ]
         )
