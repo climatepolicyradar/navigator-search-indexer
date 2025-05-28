@@ -31,6 +31,10 @@ from tests.conftest import get_parser_output, FIXTURE_DIR
             [VespaFamilyDocument.MetadataItem(name="topic", value="Adaptation")],
         ),
         (
+            {"family.id": [192949]},
+            [VespaFamilyDocument.MetadataItem(name="family.id", value="192949")],
+        ),
+        (
             {
                 "hazard": [],
                 "sector": [
