@@ -14,8 +14,6 @@ updates:
       interval: monthly
     ignore:
       - dependency-name: cpr_sdk
-    reviewers:
-      - climatepolicyradar/deng
   - package-ecosystem: github-actions
     commit-message:
       prefix: feat
@@ -30,8 +28,6 @@ updates:
       interval: monthly
     ignore:
       - dependency-name: cpr_sdk
-    reviewers:
-      - climatepolicyradar/deng
   - package-ecosystem: pip
     commit-message:
       prefix: feat
@@ -47,5 +43,3 @@ updates:
     allow:
       - dependency-name: cpr_sdk
     target-branch: main
-    reviewers:
-      - climatepolicyradar/deng
