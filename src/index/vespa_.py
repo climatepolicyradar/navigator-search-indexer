@@ -15,7 +15,12 @@ from typing import (
 
 from cloudpathlib import S3Path
 from cpr_sdk.models.search import Passage
-from cpr_sdk.parser_models import ParserOutput, PDFTextBlock, VerticalFlipError
+from cpr_sdk.parser_models import (
+    ParserOutput,
+    PDFTextBlock,
+    VerticalFlipError,
+    TextBlock,
+)
 import json
 from pydantic import BaseModel, Field
 from tenacity import (
@@ -296,6 +301,20 @@ def join_concepts(
     return document_passage
 
 
+def passage_ids_match(
+    inference_result: dict[TextBlockId, list[VespaConcept]],
+    text_blocks: Sequence[TextBlock],
+) -> bool:
+    """"""
+    inference_result_passage_ids: list[TextBlockId] = list(inference_result.keys())
+    text_block_passage_ids: list[TextBlockId] = [
+        TextBlockId(text_block_id) for text_block_id in text_blocks
+    ]
+    if set(inference_result_passage_ids) == set(text_block_passage_ids):
+        return True
+    return False
+
+
 def get_document_generator(
     vespa: Vespa,
     paths: Sequence[S3Path],
@@ -369,7 +388,7 @@ def get_document_generator(
         # Enrich the passage with concepts from S3 Inference Results if they exist so
         # as to not wipe concepts when indexing. The following is an interrim solution
         # whilst platform work towards a more complete solution to consolidate indexers.
-        INFERENCE_RESULTS_MATCH: bool = False
+        PASSAGE_IDS_MATCH: bool = False
         INFERENCE_RESULT: dict[
             TextBlockId, list[VespaConcept]
         ] | None = retrieve_inference_result(
@@ -378,14 +397,9 @@ def get_document_generator(
         )
 
         if INFERENCE_RESULT:
-            inference_result_passage_ids: list[TextBlockId] = list(
-                INFERENCE_RESULT.keys()
+            PASSAGE_IDS_MATCH: bool = passage_ids_match(
+                inference_result=INFERENCE_RESULT, text_blocks=text_blocks
             )
-            text_block_passage_ids: list[TextBlockId] = [
-                TextBlockId(text_block_id) for text_block_id in text_blocks
-            ]
-            if set(inference_result_passage_ids) == set(text_block_passage_ids):
-                INFERENCE_RESULTS_MATCH = True
 
         # Note that the first embedding item is the doc description
         # The rest are text blocks
@@ -398,7 +412,7 @@ def get_document_generator(
                 family_document_id, search_weights_ref, text_block, embedding
             )
 
-            if INFERENCE_RESULT and INFERENCE_RESULTS_MATCH:
+            if INFERENCE_RESULT and PASSAGE_IDS_MATCH:
                 document_passage: VespaDocumentPassage = join_concepts(
                     document_passage, INFERENCE_RESULT
                 )
