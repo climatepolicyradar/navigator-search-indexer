@@ -1,13 +1,18 @@
+from cloudpathlib import S3Path
+from cpr_sdk.models.search import Passage
 from cpr_sdk.parser_models import BlockType, ParserOutput, PDFTextBlock
 import numpy as np
 import pytest
 
 from src.index.vespa_ import (
     TextBlockId,
+    VespaConcept,
     build_vespa_family_document,
     build_vespa_document_passage,
     get_existing_passage_ids,
+    join_concepts,
     passage_ids_match,
+    retrieve_inference_result,
     reshape_metadata,
     remove_ids,
     determine_stray_ids,
@@ -22,6 +27,9 @@ from src.index.vespa_ import (
 )
 
 from tests.conftest import FIXTURE_DIR, INFERENCE_RESULTS_DIR, get_parser_output
+
+
+INFERENCE_RESULTS_FIXTURE = FIXTURE_DIR / "inference_results"
 
 
 @pytest.mark.parametrize(
@@ -83,6 +91,69 @@ def test_build_vespa_document_passage():
         embedding=np.array([-0.11900115, 0.17448892]),
     )
     VespaDocumentPassage.model_validate(model)
+
+
+def test_join_concepts():
+    """Test join_concepts sets concepts on passage from inference result by text_block_id."""
+    parser_output: ParserOutput = get_parser_output(1, 1)
+    text_block: PDFTextBlock = parser_output.pdf_data.text_blocks[0]
+
+    # Document Passage and Inference Result with Matching Passage Id's
+    document_passage: VespaDocumentPassage = build_vespa_document_passage(
+        family_document_id="doc.1.1",
+        search_weights_ref="id:doc_search:weight::default",
+        text_block=text_block,
+        embedding=np.array([-0.11900115, 0.17448892]),
+    )
+    concepts: list[VespaConcept] = [
+        VespaConcept.model_validate(
+            {
+                "name": "test_concept",
+                "id": "c1",
+                "parent_concepts": [],
+                "parent_concept_ids_flat": "",
+                "start": 0,
+                "end": 10,
+                "model": "test",
+                "timestamp": "2024-01-01T00:00:00",
+            }
+        )
+    ]
+    inference_result: dict[TextBlockId, list[VespaConcept]] = {
+        TextBlockId(document_passage.text_block_id): concepts
+    }
+    result = join_concepts(document_passage, inference_result)
+    assert result.concepts is not None
+    assert (
+        result.concepts == inference_result[TextBlockId(document_passage.text_block_id)]
+    )
+
+    # Inference Result that Doesn't match
+    document_passage.concepts = []
+    inference_result = {TextBlockId("NON_EXISTENT.executive.1.1"): concepts}
+    result_empty = join_concepts(document_passage, inference_result)
+    assert result_empty.concepts == []
+
+
+def test_retrieve_inference_result__returns_data(s3_mock, family_document_ids):
+    """Test retrieve_inference_result reads and parses inference result from S3."""
+    result = retrieve_inference_result(
+        S3Path(s3_mock.inference_results_path), family_document_ids[0]
+    )
+
+    assert result is not None
+    assert isinstance(result, dict)
+    for text_block_id, concepts in result.items():
+        assert isinstance(text_block_id, str)
+        assert all(isinstance(c, Passage.Concept) for c in concepts)
+
+
+def test_retrieve_inference_result__returns_none_when_missing(s3_mock):
+    """Test retrieve_inference_result returns None when file does not exist."""
+    result = retrieve_inference_result(
+        S3Path(s3_mock.inference_results_path), "NON_EXISTENT.document.1.1"
+    )
+    assert result is None
 
 
 @pytest.mark.usefixtures("cleanup_test_vespa_before", "cleanup_test_vespa_after")

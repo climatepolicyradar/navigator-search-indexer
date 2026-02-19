@@ -277,7 +277,7 @@ def retrieve_inference_result(
     )
     inference_result: dict[TextBlockId, list[VespaConcept]] = {
         TextBlockId(id): [VespaConcept.model_validate(c) for c in concepts]
-        for id, concepts in inference_result_data
+        for id, concepts in inference_result_data.items()
     }
 
     return inference_result

@@ -214,6 +214,14 @@ def s3_mock(s3_bucket_and_region, family_document_ids):
                 Body=npy_path.read_bytes(),
             )
 
+        inference_results_prefix = "inference-results"
+        inference_result_path = INFERENCE_RESULTS_DIR / f"{family_document_ids[0]}.json"
+        s3.put_object(
+            Bucket=bucket,
+            Key=f"{inference_results_prefix}/{family_document_ids[0]}.json",
+            Body=inference_result_path.read_bytes(),
+        )
+
         def prepare(doc_id: str, limit: int | None) -> None:
             s3_client = boto3.client("s3", region_name=s3_bucket_and_region["region"])
             _upload_s3_doc(
@@ -224,9 +232,11 @@ def s3_mock(s3_bucket_and_region, family_document_ids):
                 limit,
             )
 
-        inference_results_path = f"s3://{bucket}/inference-results"
+        inference_results_path = f"s3://{bucket}/{inference_results_prefix}"
         yield SimpleNamespace(
             path=f"s3://{bucket}/{prefix}",
             inference_results_path=inference_results_path,
+            bucket=bucket,
+            region=s3_bucket_and_region["region"],
             prepare=prepare,
         )
