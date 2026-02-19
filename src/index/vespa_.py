@@ -15,10 +15,11 @@ from typing import (
 )
 
 from cloudpathlib import S3Path
-from cpr_sdk.models.search import Concept as VespaConcept
+from cpr_sdk.models.search import Passage
 from cpr_sdk.parser_models import ParserOutput, PDFTextBlock, VerticalFlipError
 import json
 from pydantic import BaseModel, Field
+from pydantic._internal._model_construction import ModelMetaclass
 from tenacity import (
     retry,
     wait_exponential,
@@ -32,6 +33,7 @@ from src import config
 from src.utils import filter_on_block_type, read_npy_file
 
 
+VespaConcept: ModelMetaclass = Passage.Concept
 _LOGGER = logging.getLogger(__name__)
 SchemaName = NewType("SchemaName", str)
 DocumentID = NewType("DocumentID", str)
