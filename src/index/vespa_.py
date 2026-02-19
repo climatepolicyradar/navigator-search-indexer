@@ -3,6 +3,7 @@ import logging
 from pathlib import Path
 from typing import (
     Annotated,
+    Any,
     Generator,
     Mapping,
     NewType,
@@ -14,7 +15,9 @@ from typing import (
 )
 
 from cloudpathlib import S3Path
+from cpr_sdk.models.search import Concept as VespaConcept
 from cpr_sdk.parser_models import ParserOutput, PDFTextBlock, VerticalFlipError
+import json
 from pydantic import BaseModel, Field
 from tenacity import (
     retry,
@@ -34,6 +37,7 @@ SchemaName = NewType("SchemaName", str)
 DocumentID = NewType("DocumentID", str)
 Coord = tuple[float, float]
 TextCoords = Sequence[Coord]  # TODO: Could do better - look at data access change
+TextBlockId = NewType("TextBlockId", str)
 SEARCH_WEIGHTS_SCHEMA = SchemaName("search_weights")
 FAMILY_DOCUMENT_SCHEMA = SchemaName("family_document")
 DOCUMENT_PASSAGE_SCHEMA = SchemaName("document_passage")
@@ -78,6 +82,7 @@ class VespaDocumentPassage(BaseModel):
     text_block_page: Optional[Annotated[int, Field(ge=0)]] = None
     text_block_coords: Optional[TextCoords] = None
     text_embedding: Annotated[list[float], 768]
+    concepts: list[VespaConcept] = []
 
 
 class VespaFamilyDocument(BaseModel):
@@ -245,6 +250,52 @@ def remove_ids(vespa: Vespa, stray_ids: list[str]):
         )
 
 
+def retrieve_inference_result(
+    inference_results_s3_path: S3Path, document_id: str
+) -> dict[TextBlockId, list[VespaConcept]] | None:
+    """Retrieve an individual inference results file from S3 for a document."""
+
+    root_document_s3_path: S3Path = inference_results_s3_path / f"{document_id}.json"
+    translated_document_s3_path: S3Path = (
+        inference_results_s3_path / f"{document_id}_translated_en.json"
+    )
+
+    if root_document_s3_path.exists():
+        inference_result_s3_path: S3Path = root_document_s3_path
+    elif translated_document_s3_path.exists():
+        inference_result_s3_path: S3Path = translated_document_s3_path
+    else:
+        return None
+
+    inference_result_data: dict[str, Any] = json.loads(
+        inference_result_s3_path.read_text()
+    )
+    inference_result: dict[TextBlockId, list[VespaConcept]] = {
+        TextBlockId(id): [VespaConcept.model_validate(c) for c in concepts]
+        for id, concepts in inference_result_data
+    }
+
+    return inference_result
+
+
+def join_concepts(
+    document_passage: VespaDocumentPassage,
+    inference_result: dict[
+        TextBlockId,
+        list[VespaConcept],
+    ],
+) -> VespaDocumentPassage:
+    """Join Concepts from inference results on VespaDocumentPassage using the ID."""
+
+    concepts: list[VespaConcept] = inference_result.get(
+        TextBlockId(document_passage.text_block_id), []
+    )
+
+    document_passage.concepts = concepts
+
+    return document_passage
+
+
 def get_document_generator(
     vespa: Vespa,
     paths: Sequence[Union[S3Path, Path]],
@@ -270,6 +321,13 @@ def get_document_generator(
         passage_weight=1.0,
     )
     yield SEARCH_WEIGHTS_SCHEMA, search_weights_id, search_weights.model_dump()
+
+    RUNNING_AGAINST_S3: bool = isinstance(embedding_dir_as_path, S3Path)
+    INFERENCE_RESULTS_S3_PATH: S3Path | None = (
+        (embedding_dir_as_path.parent.parent / "inference_results/latest/")
+        if RUNNING_AGAINST_S3
+        else None
+    )
 
     _LOGGER.info(
         "Filtering unwanted text block types.",
@@ -316,6 +374,35 @@ def get_document_generator(
 
         new_passage_ids = []
 
+        # Enrich the passage with concepts from S3 Inference Results if they exist so
+        # as to not wipe concepts when indexing. The following is an interrim solution
+        # whilst platform work towards a more complete solution to consolidate indexers.
+        INFERENCE_RESULTS_MATCH: bool = False
+        INFERENCE_RESULT: dict[TextBlockId, list[VespaConcept]] | None = None
+
+        if RUNNING_AGAINST_S3 and INFERENCE_RESULTS_S3_PATH:
+            try:
+                INFERENCE_RESULT = retrieve_inference_result(
+                    inference_results_s3_path=INFERENCE_RESULTS_S3_PATH,
+                    document_id=task.document_id,
+                )
+
+                if INFERENCE_RESULT:
+                    inference_result_passage_ids: list[TextBlockId] = list(
+                        INFERENCE_RESULT.keys()
+                    )
+                    text_block_passage_ids: list[TextBlockId] = [
+                        TextBlockId(text_block_id) for text_block_id in text_blocks
+                    ]
+                    if set(inference_result_passage_ids) == set(text_block_passage_ids):
+                        INFERENCE_RESULTS_MATCH = True
+
+            except Exception as e:
+                _LOGGER.warning(
+                    f"Failed to load inference results for document {task.document_id} at: "
+                    f"{INFERENCE_RESULTS_S3_PATH}: {e}"
+                )
+
         # Note that the first embedding item is the doc description
         # The rest are text blocks
         for document_passage_idx, (text_block, embedding) in enumerate(
@@ -323,9 +410,21 @@ def get_document_generator(
         ):
             document_psg_id = DocumentID(f"{task.document_id}.{document_passage_idx}")
             new_passage_ids.append(document_psg_id)
-            document_passage = build_vespa_document_passage(
+            document_passage: VespaDocumentPassage = build_vespa_document_passage(
                 family_document_id, search_weights_ref, text_block, embedding
             )
+
+            if INFERENCE_RESULT and INFERENCE_RESULTS_MATCH:
+                try:
+                    document_passage: VespaDocumentPassage = join_concepts(
+                        document_passage, INFERENCE_RESULT
+                    )
+                except Exception as e:
+                    _LOGGER.warning(
+                        "Failed to join concepts to document passage for "
+                        f"{task.document_id}: {e}"
+                    )
+
             yield DOCUMENT_PASSAGE_SCHEMA, document_psg_id, document_passage.model_dump()
         # Cleanup stray docs
         stray_ids = determine_stray_ids(existing_doc_passage_ids, new_passage_ids)
