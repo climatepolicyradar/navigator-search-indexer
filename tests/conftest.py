@@ -1,10 +1,13 @@
 import json
-import pytest as pytest
 import os
-from cloudpathlib import S3Path
-
+import pytest as pytest
+from moto import mock_aws
+from io import BytesIO
+import numpy as np
+import boto3
 from pathlib import Path
 from datetime import datetime
+from types import SimpleNamespace
 
 from vespa.application import Vespa
 from tenacity import RetryError
@@ -84,26 +87,21 @@ def get_parser_output(document_id: int, family_id: int) -> ParserOutput:
 
 
 @pytest.fixture
+def family_document_ids():
+    """Document IDs for integration test fixtures in s3_files."""
+    return [
+        "CCLW.executive.10014.4470",
+        "CCLW.executive.10002.4495",
+        "CCLW.document.i00000004.n0000",
+    ]
+
+
+@pytest.fixture
 def s3_bucket_and_region() -> dict:
     return {
         "bucket": "test-bucket",
         "region": "eu-west-1",
     }
-
-
-@pytest.fixture
-def indexer_input_prefix():
-    return "indexer-input"
-
-
-@pytest.fixture
-def embeddings_dir_as_path(
-    s3_bucket_and_region,
-    indexer_input_prefix,
-) -> S3Path:
-    return S3Path(
-        os.path.join("s3://", s3_bucket_and_region["bucket"], indexer_input_prefix)
-    )
 
 
 @pytest.fixture
@@ -142,3 +140,87 @@ def cleanup_test_vespa_after(test_vespa):
 def cleanup_test_vespa_before(test_vespa):
     cleanup_test_vespa(test_vespa)
     yield
+
+
+def _upload_s3_doc(
+    s3_client,
+    bucket: str,
+    prefix: str,
+    doc_id: str,
+    limit: int | None,
+) -> None:
+    """Upload a (possibly shortened) fixture doc to moto-mocked S3."""
+
+    json_path = FIXTURE_DIR / "s3_files" / f"{doc_id}.json"
+    npy_path = FIXTURE_DIR / "s3_files" / f"{doc_id}.npy"
+    family_document = ParserOutput.model_validate_json(json_path.read_text())
+    embedding = np.load(npy_path)
+
+    if limit is not None:
+        family_document.pdf_data.page_metadata = family_document.pdf_data.page_metadata[
+            :limit
+        ]
+        family_document.pdf_data.text_blocks = family_document.pdf_data.text_blocks[
+            :limit
+        ]
+        embedding = embedding[:limit]
+
+    s3_client.put_object(
+        Bucket=bucket,
+        Key=f"{prefix}/{doc_id}.json",
+        Body=family_document.model_dump_json().encode(),
+    )
+    buf = BytesIO()
+    np.save(buf, embedding)
+    s3_client.put_object(
+        Bucket=bucket,
+        Key=f"{prefix}/{doc_id}.npy",
+        Body=buf.getvalue(),
+    )
+
+
+@pytest.fixture
+def s3_mock(s3_bucket_and_region, family_document_ids):
+    """
+    Mock S3 using moto. Creates bucket and populates with fixture docs.
+
+    Yields object with .path (S3 URI for CLI) and .prepare(doc_id, limit) for overwrites.
+    """
+    with mock_aws():
+        s3 = boto3.client(
+            "s3",
+            region_name=s3_bucket_and_region["region"],
+        )
+        bucket = s3_bucket_and_region["bucket"]
+        s3.create_bucket(
+            Bucket=bucket,
+            CreateBucketConfiguration={
+                "LocationConstraint": s3_bucket_and_region["region"],
+            },
+        )
+        prefix = "indexer-input"
+        for doc_id in family_document_ids:
+            json_path = FIXTURE_DIR / "s3_files" / f"{doc_id}.json"
+            npy_path = FIXTURE_DIR / "s3_files" / f"{doc_id}.npy"
+            s3.put_object(
+                Bucket=bucket,
+                Key=f"{prefix}/{doc_id}.json",
+                Body=json_path.read_bytes(),
+            )
+            s3.put_object(
+                Bucket=bucket,
+                Key=f"{prefix}/{doc_id}.npy",
+                Body=npy_path.read_bytes(),
+            )
+
+        def prepare(doc_id: str, limit: int | None) -> None:
+            s3_client = boto3.client("s3", region_name=s3_bucket_and_region["region"])
+            _upload_s3_doc(
+                s3_client,
+                s3_bucket_and_region["bucket"],
+                prefix,
+                doc_id,
+                limit,
+            )
+
+        yield SimpleNamespace(path=f"s3://{bucket}/{prefix}", prepare=prepare)
