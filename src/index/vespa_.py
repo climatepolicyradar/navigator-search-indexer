@@ -305,10 +305,10 @@ def passage_ids_match(
     inference_result: dict[TextBlockId, list[VespaConcept]],
     text_blocks: Sequence[TextBlock],
 ) -> bool:
-    """"""
+    """Compare ids of passages in an inference result against text blocks for a match."""
     inference_result_passage_ids: list[TextBlockId] = list(inference_result.keys())
     text_block_passage_ids: list[TextBlockId] = [
-        TextBlockId(text_block_id) for text_block_id in text_blocks
+        TextBlockId(tb.text_block_id) for tb in text_blocks
     ]
     if set(inference_result_passage_ids) == set(text_block_passage_ids):
         return True

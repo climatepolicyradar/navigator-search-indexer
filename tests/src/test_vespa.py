@@ -1,11 +1,13 @@
-from cpr_sdk.parser_models import ParserOutput
+from cpr_sdk.parser_models import BlockType, ParserOutput, PDFTextBlock
 import numpy as np
 import pytest
 
 from src.index.vespa_ import (
+    TextBlockId,
     build_vespa_family_document,
     build_vespa_document_passage,
     get_existing_passage_ids,
+    passage_ids_match,
     reshape_metadata,
     remove_ids,
     determine_stray_ids,
@@ -128,6 +130,71 @@ def test_determine_stray_ids():
         new_passage_ids=new_passage_ids,
     )
     assert sorted(stray_ids) == ["C.1.4", "C.1.5"]
+
+
+def test_passage_ids_match():
+    """Test passage_ids_match compares inference result keys with text block ids."""
+    parser_output = get_parser_output(1, 1)
+    parser_output.pdf_data.text_blocks = [
+        PDFTextBlock(
+            text=["test_text"],
+            text_block_id="p_1_b_0",
+            type=BlockType.TEXT,
+            type_confidence=1.0,
+            coords=[(0, 0), (0, 0), (0, 0), (0, 0)],
+            page_number=1,
+        ),
+        PDFTextBlock(
+            text=["test_text"],
+            text_block_id="p_1_b_1",
+            type=BlockType.TEXT,
+            type_confidence=1.0,
+            coords=[(0, 0), (0, 0), (0, 0), (0, 0)],
+            page_number=1,
+        ),
+        PDFTextBlock(
+            text=["test_text"],
+            text_block_id="p_1_b_2",
+            type=BlockType.TEXT,
+            type_confidence=1.0,
+            coords=[(0, 0), (0, 0), (0, 0), (0, 0)],
+            page_number=1,
+        ),
+    ]
+    text_blocks = parser_output.get_text_blocks()
+    assert len(text_blocks) == 3
+
+    block_ids = [tb.text_block_id for tb in text_blocks]
+
+    # Match: inference keys equal text block ids
+    inference_match = {TextBlockId(bid): [] for bid in block_ids}
+    assert passage_ids_match(inference_match, text_blocks) is True
+
+    # No match: different ids
+    inference_mismatch = {TextBlockId("other_id"): []}
+    assert passage_ids_match(inference_mismatch, text_blocks) is False
+
+    # No match: inference has extra id
+    inference_extra = {
+        TextBlockId(block_ids[0]): [],
+        TextBlockId(block_ids[1]): [],
+        TextBlockId(block_ids[2]): [],
+        TextBlockId("extra_id"): [],
+    }
+    assert passage_ids_match(inference_extra, text_blocks) is False
+
+    # No match: inference missing one id
+    inference_missing = {
+        TextBlockId(block_ids[0]): [],
+        TextBlockId(block_ids[1]): [],
+    }
+    assert passage_ids_match(inference_missing, text_blocks) is False
+
+    # No match: inference missing id (empty)
+    assert passage_ids_match({}, text_blocks) is False
+
+    # Match: both empty
+    assert passage_ids_match({}, []) is True
 
 
 @pytest.mark.usefixtures("cleanup_test_vespa_before", "cleanup_test_vespa_after")
