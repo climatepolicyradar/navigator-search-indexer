@@ -41,8 +41,6 @@ def test_integration(test_vespa, s3_mock, family_document_ids):
         run_as_cli,
         args=[
             s3_mock.path,
-            "--index-type",
-            "vespa",
             "--files-to-index",
             json.dumps(family_document_ids),
         ],
@@ -122,8 +120,6 @@ def test_repeated_integration(test_vespa, s3_mock, family_document_ids):
         run_as_cli,
         args=[
             s3_mock.path,
-            "--index-type",
-            "vespa",
             "--files-to-index",
             json.dumps(family_document_ids),
         ],
@@ -150,8 +146,6 @@ def test_repeated_integration(test_vespa, s3_mock, family_document_ids):
         run_as_cli,
         args=[
             s3_mock.path,
-            "--index-type",
-            "vespa",
             "--files-to-index",
             json.dumps([CHANGE_FAMILY]),
         ],
@@ -185,8 +179,6 @@ def test_repeated_integration(test_vespa, s3_mock, family_document_ids):
         run_as_cli,
         args=[
             s3_mock.path,
-            "--index-type",
-            "vespa",
             "--files-to-index",
             json.dumps([CHANGE_FAMILY]),
         ],
@@ -219,8 +211,6 @@ def test_repeated_integration(test_vespa, s3_mock, family_document_ids):
         run_as_cli,
         args=[
             s3_mock.path,
-            "--index-type",
-            "vespa",
             "--files-to-index",
             json.dumps([CHANGE_FAMILY]),
         ],
