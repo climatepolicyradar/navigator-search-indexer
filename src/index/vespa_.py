@@ -370,29 +370,22 @@ def get_document_generator(
         # as to not wipe concepts when indexing. The following is an interrim solution
         # whilst platform work towards a more complete solution to consolidate indexers.
         INFERENCE_RESULTS_MATCH: bool = False
-        INFERENCE_RESULT: dict[TextBlockId, list[VespaConcept]] | None = None
+        INFERENCE_RESULT: dict[
+            TextBlockId, list[VespaConcept]
+        ] | None = retrieve_inference_result(
+            inference_results_s3_path=inference_results_s3_path,
+            document_id=task.document_id,
+        )
 
-        try:
-            INFERENCE_RESULT = retrieve_inference_result(
-                inference_results_s3_path=inference_results_s3_path,
-                document_id=task.document_id,
+        if INFERENCE_RESULT:
+            inference_result_passage_ids: list[TextBlockId] = list(
+                INFERENCE_RESULT.keys()
             )
-
-            if INFERENCE_RESULT:
-                inference_result_passage_ids: list[TextBlockId] = list(
-                    INFERENCE_RESULT.keys()
-                )
-                text_block_passage_ids: list[TextBlockId] = [
-                    TextBlockId(text_block_id) for text_block_id in text_blocks
-                ]
-                if set(inference_result_passage_ids) == set(text_block_passage_ids):
-                    INFERENCE_RESULTS_MATCH = True
-
-        except Exception as e:
-            _LOGGER.warning(
-                f"Failed to load inference results for document {task.document_id} at: "
-                f"{inference_results_s3_path}: {e}"
-            )
+            text_block_passage_ids: list[TextBlockId] = [
+                TextBlockId(text_block_id) for text_block_id in text_blocks
+            ]
+            if set(inference_result_passage_ids) == set(text_block_passage_ids):
+                INFERENCE_RESULTS_MATCH = True
 
         # Note that the first embedding item is the doc description
         # The rest are text blocks
@@ -406,15 +399,9 @@ def get_document_generator(
             )
 
             if INFERENCE_RESULT and INFERENCE_RESULTS_MATCH:
-                try:
-                    document_passage: VespaDocumentPassage = join_concepts(
-                        document_passage, INFERENCE_RESULT
-                    )
-                except Exception as e:
-                    _LOGGER.warning(
-                        "Failed to join concepts to document passage for "
-                        f"{task.document_id}: {e}"
-                    )
+                document_passage: VespaDocumentPassage = join_concepts(
+                    document_passage, INFERENCE_RESULT
+                )
 
             yield DOCUMENT_PASSAGE_SCHEMA, document_psg_id, document_passage.model_dump()
         # Cleanup stray docs
