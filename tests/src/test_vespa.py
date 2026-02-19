@@ -19,7 +19,7 @@ from src.index.vespa_ import (
     _SCHEMAS_TO_PROCESS,
 )
 
-from tests.conftest import get_parser_output, FIXTURE_DIR
+from tests.conftest import FIXTURE_DIR, INFERENCE_RESULTS_DIR, get_parser_output
 
 
 @pytest.mark.parametrize(
@@ -133,11 +133,11 @@ def test_determine_stray_ids():
 @pytest.mark.usefixtures("cleanup_test_vespa_before", "cleanup_test_vespa_after")
 def test_get_document_generator(test_vespa):
     """Assert that the vespa document generator works as expected."""
-    embedding_dir_as_path = FIXTURE_DIR / "s3_files"
+    indexer_input_s3_path = FIXTURE_DIR / "s3_files"
     paths = [
-        embedding_dir_as_path / "CCLW.executive.10002.4495.json",
-        embedding_dir_as_path / "CCLW.executive.10014.4470.json",
-        embedding_dir_as_path / "CCLW.document.i00000004.n0000.json",
+        indexer_input_s3_path / "CCLW.executive.10002.4495.json",
+        indexer_input_s3_path / "CCLW.executive.10014.4470.json",
+        indexer_input_s3_path / "CCLW.document.i00000004.n0000.json",
     ]
 
     fixture_doc_ids = []
@@ -147,7 +147,9 @@ def test_get_document_generator(test_vespa):
         fixture_doc_ids.append(fixture_content.document_id)
         fixture_text_blocks.extend(fixture_content.text_blocks)
 
-    generator = get_document_generator(test_vespa, paths, embedding_dir_as_path)
+    generator = get_document_generator(
+        test_vespa, paths, indexer_input_s3_path, INFERENCE_RESULTS_DIR
+    )
 
     EXPECTED_DOCUMENTS = 3
     EXPECTED_PASSAGES = 1978

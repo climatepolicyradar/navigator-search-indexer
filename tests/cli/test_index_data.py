@@ -3,6 +3,7 @@ from pathlib import Path
 import pytest
 from vespa.application import Vespa
 
+from tests.conftest import INFERENCE_RESULTS_DIR
 from src.index.vespa_ import (
     _NAMESPACE,
     DOCUMENT_PASSAGE_SCHEMA,
@@ -59,7 +60,8 @@ def test_vespa_document_generator(
     doc_generator = get_document_generator(
         vespa=test_vespa,
         paths=paths,
-        embedding_dir_as_path=test_input_dir,
+        indexer_input_s3_path=test_input_dir,
+        inference_results_s3_path=INFERENCE_RESULTS_DIR,
     )
 
     id_start_string = f"id:{_NAMESPACE}"

@@ -25,6 +25,7 @@ from src.config import VESPA_INSTANCE_URL
 
 
 FIXTURE_DIR = Path(__file__).parent / "fixtures"
+INFERENCE_RESULTS_DIR = FIXTURE_DIR / "inference_results"
 VESPA_TEST_ENDPOINT = os.getenv("VESPA_INSTANCE_URL", "http://localhost:8080")
 
 
@@ -223,4 +224,9 @@ def s3_mock(s3_bucket_and_region, family_document_ids):
                 limit,
             )
 
-        yield SimpleNamespace(path=f"s3://{bucket}/{prefix}", prepare=prepare)
+        inference_results_path = f"s3://{bucket}/inference-results"
+        yield SimpleNamespace(
+            path=f"s3://{bucket}/{prefix}",
+            inference_results_path=inference_results_path,
+            prepare=prepare,
+        )
