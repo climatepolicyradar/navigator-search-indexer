@@ -9,8 +9,6 @@ from typing import (
     Optional,
     Sequence,
     Tuple,
-    Union,
-    cast,
 )
 
 from cloudpathlib import S3Path
@@ -247,8 +245,8 @@ def remove_ids(vespa: Vespa, stray_ids: list[str]):
 
 def get_document_generator(
     vespa: Vespa,
-    paths: Sequence[Union[S3Path, Path]],
-    embedding_dir_as_path: Union[Path, S3Path],
+    paths: Sequence[S3Path],
+    embedding_dir_as_path: S3Path,
 ) -> Generator[Tuple[SchemaName, DocumentID, dict], None, None]:
     """
     Get generator for documents to index.
@@ -285,9 +283,7 @@ def get_document_generator(
             input=task, remove_block_types=config.BLOCKS_TO_FILTER
         )
 
-        task_array_file_path = cast(
-            Path, embedding_dir_as_path / f"{task.document_id}.npy"
-        )
+        task_array_file_path = embedding_dir_as_path / f"{task.document_id}.npy"
         embeddings = read_npy_file(task_array_file_path)
 
         family_document_id = DocumentID(task.document_metadata.import_id)
@@ -420,8 +416,8 @@ def _batch_ingest(vespa: Vespa, to_process: Mapping[SchemaName, list]):
 
 
 def populate_vespa(
-    paths: Sequence[Union[Path, S3Path]],
-    embedding_dir_as_path: Union[Path, S3Path],
+    paths: Sequence[S3Path],
+    embedding_dir_as_path: S3Path,
 ) -> None:
     """
     Index documents into Vespa.

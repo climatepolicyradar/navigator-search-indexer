@@ -1,5 +1,6 @@
 import os
 import sys
+import json
 import time
 import logging
 import logging.config
@@ -7,8 +8,9 @@ from typing import Optional
 
 import click
 
-from src.index.vespa_ import populate_vespa
-from src.utils import build_indexer_input_path, get_index_paths
+from cloudpathlib import S3Path
+
+from src.index.vespa_ import populate_vespa, DocumentID
 
 LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO").upper()
 DEFAULT_LOGGING = {
@@ -38,14 +40,8 @@ os.environ["CLOUPATHLIB_FILE_CACHE_MODE"] = "close_file"
 @click.command()
 @click.argument("indexer_input_dir")
 @click.option(
-    "--s3",
-    is_flag=True,
-    required=False,
-    help="Whether or not we are reading from and writing to S3.",
-)
-@click.option(
     "--files-to-index",
-    required=False,
+    required=True,
     help="Comma-separated list of IDs of files to index.",
 )
 @click.option(
@@ -55,6 +51,7 @@ os.environ["CLOUPATHLIB_FILE_CACHE_MODE"] = "close_file"
     required=False,
     help="Optionally limit the number of documents to index.",
 )
+# TODO: Remove
 @click.option(
     "--index-type",
     "-i",
@@ -65,7 +62,6 @@ os.environ["CLOUPATHLIB_FILE_CACHE_MODE"] = "close_file"
 )
 def run_as_cli(
     indexer_input_dir: str,
-    s3: bool,
     files_to_index: Optional[str],
     limit: Optional[int],
     index_type: str,
@@ -76,14 +72,25 @@ def run_as_cli(
     elif index_type.lower() == "vespa":
         _LOGGER.warning("Vespa indexing still experimental")
 
-        indexer_input_path = build_indexer_input_path(indexer_input_dir, s3)
-        paths = get_index_paths(indexer_input_path, files_to_index, limit)
+        indexer_input_path = S3Path(indexer_input_dir)
+
+        document_ids: list[DocumentID] = [
+            DocumentID(doc_id) for doc_id in json.loads(files_to_index)
+        ]
+        document_s3_paths: list[S3Path] = [
+            indexer_input_path / f"{document_id}.json" for document_id in document_ids
+        ]
 
         start = time.time()
-        populate_vespa(paths=paths, embedding_dir_as_path=indexer_input_path)
+        # TODO: Confirm how we handle missing files.
+        populate_vespa(
+            paths=document_s3_paths, embedding_dir_as_path=indexer_input_path
+        )
         duration = time.time() - start
+
         _LOGGER.info(f"Vespa indexing completed after: {duration}s")
         sys.exit(0)
+
     _LOGGER.error(f"Unknown index type: {index_type}")
     sys.exit(1)
 
