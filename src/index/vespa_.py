@@ -417,7 +417,9 @@ def get_document_generator(
                     document_passage, INFERENCE_RESULT
                 )
 
-            yield DOCUMENT_PASSAGE_SCHEMA, document_psg_id, document_passage.model_dump()
+            yield DOCUMENT_PASSAGE_SCHEMA, document_psg_id, document_passage.model_dump(
+                mode="json"
+            )
         # Cleanup stray docs
         stray_ids = determine_stray_ids(existing_doc_passage_ids, new_passage_ids)
         if stray_ids:

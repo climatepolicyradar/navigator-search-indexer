@@ -8,6 +8,8 @@ from cpr_sdk.parser_models import ParserOutput
 import numpy as np
 import pytest
 from vespa.application import Vespa
+from vespa.io import VespaQueryResponse
+from typing import Any
 
 from cli.index_data import run_as_cli
 from conftest import FIXTURE_DIR, VESPA_TEST_ENDPOINT
@@ -16,6 +18,7 @@ from src.index.vespa_ import (
     SEARCH_WEIGHTS_SCHEMA,
     FAMILY_DOCUMENT_SCHEMA,
     _NAMESPACE,
+    DocumentID,
     get_existing_passage_ids,
 )
 
@@ -262,3 +265,63 @@ def test_repeated_integration(test_vespa, s3_mock, family_document_ids):
     assert sorted(change_family_passages_1) == sorted(change_family_passages_4)
     assert sorted(change_family_passages_1) != sorted(change_family_passages_2)
     assert sorted(change_family_passages_1) != sorted(change_family_passages_3)
+
+
+@patch.object(config, "VESPA_INSTANCE_URL", new=VESPA_TEST_ENDPOINT)
+@patch.object(config, "DEVELOPMENT_MODE", new="true")
+@pytest.mark.usefixtures("cleanup_test_vespa_before", "cleanup_test_vespa_after")
+def test_concept_enrichment_integration(test_vespa, s3_mock):
+    """Test that we successfully index enriched concepts."""
+
+    DOCUMENT_ID: DocumentID = DocumentID("CCLW.executive.10014.4470")
+    json_path = FIXTURE_DIR / "inference_results" / f"{DOCUMENT_ID}.json"
+    inference_results: list[dict[str, Any]] = json.loads(json_path.read_text())
+    DOCUMENT_PASSAAGES_WITH_CONCEPTS = len(
+        [
+            passage_id
+            for passage_id in inference_results
+            if len(inference_results[passage_id]) > 0
+        ]
+    )
+
+    runner = CliRunner()
+    result = runner.invoke(
+        run_as_cli,
+        args=[
+            s3_mock.path,
+            s3_mock.inference_results_path,
+            "--files-to-index",
+            json.dumps([DOCUMENT_ID]),
+        ],
+    )
+    assert result.exit_code == 0, (
+        f"Exception: {result.exception if result.exception else None}\n"
+        f"Stdout: {result.stdout}"
+    )
+
+    # Allow async feed operation to elapse.
+    time.sleep(5)
+
+    response: VespaQueryResponse = test_vespa.query(
+        body={
+            "yql": """
+                select documentid, concepts from sources document_passage
+                where family_document_ref contains phrase(@family_doc_id)
+            """,
+            "family_doc_id": f"id:{_NAMESPACE}:family_document::{DOCUMENT_ID}",
+            "presentation.summary": "search_summary",
+        },
+    )
+    hits = response.hits
+    assert len(hits) > 0, (
+        f"Expected passages with concepts, got 0 hits. " f"Response: {response}"
+    )
+    passage_hits_with_concepts = []
+    for hit in hits:
+        hit_id = hit.get("id")
+        if hit_id and "family-document-passage" in hit_id:
+            hit_fields = hit.get("fields")
+            if hit_fields and len(hit["fields"]["concepts"]) > 0:
+                passage_hits_with_concepts.append(hit_id)
+
+    assert len(passage_hits_with_concepts) == DOCUMENT_PASSAAGES_WITH_CONCEPTS
