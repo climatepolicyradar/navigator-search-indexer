@@ -1,6 +1,7 @@
 from unittest.mock import patch
 import json
 import traceback
+import time
 
 from click.testing import CliRunner
 from cpr_sdk.parser_models import ParserOutput
@@ -158,6 +159,9 @@ def test_repeated_integration(test_vespa, s3_mock, family_document_ids):
         f"Stdout: {result.stdout}"
     )
 
+    # Allow async feed operation to elapse.
+    time.sleep(5)
+
     # After update
     search_weights_2 = get_vespa_data(
         test_vespa, SEARCH_WEIGHTS_SCHEMA, "default_weights"
@@ -192,6 +196,9 @@ def test_repeated_integration(test_vespa, s3_mock, family_document_ids):
         f"Stdout: {result.stdout}"
     )
 
+    # Allow async feed operation to elapse.
+    time.sleep(5)
+
     # After update
     search_weights_3 = get_vespa_data(
         test_vespa, SEARCH_WEIGHTS_SCHEMA, "default_weights"
@@ -224,6 +231,9 @@ def test_repeated_integration(test_vespa, s3_mock, family_document_ids):
         f"Exception: {result.exception if result.exception else None}\n"
         f"Stdout: {result.stdout}"
     )
+
+    # Allow async feed operation to elapse.
+    time.sleep(5)
 
     search_weights_4 = get_vespa_data(
         test_vespa, SEARCH_WEIGHTS_SCHEMA, "default_weights"
