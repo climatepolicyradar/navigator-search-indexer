@@ -2,7 +2,6 @@ import os
 import json
 import logging
 import logging.config
-from typing import Optional
 
 import click
 
@@ -40,14 +39,12 @@ os.environ["CLOUPATHLIB_FILE_CACHE_MODE"] = "close_file"
 @click.option(
     "--files-to-index",
     required=True,
-    help="Comma-separated list of IDs of files to index.",
+    help="JSON array of document IDs to index.",
 )
 def run_as_cli(
     indexer_input_dir: str,
-    files_to_index: Optional[str],
+    files_to_index: str,
 ) -> None:
-    _LOGGER.warning("Vespa indexing still experimental")
-
     indexer_input_path = S3Path(indexer_input_dir)
     document_ids: list[DocumentID] = [
         DocumentID(doc_id) for doc_id in json.loads(files_to_index)
