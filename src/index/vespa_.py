@@ -3,16 +3,25 @@ import logging
 from pathlib import Path
 from typing import (
     Annotated,
+    Any,
     Generator,
     Mapping,
     NewType,
     Optional,
     Sequence,
     Tuple,
+    TypeAlias,
 )
 
 from cloudpathlib import S3Path
-from cpr_sdk.parser_models import ParserOutput, PDFTextBlock, VerticalFlipError
+from cpr_sdk.models.search import Passage
+from cpr_sdk.parser_models import (
+    ParserOutput,
+    PDFTextBlock,
+    VerticalFlipError,
+    TextBlock,
+)
+import json
 from pydantic import BaseModel, Field
 from tenacity import (
     retry,
@@ -27,11 +36,13 @@ from src import config
 from src.utils import filter_on_block_type, read_npy_file
 
 
+VespaConcept: TypeAlias = Passage.Concept
 _LOGGER = logging.getLogger(__name__)
 SchemaName = NewType("SchemaName", str)
 DocumentID = NewType("DocumentID", str)
 Coord = tuple[float, float]
 TextCoords = Sequence[Coord]  # TODO: Could do better - look at data access change
+TextBlockId = NewType("TextBlockId", str)
 SEARCH_WEIGHTS_SCHEMA = SchemaName("search_weights")
 FAMILY_DOCUMENT_SCHEMA = SchemaName("family_document")
 DOCUMENT_PASSAGE_SCHEMA = SchemaName("document_passage")
@@ -76,6 +87,7 @@ class VespaDocumentPassage(BaseModel):
     text_block_page: Optional[Annotated[int, Field(ge=0)]] = None
     text_block_coords: Optional[TextCoords] = None
     text_embedding: Annotated[list[float], 768]
+    concepts: list[VespaConcept] = []
 
 
 class VespaFamilyDocument(BaseModel):
@@ -243,10 +255,71 @@ def remove_ids(vespa: Vespa, stray_ids: list[str]):
         )
 
 
+def retrieve_inference_result(
+    inference_results_s3_path: S3Path, document_id: str
+) -> dict[TextBlockId, list[VespaConcept]] | None:
+    """Retrieve an individual inference results file from S3 for a document."""
+
+    root_document_s3_path: S3Path = inference_results_s3_path / f"{document_id}.json"
+    translated_document_s3_path: S3Path = (
+        inference_results_s3_path / f"{document_id}_translated_en.json"
+    )
+
+    if root_document_s3_path.exists():
+        inference_result_s3_path: S3Path = root_document_s3_path
+    elif translated_document_s3_path.exists():
+        inference_result_s3_path: S3Path = translated_document_s3_path
+    else:
+        return None
+
+    inference_result_data: dict[str, Any] = json.loads(
+        inference_result_s3_path.read_text()
+    )
+    inference_result: dict[TextBlockId, list[VespaConcept]] = {
+        TextBlockId(id): [VespaConcept.model_validate(c) for c in concepts]
+        for id, concepts in inference_result_data.items()
+    }
+
+    return inference_result
+
+
+def join_concepts(
+    document_passage: VespaDocumentPassage,
+    inference_result: dict[
+        TextBlockId,
+        list[VespaConcept],
+    ],
+) -> VespaDocumentPassage:
+    """Join Concepts from inference results on VespaDocumentPassage using the ID."""
+
+    concepts: list[VespaConcept] = inference_result.get(
+        TextBlockId(document_passage.text_block_id), []
+    )
+
+    document_passage.concepts = concepts
+
+    return document_passage
+
+
+def passage_ids_match(
+    inference_result: dict[TextBlockId, list[VespaConcept]],
+    text_blocks: Sequence[TextBlock],
+) -> bool:
+    """Compare ids of passages in an inference result against text blocks for a match."""
+    inference_result_passage_ids: list[TextBlockId] = list(inference_result.keys())
+    text_block_passage_ids: list[TextBlockId] = [
+        TextBlockId(tb.text_block_id) for tb in text_blocks
+    ]
+    if set(inference_result_passage_ids) == set(text_block_passage_ids):
+        return True
+    return False
+
+
 def get_document_generator(
     vespa: Vespa,
     paths: Sequence[S3Path],
-    embedding_dir_as_path: S3Path,
+    indexer_input_s3_path: S3Path,
+    inference_results_s3_path: S3Path,
 ) -> Generator[Tuple[SchemaName, DocumentID, dict], None, None]:
     """
     Get generator for documents to index.
@@ -255,7 +328,7 @@ def get_document_generator(
 
     :param namespace: the Vespa namespace into which these documents should be placed
     :param tasks: list of tasks from the embeddings generator
-    :param embedding_dir_as_path: directory containing embeddings .npy files.
+    :param indexer_input_s3_path: directory containing embeddings .npy files.
         These are named with IDs corresponding to the IDs in the tasks.
     :yield Generator[Tuple[SchemaName, DocumentID, dict], None, None]: generator of
         Vespa documents along with their schema and ID.
@@ -283,7 +356,7 @@ def get_document_generator(
             input=task, remove_block_types=config.BLOCKS_TO_FILTER
         )
 
-        task_array_file_path = embedding_dir_as_path / f"{task.document_id}.npy"
+        task_array_file_path = indexer_input_s3_path / f"{task.document_id}.npy"
         embeddings = read_npy_file(task_array_file_path)
 
         family_document_id = DocumentID(task.document_metadata.import_id)
@@ -312,6 +385,22 @@ def get_document_generator(
 
         new_passage_ids = []
 
+        # Enrich the passage with concepts from S3 Inference Results if they exist so
+        # as to not wipe concepts when indexing. The following is an interrim solution
+        # whilst platform work towards a more complete solution to consolidate indexers.
+        PASSAGE_IDS_MATCH: bool = False
+        INFERENCE_RESULT: dict[
+            TextBlockId, list[VespaConcept]
+        ] | None = retrieve_inference_result(
+            inference_results_s3_path=inference_results_s3_path,
+            document_id=task.document_id,
+        )
+
+        if INFERENCE_RESULT:
+            PASSAGE_IDS_MATCH: bool = passage_ids_match(
+                inference_result=INFERENCE_RESULT, text_blocks=text_blocks
+            )
+
         # Note that the first embedding item is the doc description
         # The rest are text blocks
         for document_passage_idx, (text_block, embedding) in enumerate(
@@ -319,10 +408,18 @@ def get_document_generator(
         ):
             document_psg_id = DocumentID(f"{task.document_id}.{document_passage_idx}")
             new_passage_ids.append(document_psg_id)
-            document_passage = build_vespa_document_passage(
+            document_passage: VespaDocumentPassage = build_vespa_document_passage(
                 family_document_id, search_weights_ref, text_block, embedding
             )
-            yield DOCUMENT_PASSAGE_SCHEMA, document_psg_id, document_passage.model_dump()
+
+            if INFERENCE_RESULT and PASSAGE_IDS_MATCH:
+                document_passage: VespaDocumentPassage = join_concepts(
+                    document_passage, INFERENCE_RESULT
+                )
+
+            yield DOCUMENT_PASSAGE_SCHEMA, document_psg_id, document_passage.model_dump(
+                mode="json"
+            )
         # Cleanup stray docs
         stray_ids = determine_stray_ids(existing_doc_passage_ids, new_passage_ids)
         if stray_ids:
@@ -417,7 +514,8 @@ def _batch_ingest(vespa: Vespa, to_process: Mapping[SchemaName, list]):
 
 def populate_vespa(
     paths: Sequence[S3Path],
-    embedding_dir_as_path: S3Path,
+    indexer_input_s3_path: S3Path,
+    inference_results_s3_path: S3Path,
 ) -> None:
     """
     Index documents into Vespa.
@@ -430,9 +528,10 @@ def populate_vespa(
     vespa = _get_vespa_instance()
 
     document_generator = get_document_generator(
-        paths=paths,
-        embedding_dir_as_path=embedding_dir_as_path,
         vespa=vespa,
+        paths=paths,
+        indexer_input_s3_path=indexer_input_s3_path,
+        inference_results_s3_path=inference_results_s3_path,
     )
 
     # Process documents into Vespa in sized groups (bulk ingest operates on documents

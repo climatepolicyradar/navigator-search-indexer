@@ -36,6 +36,7 @@ os.environ["CLOUPATHLIB_FILE_CACHE_MODE"] = "close_file"
 
 @click.command()
 @click.argument("indexer_input_dir")
+@click.argument("inference_results_s3_path")
 @click.option(
     "--files-to-index",
     required=True,
@@ -43,22 +44,29 @@ os.environ["CLOUPATHLIB_FILE_CACHE_MODE"] = "close_file"
 )
 def run_as_cli(
     indexer_input_dir: str,
+    inference_results_s3_path: str,
     files_to_index: str,
 ) -> None:
-    indexer_input_path = S3Path(indexer_input_dir)
+
+    indexer_input_s3_path = S3Path(indexer_input_dir)
+    inference_results_s3_path = S3Path(inference_results_s3_path)
     document_ids: list[DocumentID] = [
         DocumentID(doc_id) for doc_id in json.loads(files_to_index)
     ]
 
     document_s3_paths: list[S3Path] = []
     for document_id in document_ids:
-        s3_path: S3Path = indexer_input_path / f"{document_id}.json"
+        s3_path: S3Path = indexer_input_s3_path / f"{document_id}.json"
         if not s3_path.exists():
             _LOGGER.warning(f"S3 Path does not exist: {s3_path}")
         else:
             document_s3_paths.append(s3_path)
 
-    populate_vespa(paths=document_s3_paths, embedding_dir_as_path=indexer_input_path)
+    populate_vespa(
+        paths=document_s3_paths,
+        indexer_input_s3_path=indexer_input_s3_path,
+        inference_results_s3_path=inference_results_s3_path,
+    )
 
 
 if __name__ == "__main__":

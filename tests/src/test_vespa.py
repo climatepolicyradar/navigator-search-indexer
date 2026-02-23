@@ -1,11 +1,18 @@
-from cpr_sdk.parser_models import ParserOutput
+from cloudpathlib import S3Path
+from cpr_sdk.models.search import Passage
+from cpr_sdk.parser_models import BlockType, ParserOutput, PDFTextBlock
 import numpy as np
 import pytest
 
 from src.index.vespa_ import (
+    TextBlockId,
+    VespaConcept,
     build_vespa_family_document,
     build_vespa_document_passage,
     get_existing_passage_ids,
+    join_concepts,
+    passage_ids_match,
+    retrieve_inference_result,
     reshape_metadata,
     remove_ids,
     determine_stray_ids,
@@ -19,7 +26,10 @@ from src.index.vespa_ import (
     _SCHEMAS_TO_PROCESS,
 )
 
-from tests.conftest import get_parser_output, FIXTURE_DIR
+from tests.conftest import FIXTURE_DIR, INFERENCE_RESULTS_DIR, get_parser_output
+
+
+INFERENCE_RESULTS_FIXTURE = FIXTURE_DIR / "inference_results"
 
 
 @pytest.mark.parametrize(
@@ -83,6 +93,69 @@ def test_build_vespa_document_passage():
     VespaDocumentPassage.model_validate(model)
 
 
+def test_join_concepts():
+    """Test join_concepts sets concepts on passage from inference result by text_block_id."""
+    parser_output: ParserOutput = get_parser_output(1, 1)
+    text_block: PDFTextBlock = parser_output.pdf_data.text_blocks[0]
+
+    # Document Passage and Inference Result with Matching Passage Id's
+    document_passage: VespaDocumentPassage = build_vespa_document_passage(
+        family_document_id="doc.1.1",
+        search_weights_ref="id:doc_search:weight::default",
+        text_block=text_block,
+        embedding=np.array([-0.11900115, 0.17448892]),
+    )
+    concepts: list[VespaConcept] = [
+        VespaConcept.model_validate(
+            {
+                "name": "test_concept",
+                "id": "c1",
+                "parent_concepts": [],
+                "parent_concept_ids_flat": "",
+                "start": 0,
+                "end": 10,
+                "model": "test",
+                "timestamp": "2024-01-01T00:00:00",
+            }
+        )
+    ]
+    inference_result: dict[TextBlockId, list[VespaConcept]] = {
+        TextBlockId(document_passage.text_block_id): concepts
+    }
+    result = join_concepts(document_passage, inference_result)
+    assert result.concepts is not None
+    assert (
+        result.concepts == inference_result[TextBlockId(document_passage.text_block_id)]
+    )
+
+    # Inference Result that Doesn't match
+    document_passage.concepts = []
+    inference_result = {TextBlockId("NON_EXISTENT.executive.1.1"): concepts}
+    result_empty = join_concepts(document_passage, inference_result)
+    assert result_empty.concepts == []
+
+
+def test_retrieve_inference_result__returns_data(s3_mock, family_document_ids):
+    """Test retrieve_inference_result reads and parses inference result from S3."""
+    result = retrieve_inference_result(
+        S3Path(s3_mock.inference_results_path), family_document_ids[0]
+    )
+
+    assert result is not None
+    assert isinstance(result, dict)
+    for text_block_id, concepts in result.items():
+        assert isinstance(text_block_id, str)
+        assert all(isinstance(c, Passage.Concept) for c in concepts)
+
+
+def test_retrieve_inference_result__returns_none_when_missing(s3_mock):
+    """Test retrieve_inference_result returns None when file does not exist."""
+    result = retrieve_inference_result(
+        S3Path(s3_mock.inference_results_path), "NON_EXISTENT.document.1.1"
+    )
+    assert result is None
+
+
 @pytest.mark.usefixtures("cleanup_test_vespa_before", "cleanup_test_vespa_after")
 def test_get_existing_passage_ids__new_doc(test_vespa):
     new_id = "CCLW.executive.10014.111"
@@ -130,14 +203,79 @@ def test_determine_stray_ids():
     assert sorted(stray_ids) == ["C.1.4", "C.1.5"]
 
 
+def test_passage_ids_match():
+    """Test passage_ids_match compares inference result keys with text block ids."""
+    parser_output = get_parser_output(1, 1)
+    parser_output.pdf_data.text_blocks = [
+        PDFTextBlock(
+            text=["test_text"],
+            text_block_id="p_1_b_0",
+            type=BlockType.TEXT,
+            type_confidence=1.0,
+            coords=[(0, 0), (0, 0), (0, 0), (0, 0)],
+            page_number=1,
+        ),
+        PDFTextBlock(
+            text=["test_text"],
+            text_block_id="p_1_b_1",
+            type=BlockType.TEXT,
+            type_confidence=1.0,
+            coords=[(0, 0), (0, 0), (0, 0), (0, 0)],
+            page_number=1,
+        ),
+        PDFTextBlock(
+            text=["test_text"],
+            text_block_id="p_1_b_2",
+            type=BlockType.TEXT,
+            type_confidence=1.0,
+            coords=[(0, 0), (0, 0), (0, 0), (0, 0)],
+            page_number=1,
+        ),
+    ]
+    text_blocks = parser_output.get_text_blocks()
+    assert len(text_blocks) == 3
+
+    block_ids = [tb.text_block_id for tb in text_blocks]
+
+    # Match: inference keys equal text block ids
+    inference_match = {TextBlockId(bid): [] for bid in block_ids}
+    assert passage_ids_match(inference_match, text_blocks) is True
+
+    # No match: different ids
+    inference_mismatch = {TextBlockId("other_id"): []}
+    assert passage_ids_match(inference_mismatch, text_blocks) is False
+
+    # No match: inference has extra id
+    inference_extra = {
+        TextBlockId(block_ids[0]): [],
+        TextBlockId(block_ids[1]): [],
+        TextBlockId(block_ids[2]): [],
+        TextBlockId("extra_id"): [],
+    }
+    assert passage_ids_match(inference_extra, text_blocks) is False
+
+    # No match: inference missing one id
+    inference_missing = {
+        TextBlockId(block_ids[0]): [],
+        TextBlockId(block_ids[1]): [],
+    }
+    assert passage_ids_match(inference_missing, text_blocks) is False
+
+    # No match: inference missing id (empty)
+    assert passage_ids_match({}, text_blocks) is False
+
+    # Match: both empty
+    assert passage_ids_match({}, []) is True
+
+
 @pytest.mark.usefixtures("cleanup_test_vespa_before", "cleanup_test_vespa_after")
 def test_get_document_generator(test_vespa):
     """Assert that the vespa document generator works as expected."""
-    embedding_dir_as_path = FIXTURE_DIR / "s3_files"
+    indexer_input_s3_path = FIXTURE_DIR / "s3_files"
     paths = [
-        embedding_dir_as_path / "CCLW.executive.10002.4495.json",
-        embedding_dir_as_path / "CCLW.executive.10014.4470.json",
-        embedding_dir_as_path / "CCLW.document.i00000004.n0000.json",
+        indexer_input_s3_path / "CCLW.executive.10002.4495.json",
+        indexer_input_s3_path / "CCLW.executive.10014.4470.json",
+        indexer_input_s3_path / "CCLW.document.i00000004.n0000.json",
     ]
 
     fixture_doc_ids = []
@@ -147,7 +285,9 @@ def test_get_document_generator(test_vespa):
         fixture_doc_ids.append(fixture_content.document_id)
         fixture_text_blocks.extend(fixture_content.text_blocks)
 
-    generator = get_document_generator(test_vespa, paths, embedding_dir_as_path)
+    generator = get_document_generator(
+        test_vespa, paths, indexer_input_s3_path, INFERENCE_RESULTS_DIR
+    )
 
     EXPECTED_DOCUMENTS = 3
     EXPECTED_PASSAGES = 1978
