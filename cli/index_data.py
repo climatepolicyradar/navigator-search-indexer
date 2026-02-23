@@ -40,7 +40,7 @@ os.environ["CLOUPATHLIB_FILE_CACHE_MODE"] = "close_file"
 @click.option(
     "--files-to-index",
     required=True,
-    help='JSON array of document IDs to index (e.g. \'["doc.1", "doc.2"]\').',
+    help="JSON array of document IDs to index.",
 )
 def run_as_cli(
     indexer_input_dir: str,
