@@ -1,14 +1,13 @@
 import os
-import sys
-import time
+import json
 import logging
 import logging.config
-from typing import Optional
 
 import click
 
-from src.index.vespa_ import populate_vespa
-from src.utils import build_indexer_input_path, get_index_paths
+from cloudpathlib import S3Path
+
+from src.index.vespa_ import populate_vespa, DocumentID
 
 LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO").upper()
 DEFAULT_LOGGING = {
@@ -38,54 +37,28 @@ os.environ["CLOUPATHLIB_FILE_CACHE_MODE"] = "close_file"
 @click.command()
 @click.argument("indexer_input_dir")
 @click.option(
-    "--s3",
-    is_flag=True,
-    required=False,
-    help="Whether or not we are reading from and writing to S3.",
-)
-@click.option(
     "--files-to-index",
-    required=False,
-    help="Comma-separated list of IDs of files to index.",
-)
-@click.option(
-    "--limit",
-    "-l",
-    type=int,
-    required=False,
-    help="Optionally limit the number of documents to index.",
-)
-@click.option(
-    "--index-type",
-    "-i",
-    type=click.Choice(["opensearch", "vespa"]),
-    default="opensearch",
-    required=False,
-    help="Which search database type to populate.",
+    required=True,
+    help="JSON array of document IDs to index.",
 )
 def run_as_cli(
     indexer_input_dir: str,
-    s3: bool,
-    files_to_index: Optional[str],
-    limit: Optional[int],
-    index_type: str,
+    files_to_index: str,
 ) -> None:
-    if index_type.lower() == "opensearch":
-        click.echo(f"Index type: {index_type}, is no longer used", err=True)
-        sys.exit(1)
-    elif index_type.lower() == "vespa":
-        _LOGGER.warning("Vespa indexing still experimental")
+    indexer_input_path = S3Path(indexer_input_dir)
+    document_ids: list[DocumentID] = [
+        DocumentID(doc_id) for doc_id in json.loads(files_to_index)
+    ]
 
-        indexer_input_path = build_indexer_input_path(indexer_input_dir, s3)
-        paths = get_index_paths(indexer_input_path, files_to_index, limit)
+    document_s3_paths: list[S3Path] = []
+    for document_id in document_ids:
+        s3_path: S3Path = indexer_input_path / f"{document_id}.json"
+        if not s3_path.exists():
+            _LOGGER.warning(f"S3 Path does not exist: {s3_path}")
+        else:
+            document_s3_paths.append(s3_path)
 
-        start = time.time()
-        populate_vespa(paths=paths, embedding_dir_as_path=indexer_input_path)
-        duration = time.time() - start
-        _LOGGER.info(f"Vespa indexing completed after: {duration}s")
-        sys.exit(0)
-    _LOGGER.error(f"Unknown index type: {index_type}")
-    sys.exit(1)
+    populate_vespa(paths=document_s3_paths, embedding_dir_as_path=indexer_input_path)
 
 
 if __name__ == "__main__":
