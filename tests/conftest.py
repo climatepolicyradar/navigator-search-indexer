@@ -1,5 +1,6 @@
 import json
 import os
+import uuid_utils as uuid
 import pytest as pytest
 from moto import mock_aws
 from io import BytesIO
@@ -148,10 +149,14 @@ def _upload_s3_doc(
     bucket: str,
     prefix: str,
     doc_id: str,
-    limit: int | None,
+    limit: int | None = None,
+    uuid_ids: bool = False,
 ) -> None:
-    """Upload a (possibly shortened) fixture doc to moto-mocked S3."""
+    """Upload a fixture doc to moto-mocked S3.
 
+    :param limit: truncate text blocks and embeddings to this many items.
+    :param uuid_ids: replace every text_block_id with a fresh UUID (v2 format).
+    """
     json_path = FIXTURE_DIR / "s3_files" / f"{doc_id}.json"
     npy_path = FIXTURE_DIR / "s3_files" / f"{doc_id}.npy"
     family_document = ParserOutput.model_validate_json(json_path.read_text())
@@ -165,6 +170,10 @@ def _upload_s3_doc(
             :limit
         ]
         embedding = embedding[:limit]
+
+    if uuid_ids:
+        for block in family_document.pdf_data.text_blocks:
+            block.text_block_id = str(uuid.uuid4())
 
     s3_client.put_object(
         Bucket=bucket,
@@ -224,13 +233,11 @@ def s3_mock(s3_bucket_and_region, family_document_ids):
 
         def prepare(doc_id: str, limit: int | None) -> None:
             s3_client = boto3.client("s3", region_name=s3_bucket_and_region["region"])
-            _upload_s3_doc(
-                s3_client,
-                s3_bucket_and_region["bucket"],
-                prefix,
-                doc_id,
-                limit,
-            )
+            _upload_s3_doc(s3_client, bucket, prefix, doc_id, limit=limit)
+
+        def prepare_with_uuid_ids(doc_id: str) -> None:
+            s3_client = boto3.client("s3", region_name=s3_bucket_and_region["region"])
+            _upload_s3_doc(s3_client, bucket, prefix, doc_id, uuid_ids=True)
 
         inference_results_path = f"s3://{bucket}/{inference_results_prefix}"
         yield SimpleNamespace(
@@ -239,4 +246,5 @@ def s3_mock(s3_bucket_and_region, family_document_ids):
             bucket=bucket,
             region=s3_bucket_and_region["region"],
             prepare=prepare,
+            prepare_with_uuid_ids=prepare_with_uuid_ids,
         )

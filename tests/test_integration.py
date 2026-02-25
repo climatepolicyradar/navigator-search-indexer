@@ -2,6 +2,7 @@ from unittest.mock import patch
 import json
 import traceback
 import time
+import uuid_utils as uuid
 
 from click.testing import CliRunner
 from cpr_sdk.parser_models import ParserOutput
@@ -299,7 +300,7 @@ def test_concept_enrichment_integration(test_vespa, s3_mock):
         f"Stdout: {result.stdout}"
     )
 
-    # Allow async feed operation to elapse.
+    # Allow async feed operation to elapse
     time.sleep(5)
 
     response: VespaQueryResponse = test_vespa.query(
@@ -313,9 +314,9 @@ def test_concept_enrichment_integration(test_vespa, s3_mock):
         },
     )
     hits = response.hits
-    assert len(hits) > 0, (
-        f"Expected passages with concepts, got 0 hits. " f"Response: {response}"
-    )
+    assert (
+        len(hits) > 0
+    ), f"Expected passages with concepts, got 0 hits. Response: {response}"
     passage_hits_with_concepts = []
     for hit in hits:
         hit_id = hit.get("id")
@@ -325,3 +326,92 @@ def test_concept_enrichment_integration(test_vespa, s3_mock):
                 passage_hits_with_concepts.append(hit_id)
 
     assert len(passage_hits_with_concepts) == DOCUMENT_PASSAAGES_WITH_CONCEPTS
+
+
+@patch.object(config, "VESPA_INSTANCE_URL", new=VESPA_TEST_ENDPOINT)
+@patch.object(config, "DEVELOPMENT_MODE", new="true")
+@pytest.mark.usefixtures("cleanup_test_vespa_before", "cleanup_test_vespa_after")
+def test_cleanup_on_passage_id_format_change(test_vespa, s3_mock):
+    """v1 passages are replaced with v2 passages.
+
+    When `text_block_ids` change from v1 (non-UUID, e.g. 'p_0_b_0') to v2 (UUID),
+    passage IDs change format. The indexer must clean up old-format passages so they
+    don't accumulate as stray documents in Vespa.
+    """
+    DOCUMENT_ID = "CCLW.executive.10002.4495"
+    runner = CliRunner()
+
+    # Run 1: Index with v1 `text_block_ids` (e.g. 'p_0_b_0').
+    #
+    # `get_passage_id` falls back to loop index → passage IDs end with integers.
+    result = runner.invoke(
+        run_as_cli,
+        args=[
+            s3_mock.path,
+            s3_mock.inference_results_path,
+            "--files-to-index",
+            json.dumps([DOCUMENT_ID]),
+        ],
+    )
+    assert result.exit_code == 0, (
+        f"Exception: {result.exception if result.exception else None}\n"
+        f"Stdout: {result.stdout}"
+        f"Trace: {traceback.print_exception(*result.exc_info)}"
+    )
+
+    # Allow async feed operation to elapse
+    time.sleep(5)
+
+    # Get the passages that were just fed in
+    passages_v1 = get_existing_passage_ids(
+        test_vespa,
+        DOCUMENT_ID,
+    )
+    assert len(passages_v1) > 0
+    # All v1 passage IDs end with a plain integer suffix, the sequential fallback
+    assert all(passage_id.rsplit(".", 1)[-1].isdigit() for passage_id in passages_v1)
+
+    # Replace S3 fixture with UUID `text_block_ids` to simulate v2 format documents
+    s3_mock.prepare_with_uuid_ids(DOCUMENT_ID)
+
+    # Run 2: Re-index with v2 UUID text_block_ids.
+    #
+    # `get_passage_id` uses UUID → passage IDs end with UUIDs so old IDs become stray
+    result = runner.invoke(
+        run_as_cli,
+        args=[
+            s3_mock.path,
+            s3_mock.inference_results_path,
+            "--files-to-index",
+            json.dumps([DOCUMENT_ID]),
+        ],
+    )
+    assert result.exit_code == 0, (
+        f"Exception: {result.exception if result.exception else None}\n"
+        f"Stdout: {result.stdout}"
+        f"Trace: {traceback.print_exception(*result.exc_info)}"
+    )
+
+    # Allow async feed operation to elapse
+    time.sleep(5)
+
+    passages_v2 = get_existing_passage_ids(test_vespa, DOCUMENT_ID)
+
+    # Same number of passages — the document content is unchanged,
+    # only IDs differ.
+    assert len(passages_v2) == len(passages_v1)
+
+    # Old v1 sequential passages must be gone after cleanup
+    assert set(passages_v1).isdisjoint(
+        set(passages_v2)
+    ), "Old v1 passage IDs were not cleaned up after re-indexing with UUID IDs"
+
+    # New passage IDs must use UUID suffixes
+    def _is_uuid(s: str) -> bool:
+        try:
+            uuid.UUID(s)
+            return True
+        except ValueError:
+            return False
+
+    assert all(_is_uuid(passage_id.rsplit(".", 1)[-1]) for passage_id in passages_v2)
