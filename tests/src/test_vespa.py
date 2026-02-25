@@ -5,11 +5,14 @@ import numpy as np
 import pytest
 
 from src.index.vespa_ import (
+    DocumentID,
+    PassageID,
     TextBlockId,
     VespaConcept,
     build_vespa_family_document,
     build_vespa_document_passage,
     get_existing_passage_ids,
+    get_passage_id,
     join_concepts,
     passage_ids_match,
     retrieve_inference_result,
@@ -348,3 +351,23 @@ def test_get_document_generator(test_vespa):
         assert family_schema == FAMILY_DOCUMENT_SCHEMA
         assert family_id in ids
         assert len(family_id.split(".")) == 4
+
+
+@pytest.mark.parametrize(
+    ("text_block_id", "passage_idx", "expected_suffix"),
+    [
+        # v2: valid UUID — used verbatim
+        (
+            "550e8400-e29b-41d4-a716-446655440000",
+            0,
+            "550e8400-e29b-41d4-a716-446655440000",
+        ),
+        # v1: legacy format — falls back to loop index
+        ("p_1_b_0", 0, "0"),
+        ("p_1_b_0", 3, "3"),
+    ],
+)
+def test_get_passage_id(text_block_id, passage_idx, expected_suffix):
+    doc_id = DocumentID("CCLW.executive.1.0")
+    result = get_passage_id(doc_id, text_block_id, passage_idx)
+    assert result == PassageID(f"{doc_id}.{expected_suffix}")

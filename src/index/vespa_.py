@@ -1,6 +1,7 @@
 from collections import defaultdict
 import logging
 from pathlib import Path
+import uuid_utils as uuid
 from typing import (
     Annotated,
     Any,
@@ -39,7 +40,9 @@ from src.utils import filter_on_block_type, read_npy_file
 VespaConcept: TypeAlias = Passage.Concept
 _LOGGER = logging.getLogger(__name__)
 SchemaName = NewType("SchemaName", str)
+SearchWeightsID = NewType("SearchWeightsID", str)
 DocumentID = NewType("DocumentID", str)
+PassageID = NewType("PassageID", str)
 Coord = tuple[float, float]
 TextCoords = Sequence[Coord]  # TODO: Could do better - look at data access change
 TextBlockId = NewType("TextBlockId", str)
@@ -131,7 +134,7 @@ class VespaFamilyDocument(BaseModel):
 
 
 def reshape_metadata(
-    metadata: Optional[dict[str, list[str]]]
+    metadata: Optional[dict[str, list[str]]],
 ) -> Optional[list[VespaFamilyDocument.MetadataItem]]:
     if metadata is None:
         return None
@@ -315,12 +318,36 @@ def passage_ids_match(
     return False
 
 
+def get_passage_id(
+    document_id: DocumentID,
+    text_block_id: str,
+    passage_idx: int,
+) -> PassageID:
+    """Build a passage ID from a text block.
+
+    Supports both v1 IDs and v2 IDs.
+
+    v1 IDs are non-UUID strings like `'p_1_b_0'`, falling back to the
+    v2 IDs are UUIDs. loop index.
+    """
+    try:
+        return PassageID(f"{document_id}.{uuid.UUID(text_block_id)}")
+    except ValueError as e:
+        if "badly formed hexadecimal UUID string" in str(e):
+            return PassageID(f"{document_id}.{passage_idx}")
+        raise
+
+
 def get_document_generator(
     vespa: Vespa,
     paths: Sequence[S3Path],
     indexer_input_s3_path: S3Path,
     inference_results_s3_path: S3Path,
-) -> Generator[Tuple[SchemaName, DocumentID, dict], None, None]:
+) -> Generator[
+    Tuple[SchemaName, SearchWeightsID | DocumentID | PassageID, dict],
+    None,
+    None,
+]:
     """
     Get generator for documents to index.
 
@@ -330,11 +357,11 @@ def get_document_generator(
     :param tasks: list of tasks from the embeddings generator
     :param indexer_input_s3_path: directory containing embeddings .npy files.
         These are named with IDs corresponding to the IDs in the tasks.
-    :yield Generator[Tuple[SchemaName, DocumentID, dict], None, None]: generator of
+    :yield Generator[Tuple[SchemaName, SearchWeightsID | DocumentID | PassageID, dict], None, None]: generator of
         Vespa documents along with their schema and ID.
     """
 
-    search_weights_id = DocumentID("default_weights")
+    search_weights_id = SearchWeightsID("default_weights")
     search_weights = VespaSearchWeights(
         name_weight=2.5,
         description_weight=2.0,
@@ -406,8 +433,14 @@ def get_document_generator(
         for document_passage_idx, (text_block, embedding) in enumerate(
             zip(text_blocks, embeddings[1:, :])
         ):
-            document_psg_id = DocumentID(f"{task.document_id}.{document_passage_idx}")
-            new_passage_ids.append(document_psg_id)
+            document_passage_id = get_passage_id(
+                family_document_id,
+                text_block.text_block_id,
+                document_passage_idx,
+            )
+
+            new_passage_ids.append(document_passage_id)
+
             document_passage: VespaDocumentPassage = build_vespa_document_passage(
                 family_document_id, search_weights_ref, text_block, embedding
             )
@@ -417,8 +450,10 @@ def get_document_generator(
                     document_passage, INFERENCE_RESULT
                 )
 
-            yield DOCUMENT_PASSAGE_SCHEMA, document_psg_id, document_passage.model_dump(
-                mode="json"
+            yield (
+                DOCUMENT_PASSAGE_SCHEMA,
+                document_passage_id,
+                document_passage.model_dump(mode="json"),
             )
         # Cleanup stray docs
         stray_ids = determine_stray_ids(existing_doc_passage_ids, new_passage_ids)
