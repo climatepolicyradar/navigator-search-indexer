@@ -163,7 +163,9 @@ def build_vespa_family_document(
         family_description=task.document_description,
         family_description_index=task.document_description,
         # Embeddings generation has been removed from the pipeline; populated with
-        # zeros to satisfy the Vespa schema requirement.
+        # zeros to satisfy the Vespa schema requirement. The length is 768 to match the
+        # schema definition for the field in vespa:
+        # https://github.com/climatepolicyradar/navigator-infra/blob/main/vespa/navigator_app/schemas/document_passage.sd#L49
         family_description_embedding=[0.0] * 768,
         family_import_id=task.document_metadata.family_import_id,
         family_slug=task.document_metadata.family_slug,
@@ -206,7 +208,9 @@ def build_vespa_document_passage(
             text_block.coords if isinstance(text_block, PDFTextBlock) else None
         ),
         # Embeddings generation has been removed from the pipeline; populated with
-        # zeros to satisfy the Vespa schema requirement.
+        # zeros to satisfy the Vespa schema requirement. The length is 768 to match the
+        # schema definition for the field in vespa:
+        # https://github.com/climatepolicyradar/navigator-infra/blob/main/vespa/navigator_app/schemas/document_passage.sd#L49
         text_embedding=[0.0] * 768,
     )
 
