@@ -1,7 +1,6 @@
 from cloudpathlib import S3Path
 from cpr_sdk.models.search import Passage
 from cpr_sdk.parser_models import BlockType, ParserOutput, PDFTextBlock
-import numpy as np
 import pytest
 
 from src.index.vespa_ import (
@@ -78,7 +77,6 @@ def test_build_vespa_family_document():
     parser_output = get_parser_output(1, 1)
     model = build_vespa_family_document(
         task=parser_output,
-        embeddings=[np.array([-0.11900115, 0.17448892])],
         search_weights_ref="id:doc_search:weight::default",
     )
     VespaFamilyDocument.model_validate(model)
@@ -91,7 +89,6 @@ def test_build_vespa_document_passage():
         family_document_id="doc.1.1",
         search_weights_ref="id:doc_search:weight::default",
         text_block=text_block,
-        embedding=np.array([-0.11900115, 0.17448892]),
     )
     VespaDocumentPassage.model_validate(model)
 
@@ -106,7 +103,6 @@ def test_join_concepts():
         family_document_id="doc.1.1",
         search_weights_ref="id:doc_search:weight::default",
         text_block=text_block,
-        embedding=np.array([-0.11900115, 0.17448892]),
     )
     concepts: list[VespaConcept] = [
         VespaConcept.model_validate(
@@ -288,9 +284,7 @@ def test_get_document_generator(test_vespa):
         fixture_doc_ids.append(fixture_content.document_id)
         fixture_text_blocks.extend(fixture_content.text_blocks)
 
-    generator = get_document_generator(
-        test_vespa, paths, indexer_input_s3_path, INFERENCE_RESULTS_DIR
-    )
+    generator = get_document_generator(test_vespa, paths, INFERENCE_RESULTS_DIR)
 
     EXPECTED_DOCUMENTS = 3
     EXPECTED_PASSAGES = 1978

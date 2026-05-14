@@ -60,7 +60,6 @@ def test_vespa_document_generator(
     doc_generator = get_document_generator(
         vespa=test_vespa,
         paths=paths,
-        indexer_input_s3_path=test_input_dir,
         inference_results_s3_path=INFERENCE_RESULTS_DIR,
     )
 

@@ -64,7 +64,6 @@ def run_as_cli(
 
     populate_vespa(
         paths=document_s3_paths,
-        indexer_input_s3_path=indexer_input_s3_path,
         inference_results_s3_path=inference_results_s3_path,
     )
 

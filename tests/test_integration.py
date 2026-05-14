@@ -6,7 +6,6 @@ import uuid_utils as uuid
 
 from click.testing import CliRunner
 from cpr_sdk.parser_models import ParserOutput
-import numpy as np
 import pytest
 from vespa.application import Vespa
 from vespa.io import VespaQueryResponse
@@ -60,16 +59,14 @@ def test_integration(test_vespa, s3_mock, family_document_ids):
     for doc_id in family_document_ids:
         vespa_data = get_vespa_data(test_vespa, FAMILY_DOCUMENT_SCHEMA, doc_id)
         fixture_path = FIXTURE_DIR / "s3_files" / f"{doc_id}.json"
-        embeddings_path = FIXTURE_DIR / "s3_files" / f"{doc_id}.npy"
         s3_data = ParserOutput.model_validate_json(fixture_path.read_text())
-        embeddings = np.load(embeddings_path)
 
         vf = vespa_data["fields"]
         assert vf["family_name"] == s3_data.document_name
         assert vf["family_name_index"] == s3_data.document_name
         assert vf["family_description"] == s3_data.document_description
         assert vf["family_description_index"] == s3_data.document_description
-        assert vf["family_description_embedding"]["values"] == embeddings[0].tolist()
+        assert vf["family_description_embedding"]["values"] == [0.0] * 768
         assert vf["family_import_id"] == s3_data.document_metadata.family_import_id
         assert vf["family_slug"] == s3_data.document_metadata.family_slug
         assert (
@@ -178,10 +175,7 @@ def test_repeated_integration(test_vespa, s3_mock, family_document_ids):
 
     change_family_passages_2 = get_existing_passage_ids(test_vespa, CHANGE_FAMILY)
 
-    # The first embedding item is the document description
-    # So the number of passages is one less than what we limited to
-    expected_text_block_count = limit - 1
-    assert len(change_family_passages_2) == expected_text_block_count
+    assert len(change_family_passages_2) == limit
 
     # Another incremental run that will now add back some of those docs but not all
     limit = 100
@@ -215,10 +209,7 @@ def test_repeated_integration(test_vespa, s3_mock, family_document_ids):
 
     change_family_passages_3 = get_existing_passage_ids(test_vespa, CHANGE_FAMILY)
 
-    # The first embedding item is the document description
-    # So the number of passages is one less than what we limited to
-    expected_text_block_count = limit - 1
-    assert len(change_family_passages_3) == expected_text_block_count
+    assert len(change_family_passages_3) == limit
 
     # Rerun all, adding back those docs (restore full version in mock S3)
     s3_mock.prepare(CHANGE_FAMILY, None)

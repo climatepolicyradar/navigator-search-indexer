@@ -3,8 +3,6 @@ import os
 import uuid_utils as uuid
 import pytest as pytest
 from moto import mock_aws
-from io import BytesIO
-import numpy as np
 import boto3
 from pathlib import Path
 from datetime import datetime
@@ -154,13 +152,11 @@ def _upload_s3_doc(
 ) -> None:
     """Upload a fixture doc to moto-mocked S3.
 
-    :param limit: truncate text blocks and embeddings to this many items.
+    :param limit: truncate text blocks to this many items.
     :param uuid_ids: replace every text_block_id with a fresh UUID (v2 format).
     """
     json_path = FIXTURE_DIR / "s3_files" / f"{doc_id}.json"
-    npy_path = FIXTURE_DIR / "s3_files" / f"{doc_id}.npy"
     family_document = ParserOutput.model_validate_json(json_path.read_text())
-    embedding = np.load(npy_path)
 
     if limit is not None:
         family_document.pdf_data.page_metadata = family_document.pdf_data.page_metadata[
@@ -169,7 +165,6 @@ def _upload_s3_doc(
         family_document.pdf_data.text_blocks = family_document.pdf_data.text_blocks[
             :limit
         ]
-        embedding = embedding[:limit]
 
     if uuid_ids:
         for block in family_document.pdf_data.text_blocks:
@@ -179,13 +174,6 @@ def _upload_s3_doc(
         Bucket=bucket,
         Key=f"{prefix}/{doc_id}.json",
         Body=family_document.model_dump_json().encode(),
-    )
-    buf = BytesIO()
-    np.save(buf, embedding)
-    s3_client.put_object(
-        Bucket=bucket,
-        Key=f"{prefix}/{doc_id}.npy",
-        Body=buf.getvalue(),
     )
 
 
@@ -211,16 +199,10 @@ def s3_mock(s3_bucket_and_region, family_document_ids):
         prefix = "indexer-input"
         for doc_id in family_document_ids:
             json_path = FIXTURE_DIR / "s3_files" / f"{doc_id}.json"
-            npy_path = FIXTURE_DIR / "s3_files" / f"{doc_id}.npy"
             s3.put_object(
                 Bucket=bucket,
                 Key=f"{prefix}/{doc_id}.json",
                 Body=json_path.read_bytes(),
-            )
-            s3.put_object(
-                Bucket=bucket,
-                Key=f"{prefix}/{doc_id}.npy",
-                Body=npy_path.read_bytes(),
             )
 
         inference_results_prefix = "inference-results"
