@@ -34,7 +34,7 @@ from vespa.io import VespaResponse
 
 
 from src import config
-from src.utils import filter_on_block_type, read_npy_file
+from src.utils import filter_on_block_type
 
 
 VespaConcept: TypeAlias = Passage.Concept
@@ -154,7 +154,6 @@ def reshape_metadata(
 
 def build_vespa_family_document(
     task: ParserOutput,
-    embeddings,
     search_weights_ref,
 ) -> VespaFamilyDocument:
     return VespaFamilyDocument(
@@ -163,7 +162,11 @@ def build_vespa_family_document(
         family_name_index=task.document_name,
         family_description=task.document_description,
         family_description_index=task.document_description,
-        family_description_embedding=embeddings[0].tolist(),
+        # Embeddings generation has been removed from the pipeline; populated with
+        # zeros to satisfy the Vespa schema requirement. The length is 768 to match the
+        # schema definition for the field in vespa:
+        # https://github.com/climatepolicyradar/navigator-infra/blob/main/vespa/navigator_app/schemas/document_passage.sd#L49
+        family_description_embedding=[0.0] * 768,
         family_import_id=task.document_metadata.family_import_id,
         family_slug=task.document_metadata.family_slug,
         family_publication_ts=task.document_metadata.publication_ts.isoformat(),
@@ -189,7 +192,7 @@ def build_vespa_family_document(
 
 
 def build_vespa_document_passage(
-    family_document_id, search_weights_ref, text_block, embedding
+    family_document_id, search_weights_ref, text_block
 ) -> VespaDocumentPassage:
     fam_doc_ref = f"id:{_NAMESPACE}:family_document::{family_document_id}"
     return VespaDocumentPassage(
@@ -204,7 +207,11 @@ def build_vespa_document_passage(
         text_block_coords=(
             text_block.coords if isinstance(text_block, PDFTextBlock) else None
         ),
-        text_embedding=embedding.tolist(),
+        # Embeddings generation has been removed from the pipeline; populated with
+        # zeros to satisfy the Vespa schema requirement. The length is 768 to match the
+        # schema definition for the field in vespa:
+        # https://github.com/climatepolicyradar/navigator-infra/blob/main/vespa/navigator_app/schemas/document_passage.sd#L49
+        text_embedding=[0.0] * 768,
     )
 
 
@@ -341,7 +348,6 @@ def get_passage_id(
 def get_document_generator(
     vespa: Vespa,
     paths: Sequence[S3Path],
-    indexer_input_s3_path: S3Path,
     inference_results_s3_path: S3Path,
 ) -> Generator[
     Tuple[SchemaName, SearchWeightsID | DocumentID | PassageID, dict],
@@ -351,12 +357,9 @@ def get_document_generator(
     """
     Get generator for documents to index.
 
-    Documents to index are those containing text passages and their embeddings.
-
-    :param namespace: the Vespa namespace into which these documents should be placed
-    :param tasks: list of tasks from the embeddings generator
-    :param indexer_input_s3_path: directory containing embeddings .npy files.
-        These are named with IDs corresponding to the IDs in the tasks.
+    :param vespa: Vespa application instance.
+    :param paths: list of S3 paths to parser output JSON files.
+    :param inference_results_s3_path: directory containing concept inference results.
     :yield Generator[Tuple[SchemaName, SearchWeightsID | DocumentID | PassageID, dict], None, None]: generator of
         Vespa documents along with their schema and ID.
     """
@@ -383,13 +386,8 @@ def get_document_generator(
             input=task, remove_block_types=config.BLOCKS_TO_FILTER
         )
 
-        task_array_file_path = indexer_input_s3_path / f"{task.document_id}.npy"
-        embeddings = read_npy_file(task_array_file_path)
-
         family_document_id = DocumentID(task.document_metadata.import_id)
-        family_document = build_vespa_family_document(
-            task, embeddings, search_weights_ref
-        )
+        family_document = build_vespa_family_document(task, search_weights_ref)
 
         yield FAMILY_DOCUMENT_SCHEMA, family_document_id, family_document.model_dump()
         physical_document_count += 1
@@ -428,11 +426,7 @@ def get_document_generator(
                 inference_result=INFERENCE_RESULT, text_blocks=text_blocks
             )
 
-        # Note that the first embedding item is the doc description
-        # The rest are text blocks
-        for document_passage_idx, (text_block, embedding) in enumerate(
-            zip(text_blocks, embeddings[1:, :])
-        ):
+        for document_passage_idx, text_block in enumerate(text_blocks):
             document_passage_id = get_passage_id(
                 family_document_id,
                 text_block.text_block_id,
@@ -442,7 +436,7 @@ def get_document_generator(
             new_passage_ids.append(document_passage_id)
 
             document_passage: VespaDocumentPassage = build_vespa_document_passage(
-                family_document_id, search_weights_ref, text_block, embedding
+                family_document_id, search_weights_ref, text_block
             )
 
             if INFERENCE_RESULT and PASSAGE_IDS_MATCH:
@@ -549,23 +543,14 @@ def _batch_ingest(vespa: Vespa, to_process: Mapping[SchemaName, list]):
 
 def populate_vespa(
     paths: Sequence[S3Path],
-    indexer_input_s3_path: S3Path,
     inference_results_s3_path: S3Path,
 ) -> None:
-    """
-    Index documents into Vespa.
-
-    :param pdf_parser_output_dir: directory or S3 folder containing output JSON
-        files from the PDF parser.
-    :param embedding_dir: directory or S3 folder containing embeddings from the
-        text2embeddings CLI.
-    """
+    """Index documents into Vespa."""
     vespa = _get_vespa_instance()
 
     document_generator = get_document_generator(
         vespa=vespa,
         paths=paths,
-        indexer_input_s3_path=indexer_input_s3_path,
         inference_results_s3_path=inference_results_s3_path,
     )
 

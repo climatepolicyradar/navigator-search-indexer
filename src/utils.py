@@ -1,10 +1,5 @@
-from io import BytesIO
 import logging
-from typing import Any
 
-import numpy as np
-
-from cloudpathlib import S3Path
 from cpr_sdk.parser_models import BlockType, ParserOutput, TextBlock
 
 _LOGGER = logging.getLogger(__name__)
@@ -66,8 +61,3 @@ def filter_on_block_type(
             indexer_input=input, remove_block_types=remove_block_types
         ),
     )
-
-
-def read_npy_file(file_path: S3Path) -> Any:
-    """Read an npy file."""
-    return np.load(BytesIO(file_path.read_bytes()))
