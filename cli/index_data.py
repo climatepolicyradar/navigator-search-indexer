@@ -72,14 +72,23 @@ def run_as_cli(
         DocumentID(doc_id) for doc_id in json.loads(files_to_index)
     ]
 
-    assert len(config.TARGET_LANGUAGES) == 1, "Must be one target language."
-    target_lang = next(iter(config.TARGET_LANGUAGES))
+    if len(config.TARGET_LANGUAGES) != 1:
+        raise config.ConfigError(
+            f"TARGET_LANGUAGES must contain exactly one language, got: {config.TARGET_LANGUAGES}"
+        )
+    target_lang = list(config.TARGET_LANGUAGES)[0]
 
     document_s3_paths: list[S3Path] = []
     for document_id in document_ids:
         s3_path: S3Path = identify_document_path(
             document_id, embeddings_input_s3_path, target_lang
         )
+        if not s3_path.exists():
+            _LOGGER.warning(
+                f"S3 path does not exist, skipping document: {s3_path}",
+                extra={"props": {"document_id": document_id, "s3_path": str(s3_path)}},
+            )
+            continue
         document_s3_paths.append(s3_path)
 
     populate_vespa(

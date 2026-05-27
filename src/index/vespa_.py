@@ -386,17 +386,23 @@ def get_document_generator(
             input=task, remove_block_types=config.BLOCKS_TO_FILTER
         )
 
+        family_document_id = DocumentID(task.document_metadata.import_id)
+        family_document = build_vespa_family_document(task, search_weights_ref)
+
         # Persist the filtered document to the indexer_input prefix. This is to ensure
         # the s3 prefix stays up to date whilst we're in the process of migrating to
         # relying upon the preprocessor's output for the snowflake data pipelines and
         # workflows. This was previously performed by the embeddings job which we have
         # deprecated.
-        S3Path(f"s3://{path.bucket}/indexer_input/{path.name}").write_text(
-            task.model_dump_json()
-        )
-
-        family_document_id = DocumentID(task.document_metadata.import_id)
-        family_document = build_vespa_family_document(task, search_weights_ref)
+        try:
+            S3Path(
+                f"s3://{path.bucket}/indexer_input/{family_document_id}.json"
+            ).write_text(task.model_dump_json())
+        except Exception:
+            _LOGGER.exception(
+                f"Failed to persist document to indexer_input prefix: {family_document_id}",
+                extra={"props": {"document_id": family_document_id}},
+            )
 
         yield FAMILY_DOCUMENT_SCHEMA, family_document_id, family_document.model_dump()
         physical_document_count += 1
