@@ -35,6 +35,7 @@ from vespa.io import VespaResponse
 
 from src import config
 from src.utils import filter_on_block_type
+from src.languages import doc_has_supported_language
 
 
 VespaConcept: TypeAlias = Passage.Concept
@@ -381,6 +382,13 @@ def get_document_generator(
     physical_document_count = 0
     for path in paths:
         task = ParserOutput.model_validate_json(path.read_text())
+
+        if not doc_has_supported_language(task):
+            _LOGGER.warning(
+                f"Document {task.document_id} skipped due to unsupported language(s): "
+                f"{task.document_metadata.languages}"
+            )
+            continue
 
         task = filter_on_block_type(
             input=task, remove_block_types=config.BLOCKS_TO_FILTER
