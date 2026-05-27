@@ -16,19 +16,19 @@ def replace_text_blocks(block: ParserOutput, new_text_blocks: list[TextBlock]):
 
 
 def filter_blocks(
-    indexer_input: ParserOutput, remove_block_types: list[str]
+    parser_output: ParserOutput, remove_block_types: list[str]
 ) -> list[TextBlock]:
     """Filter the contained TextBlocks and return this as a list of TextBlocks."""
     filtered_blocks = []
-    for block in indexer_input.get_text_blocks(including_invalid_html=True):
+    for block in parser_output.get_text_blocks(including_invalid_html=True):
         if block.type.title() not in remove_block_types:
             filtered_blocks.append(block)
         else:
             _LOGGER.info(
-                f"Filtered {block.type} block from {indexer_input.document_id}.",
+                f"Filtered {block.type} block from {parser_output.document_id}.",
                 extra={
                     "props": {
-                        "document_id": indexer_input.document_id,
+                        "document_id": parser_output.document_id,
                         "block_type": block.type,
                         "remove_block_types": remove_block_types,
                     }
@@ -58,6 +58,6 @@ def filter_on_block_type(
     return replace_text_blocks(
         block=input,
         new_text_blocks=filter_blocks(
-            indexer_input=input, remove_block_types=remove_block_types
+            parser_output=input, remove_block_types=remove_block_types
         ),
     )

@@ -1,9 +1,10 @@
+import boto3
 from pathlib import Path
 
 import pytest
+from cloudpathlib import S3Path
 from vespa.application import Vespa
 
-from tests.conftest import INFERENCE_RESULTS_DIR
 from src.index.vespa_ import (
     _NAMESPACE,
     DOCUMENT_PASSAGE_SCHEMA,
@@ -51,16 +52,27 @@ def assert_expected_document_fields_are_present(doc):
 def test_vespa_document_generator(
     test_vespa: Vespa,
     test_input_dir: Path,
+    s3_mock,
 ):
     """Test that the document generator returns documents in the correct format."""
+    s3_client = boto3.client("s3", region_name=s3_mock.region)
+    for local_path in test_input_dir.glob("*.json"):
+        s3_client.put_object(
+            Bucket=s3_mock.bucket,
+            Key=f"embeddings_input/{local_path.name}",
+            Body=local_path.read_bytes(),
+        )
 
-    paths = list(test_input_dir.glob("*.json"))
+    paths = [
+        S3Path(f"s3://{s3_mock.bucket}/embeddings_input/{p.name}")
+        for p in test_input_dir.glob("*.json")
+    ]
     assert len(paths) > 0
 
     doc_generator = get_document_generator(
         vespa=test_vespa,
         paths=paths,
-        inference_results_s3_path=INFERENCE_RESULTS_DIR,
+        inference_results_s3_path=S3Path(s3_mock.inference_results_path),
     )
 
     id_start_string = f"id:{_NAMESPACE}"
