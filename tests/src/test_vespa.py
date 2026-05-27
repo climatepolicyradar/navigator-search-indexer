@@ -1,7 +1,9 @@
+import boto3
 from cloudpathlib import S3Path
 from cpr_sdk.models.search import Passage
 from cpr_sdk.parser_models import BlockType, ParserOutput, PDFTextBlock
 import pytest
+from unittest.mock import MagicMock, patch
 
 from src.index.vespa_ import (
     DocumentID,
@@ -270,11 +272,11 @@ def test_passage_ids_match():
 @pytest.mark.usefixtures("cleanup_test_vespa_before", "cleanup_test_vespa_after")
 def test_get_document_generator(test_vespa):
     """Assert that the vespa document generator works as expected."""
-    indexer_input_s3_path = FIXTURE_DIR / "s3_files"
+    embeddings_input_s3_path = FIXTURE_DIR / "s3_files"
     paths = [
-        indexer_input_s3_path / "CCLW.executive.10002.4495.json",
-        indexer_input_s3_path / "CCLW.executive.10014.4470.json",
-        indexer_input_s3_path / "CCLW.document.i00000004.n0000.json",
+        embeddings_input_s3_path / "CCLW.executive.10002.4495.json",
+        embeddings_input_s3_path / "CCLW.executive.10014.4470.json",
+        embeddings_input_s3_path / "CCLW.document.i00000004.n0000.json",
     ]
 
     fixture_doc_ids = []
@@ -365,3 +367,24 @@ def test_get_passage_id(text_block_id, passage_idx, expected_suffix):
     doc_id = DocumentID("CCLW.executive.1.0")
     result = get_passage_id(doc_id, text_block_id, passage_idx)
     assert result == PassageID(f"{doc_id}.{expected_suffix}")
+
+
+def test_get_document_generator_persists_to_indexer_input(s3_mock, family_document_ids):
+    """Documents read from embeddings_input are written to the indexer_input prefix."""
+    paths = [S3Path(s3_mock.path) / f"{doc_id}.json" for doc_id in family_document_ids]
+
+    with patch("src.index.vespa_.get_existing_passage_ids", return_value=[]):
+        list(
+            get_document_generator(
+                MagicMock(),
+                paths,
+                S3Path(s3_mock.inference_results_path),
+            )
+        )
+
+    s3_client = boto3.client("s3", region_name=s3_mock.region)
+    for doc_id in family_document_ids:
+        response = s3_client.get_object(
+            Bucket=s3_mock.bucket, Key=f"indexer_input/{doc_id}.json"
+        )
+        ParserOutput.model_validate_json(response["Body"].read())

@@ -196,7 +196,7 @@ def s3_mock(s3_bucket_and_region, family_document_ids):
                 "LocationConstraint": s3_bucket_and_region["region"],
             },
         )
-        prefix = "indexer-input"
+        prefix = "embeddings-input"
         for doc_id in family_document_ids:
             json_path = FIXTURE_DIR / "s3_files" / f"{doc_id}.json"
             s3.put_object(

@@ -40,7 +40,7 @@ def get_html_text_block(text_block_type: str) -> HTMLTextBlock:
 
 
 @pytest.fixture
-def test_indexer_input_array() -> list[ParserOutput]:
+def test_embeddings_input_array() -> list[ParserOutput]:
     """Test ParserOutput array with html containing various text block types."""
     return [
         ParserOutput(
@@ -128,11 +128,11 @@ def test_indexer_input_array() -> list[ParserOutput]:
     ]
 
 
-def test_filter_on_block_type(test_indexer_input_array):
+def test_filter_on_block_type(test_embeddings_input_array):
     """Tests that the filter_on_block_type function removes the correct text blocks."""
 
     filtered_input = filter_on_block_type(
-        input=test_indexer_input_array[0], remove_block_types=["Text", "Figure"]
+        input=test_embeddings_input_array[0], remove_block_types=["Text", "Figure"]
     )
     assert filtered_input.html_data is not None
 
@@ -149,7 +149,7 @@ def test_filter_on_block_type(test_indexer_input_array):
 
     # Assert that we can filter on ParserOutputs that don't have valid text
     filtered_input = filter_on_block_type(
-        input=test_indexer_input_array[1], remove_block_types=["Text", "Figure"]
+        input=test_embeddings_input_array[1], remove_block_types=["Text", "Figure"]
     )
     assert filtered_input.html_data is not None
     assert len(filtered_input.html_data.text_blocks) == 2
@@ -161,19 +161,19 @@ def test_filter_on_block_type(test_indexer_input_array):
     assert filtered_input.html_data.text_blocks[1].text == ["test_text"]
 
 
-def test_has_valid_text_override(test_indexer_input_array):
+def test_has_valid_text_override(test_embeddings_input_array):
     """
     Test that the get_text_blocks method provides the right response.
 
     Tested when using the including_invalid_html parameter.
     """
 
-    assert test_indexer_input_array[1].get_text_blocks() == []
+    assert test_embeddings_input_array[1].get_text_blocks() == []
     assert (
-        test_indexer_input_array[1].get_text_blocks(including_invalid_html=True)
+        test_embeddings_input_array[1].get_text_blocks(including_invalid_html=True)
         is not []
     )
     assert (
-        len(test_indexer_input_array[1].get_text_blocks(including_invalid_html=True))
+        len(test_embeddings_input_array[1].get_text_blocks(including_invalid_html=True))
         == 3
     )
