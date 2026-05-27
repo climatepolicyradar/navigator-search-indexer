@@ -196,7 +196,7 @@ def s3_mock(s3_bucket_and_region, family_document_ids):
                 "LocationConstraint": s3_bucket_and_region["region"],
             },
         )
-        prefix = "embeddings-input"
+        prefix = "embeddings_input"
         for doc_id in family_document_ids:
             json_path = FIXTURE_DIR / "s3_files" / f"{doc_id}.json"
             s3.put_object(
@@ -205,7 +205,7 @@ def s3_mock(s3_bucket_and_region, family_document_ids):
                 Body=json_path.read_bytes(),
             )
 
-        inference_results_prefix = "inference-results"
+        inference_results_prefix = "inference_results"
         inference_result_path = INFERENCE_RESULTS_DIR / f"{family_document_ids[0]}.json"
         s3.put_object(
             Bucket=bucket,
