@@ -7,6 +7,8 @@ import boto3
 from pathlib import Path
 from datetime import datetime
 from types import SimpleNamespace
+from typing import List, Sequence, Union
+from pydantic import AnyHttpUrl
 
 from vespa.application import Vespa
 from tenacity import RetryError
@@ -14,6 +16,8 @@ from tenacity import RetryError
 from cpr_sdk.parser_models import (
     ParserOutput,
     BackendDocument,
+    HTMLData,
+    HTMLTextBlock,
     PDFData,
     PDFTextBlock,
     BlockType,
@@ -230,3 +234,160 @@ def s3_mock(s3_bucket_and_region, family_document_ids):
             prepare=prepare,
             prepare_with_uuid_ids=prepare_with_uuid_ids,
         )
+
+
+def get_html_text_block(text_block_type: str) -> HTMLTextBlock:
+    """Returns a HTMLTextBlock object with the given type."""
+    return HTMLTextBlock(
+        text=["test_text"],
+        text_block_id="test_text_block_id",
+        language="test_language",
+        type=BlockType(text_block_type),
+        type_confidence=1.0,
+    )
+
+
+def get_parser_output_for_languages_test(
+    html_data: Union[HTMLData, None],
+    source_url: Union[str, None],
+    languages: Union[Sequence[str], None],
+    content_type: Union[str, None],
+    translated: bool,
+):
+    """Return a ParserOutput object with the given parameters."""
+    return ParserOutput(
+        document_id="test_id",
+        document_metadata=BackendDocument.model_validate(
+            {
+                "publication_ts": "2013-01-01T00:00:00",
+                "name": "Dummy Name",
+                "description": "description",
+                "source_url": "http://existing.com",
+                "download_url": None,
+                "url": None,
+                "md5_sum": None,
+                "type": "EU Decision",
+                "source": "CCLW",
+                "import_id": "TESTCCLW.executive.4.4",
+                "family_import_id": "TESTCCLW.family.4.0",
+                "family_slug": "slug_TESTCCLW.family.4.0",
+                "category": "Law",
+                "geography": "EUR",
+                "languages": ["English"],
+                "metadata": {
+                    "hazards": [],
+                    "frameworks": [],
+                    "instruments": ["Capacity building|Governance"],
+                    "keywords": ["Adaptation"],
+                    "sectors": ["Economy-wide"],
+                    "topics": ["Adaptation"],
+                },
+                "slug": "dummy_slug",
+            }
+        ),
+        document_name="test_name",
+        document_description="test_description",
+        document_source_url=(AnyHttpUrl(source_url) if source_url else None),
+        document_cdn_object="test_cdn_object",
+        document_md5_sum="test_md5_sum",
+        languages=languages,
+        translated=translated,
+        document_slug="test_slug",
+        document_content_type=content_type,
+        html_data=html_data,
+        pdf_data=None,
+    )
+
+
+@pytest.fixture
+def test_parser_output_array() -> List[ParserOutput]:
+    """Returns a list of ParserOutput's with varying block types and non/valid text."""
+    return [
+        get_parser_output_for_languages_test(
+            html_data=HTMLData(
+                has_valid_text=True,
+                text_blocks=[
+                    get_html_text_block("Table"),
+                    get_html_text_block("Text"),
+                    get_html_text_block("Text"),
+                    get_html_text_block("Figure"),
+                    get_html_text_block("Text"),
+                    get_html_text_block("Google Text Block"),
+                ],
+            ),
+            source_url="https://www.google.com/path.html",
+            languages=["test_language"],
+            content_type="text/html",
+            translated=True,
+        ),
+        get_parser_output_for_languages_test(
+            html_data=HTMLData(
+                has_valid_text=False,
+                text_blocks=[
+                    get_html_text_block("Table"),
+                    get_html_text_block("Text"),
+                    get_html_text_block("Google Text Block"),
+                ],
+            ),
+            source_url="https://www.google.com/path.html",
+            languages=["test_language"],
+            content_type="text/html",
+            translated=True,
+        ),
+    ]
+
+
+@pytest.fixture
+def test_parser_output_no_source_url_no_lang_no_data() -> ParserOutput:
+    return get_parser_output_for_languages_test(
+        html_data=None,
+        source_url=None,
+        languages=None,
+        content_type=None,
+        translated=False,
+    )
+
+
+@pytest.fixture
+def test_parser_output_source_url_no_lang_no_data() -> ParserOutput:
+    return get_parser_output_for_languages_test(
+        html_data=None,
+        source_url="https://www.example.com/files/climate-document.pdf",
+        languages=None,
+        content_type=None,
+        translated=False,
+    )
+
+
+@pytest.fixture
+def test_parser_output_source_url_supported_lang_data() -> ParserOutput:
+    return get_parser_output_for_languages_test(
+        html_data=HTMLData(
+            has_valid_text=True,
+            text_blocks=[
+                get_html_text_block("Table"),
+                get_html_text_block("Google Text Block"),
+            ],
+        ),
+        source_url="https://www.example.com/files/climate-document.pdf",
+        languages=["en"],
+        content_type="text/html",
+        translated=False,
+    )
+
+
+@pytest.fixture
+def test_parser_output_source_url_un_supported_lang_data() -> ParserOutput:
+    return get_parser_output_for_languages_test(
+        html_data=HTMLData(
+            has_valid_text=True,
+            text_blocks=[
+                get_html_text_block("Table"),
+                get_html_text_block("Google Text Block"),
+            ],
+        ),
+        source_url="https://www.example.com/files/climate-document.pdf",
+        languages=["fr"],
+        content_type="text/html",
+        translated=False,
+    )
