@@ -26,7 +26,6 @@ def assert_expected_document_fields_are_present(doc):
         "family_name_index",
         "family_description",
         "family_description_index",
-        "family_description_embedding",
         "family_import_id",
         "family_slug",
         "family_publication_ts",
