@@ -107,9 +107,6 @@ class VespaFamilyDocument(BaseModel):
     family_name_index: str
     family_description: str
     family_description_index: str
-    family_description_embedding: Annotated[
-        list[float], 768
-    ]  # TODO: not yet enforced by pydantic
     family_import_id: str
     family_slug: str
     family_publication_ts: str
@@ -162,11 +159,6 @@ def build_vespa_family_document(
         family_name_index=task.document_name,
         family_description=task.document_description,
         family_description_index=task.document_description,
-        # Embeddings generation has been removed from the pipeline; populated with
-        # zeros to satisfy the Vespa schema requirement. The length is 768 to match the
-        # schema definition for the field in vespa:
-        # https://github.com/climatepolicyradar/navigator-infra/blob/main/vespa/navigator_app/schemas/document_passage.sd#L49
-        family_description_embedding=[0.0] * 768,
         family_import_id=task.document_metadata.family_import_id,
         family_slug=task.document_metadata.family_slug,
         family_publication_ts=task.document_metadata.publication_ts.isoformat(),
