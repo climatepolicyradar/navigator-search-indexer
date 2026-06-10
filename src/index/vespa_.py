@@ -90,7 +90,6 @@ class VespaDocumentPassage(BaseModel):
     text_block_type: str
     text_block_page: Optional[Annotated[int, Field(ge=0)]] = None
     text_block_coords: Optional[TextCoords] = None
-    text_embedding: Annotated[list[float], 768]
     concepts: list[VespaConcept] = []
 
 
@@ -208,11 +207,6 @@ def build_vespa_document_passage(
         text_block_coords=(
             text_block.coords if isinstance(text_block, PDFTextBlock) else None
         ),
-        # Embeddings generation has been removed from the pipeline; populated with
-        # zeros to satisfy the Vespa schema requirement. The length is 768 to match the
-        # schema definition for the field in vespa:
-        # https://github.com/climatepolicyradar/navigator-infra/blob/main/vespa/navigator_app/schemas/document_passage.sd#L49
-        text_embedding=[0.0] * 768,
     )
 
 
