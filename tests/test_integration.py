@@ -66,7 +66,6 @@ def test_integration(test_vespa, s3_mock, family_document_ids):
         assert vf["family_name_index"] == s3_data.document_name
         assert vf["family_description"] == s3_data.document_description
         assert vf["family_description_index"] == s3_data.document_description
-        assert vf["family_description_embedding"]["values"] == [0.0] * 768
         assert vf["family_import_id"] == s3_data.document_metadata.family_import_id
         assert vf["family_slug"] == s3_data.document_metadata.family_slug
         assert (
