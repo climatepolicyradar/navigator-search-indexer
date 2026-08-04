@@ -49,6 +49,10 @@ def test_integration(test_vespa, s3_mock, family_document_ids):
     )
 
     for doc_id in family_document_ids:
+        # This fixture doc is Portuguese and is filtered out by the generator's
+        # language check, so it is never indexed into Vespa.
+        if doc_id == "CCLW.document.i00001057.n0000":
+            continue
         vespa_data = get_vespa_data(test_vespa, FAMILY_DOCUMENT_SCHEMA, doc_id)
         expected = get_pipeline_fixture_row(doc_id)["vespa_family_document"]
 
