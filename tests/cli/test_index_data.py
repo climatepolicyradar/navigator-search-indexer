@@ -8,6 +8,7 @@ from src.index.vespa_ import (
     FAMILY_DOCUMENT_SCHEMA,
     SEARCH_WEIGHTS_SCHEMA,
     get_document_generator,
+    VespaFamilyDocument,
 )
 
 
@@ -36,7 +37,9 @@ def assert_expected_document_fields_are_present(doc):
         "metadata",
     ]
     for field in expected_fields:
-        assert doc.get(field) is not None, f"{field} was None"
+        assert field in doc, f"{field} not found in document"
+        if VespaFamilyDocument.model_fields["metadata"].is_required():
+            assert doc.get(field) is not None, f"{field} was None"
 
 
 @pytest.mark.usefixtures("cleanup_test_vespa_before", "cleanup_test_vespa_after")

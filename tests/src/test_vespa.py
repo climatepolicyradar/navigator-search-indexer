@@ -275,7 +275,7 @@ def test_get_document_generator(test_vespa, s3_mock, family_document_ids):
     generator = get_document_generator(test_vespa, path)
 
     EXPECTED_DOCUMENTS = 3
-    EXPECTED_PASSAGES = 169
+    EXPECTED_PASSAGES = 152
 
     schemas = []
     ids = []

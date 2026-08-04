@@ -111,7 +111,7 @@ def family_document_ids():
     return [
         "CCLW.legislative.8580.1568",  # small, has concepts, non-UUID text_block_ids
         "CCLW.document.i00003331.n0000",  # 112 passages, non-UUID text_block_ids
-        "CCLW.document.i00006295.n0000",  # small, padding doc
+        "CCLW.document.i00001057.n0000",  # small, padding doc
     ]
 
 
