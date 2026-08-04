@@ -274,8 +274,11 @@ def test_get_document_generator(test_vespa, s3_mock, family_document_ids):
 
     generator = get_document_generator(test_vespa, path)
 
-    EXPECTED_DOCUMENTS = 3
-    EXPECTED_PASSAGES = 152
+    # The third fixture doc (CCLW.document.i00001057.n0000) is Portuguese and is
+    # filtered out by the generator's language check, so it is not indexed.
+    UNSUPPORTED_LANGUAGE_DOC_ID = "CCLW.document.i00001057.n0000"
+    EXPECTED_DOCUMENTS = 2
+    EXPECTED_PASSAGES = 130
 
     schemas = []
     ids = []
@@ -316,6 +319,9 @@ def test_get_document_generator(test_vespa, s3_mock, family_document_ids):
     assert len(set(family_document_refs)) == EXPECTED_DOCUMENTS
 
     for doc_id in family_document_ids:
+        if doc_id == UNSUPPORTED_LANGUAGE_DOC_ID:
+            assert doc_id not in ids
+            continue
         assert doc_id in ids
         assert doc_id not in document_passage_ids
 
