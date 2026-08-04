@@ -19,7 +19,6 @@ from cpr_sdk.models.search import Passage
 from cpr_sdk.parser_models import (
     ParserOutput,
     PDFTextBlock,
-    VerticalFlipError,
     TextBlock,
 )
 import json
@@ -34,8 +33,6 @@ from vespa.io import VespaResponse
 
 
 from src import config
-from src.utils import filter_on_block_type
-from src.languages import doc_has_supported_language
 
 
 VespaConcept: TypeAlias = Passage.Concept
@@ -334,8 +331,7 @@ def get_passage_id(
 
 def get_document_generator(
     vespa: Vespa,
-    paths: Sequence[S3Path],
-    inference_results_s3_path: S3Path,
+    path: S3Path,
 ) -> Generator[
     Tuple[SchemaName, SearchWeightsID | DocumentID | PassageID, dict],
     None,
@@ -345,8 +341,8 @@ def get_document_generator(
     Get generator for documents to index.
 
     :param vespa: Vespa application instance.
-    :param paths: list of S3 paths to parser output JSON files.
-    :param inference_results_s3_path: directory containing concept inference results.
+    :param path: S3 path to a single `PIPELINE_DOCUMENTS_FOR_INDEXING_V1` `.jsonl`
+        export file; one file per invocation, fan-out is managed by the caller.
     :yield Generator[Tuple[SchemaName, SearchWeightsID | DocumentID | PassageID, dict], None, None]: generator of
         Vespa documents along with their schema and ID.
     """
@@ -359,44 +355,26 @@ def get_document_generator(
     )
     yield SEARCH_WEIGHTS_SCHEMA, search_weights_id, search_weights.model_dump()
 
-    _LOGGER.info(
-        "Filtering unwanted text block types.",
-        extra={"props": {"BLOCKS_TO_FILTER": config.BLOCKS_TO_FILTER}},
-    )
-
     search_weights_ref = f"id:{_NAMESPACE}:search_weights::{search_weights_id}"
     physical_document_count = 0
-    for path in paths:
-        task = ParserOutput.model_validate_json(path.read_text())
-
-        if not doc_has_supported_language(task):
-            _LOGGER.warning(
-                f"Document {task.document_id} skipped due to unsupported language(s): "
-                f"{task.document_metadata.languages}"
-            )
+    for line in path.read_text().splitlines():
+        if not line.strip():
             continue
+        row = json.loads(line)
 
-        task = filter_on_block_type(
-            input=task, remove_block_types=config.BLOCKS_TO_FILTER
+        # TODO(ENRI-1496): language-support filtering (previously
+        # doc_has_supported_language, checked against a full ParserOutput) is not
+        # replicated here - it isn't reflected in pipeline_documents_for_indexing_v1
+        # and needs an explicit decision on whether/how it still applies.
+
+        family_document_id = DocumentID(row["document_id"])
+        family_document = VespaFamilyDocument.model_validate(
+            row["vespa_family_document"]
         )
-
-        family_document_id = DocumentID(task.document_metadata.import_id)
-        family_document = build_vespa_family_document(task, search_weights_ref)
-
-        # Persist the filtered document to the indexer_input prefix. This is to ensure
-        # the s3 prefix stays up to date whilst we're in the process of migrating to
-        # relying upon the preprocessor's output for the snowflake data pipelines and
-        # workflows. This was previously performed by the embeddings job which we have
-        # deprecated.
-        try:
-            S3Path(
-                f"s3://{path.bucket}/indexer_input/{family_document_id}.json"
-            ).write_text(task.model_dump_json())
-        except Exception:
-            _LOGGER.exception(
-                f"Failed to persist document to indexer_input prefix: {family_document_id}",
-                extra={"props": {"document_id": family_document_id}},
-            )
+        assert family_document.search_weights_ref == search_weights_ref, (
+            f"search_weights_ref mismatch for {family_document_id}: "
+            f"expected {search_weights_ref}, got {family_document.search_weights_ref}"
+        )
 
         yield FAMILY_DOCUMENT_SCHEMA, family_document_id, family_document.model_dump()
         physical_document_count += 1
@@ -406,52 +384,19 @@ def get_document_generator(
                 "physical documents"
             )
 
-        try:
-            text_blocks = task.vertically_flip_text_block_coords().get_text_blocks()
-        except VerticalFlipError:
-            _LOGGER.exception(
-                f"Error flipping text blocks for {task.document_id}, coordinates "
-                "will be incorrect for displayed passages"
-            )
-            text_blocks = task.get_text_blocks()
-
         existing_doc_passage_ids = get_existing_passage_ids(vespa, family_document_id)
-
         new_passage_ids = []
 
-        # Enrich the passage with concepts from S3 Inference Results if they exist so
-        # as to not wipe concepts when indexing. The following is an interrim solution
-        # whilst platform work towards a more complete solution to consolidate indexers.
-        PASSAGE_IDS_MATCH: bool = False
-        INFERENCE_RESULT: dict[
-            TextBlockId, list[VespaConcept]
-        ] | None = retrieve_inference_result(
-            inference_results_s3_path=inference_results_s3_path,
-            document_id=task.document_id,
-        )
-
-        if INFERENCE_RESULT:
-            PASSAGE_IDS_MATCH: bool = passage_ids_match(
-                inference_result=INFERENCE_RESULT, text_blocks=text_blocks
-            )
-
-        for document_passage_idx, text_block in enumerate(text_blocks):
+        for document_passage_idx, passage_fields in enumerate(
+            row["vespa_document_passages"]
+        ):
+            document_passage = VespaDocumentPassage.model_validate(passage_fields)
             document_passage_id = get_passage_id(
                 family_document_id,
-                text_block.text_block_id,
+                document_passage.text_block_id,
                 document_passage_idx,
             )
-
             new_passage_ids.append(document_passage_id)
-
-            document_passage: VespaDocumentPassage = build_vespa_document_passage(
-                family_document_id, search_weights_ref, text_block
-            )
-
-            if INFERENCE_RESULT and PASSAGE_IDS_MATCH:
-                document_passage: VespaDocumentPassage = join_concepts(
-                    document_passage, INFERENCE_RESULT
-                )
 
             yield (
                 DOCUMENT_PASSAGE_SCHEMA,
@@ -551,16 +496,14 @@ def _batch_ingest(vespa: Vespa, to_process: Mapping[SchemaName, list]):
 
 
 def populate_vespa(
-    paths: Sequence[S3Path],
-    inference_results_s3_path: S3Path,
+    path: S3Path,
 ) -> None:
     """Index documents into Vespa."""
     vespa = _get_vespa_instance()
 
     document_generator = get_document_generator(
         vespa=vespa,
-        paths=paths,
-        inference_results_s3_path=inference_results_s3_path,
+        path=path,
     )
 
     # Process documents into Vespa in sized groups (bulk ingest operates on documents
