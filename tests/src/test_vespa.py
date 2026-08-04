@@ -1,4 +1,3 @@
-import boto3
 from cloudpathlib import S3Path
 from cpr_sdk.models.search import Passage
 from cpr_sdk.parser_models import BlockType, ParserOutput, PDFTextBlock
@@ -271,25 +270,12 @@ def test_passage_ids_match():
 @pytest.mark.usefixtures("cleanup_test_vespa_before", "cleanup_test_vespa_after")
 def test_get_document_generator(test_vespa, s3_mock, family_document_ids):
     """Assert that the vespa document generator works as expected."""
-    paths = [S3Path(s3_mock.path) / f"{doc_id}.json" for doc_id in family_document_ids]
+    path = S3Path(s3_mock.path)
 
-    fixture_doc_ids = []
-    fixture_text_blocks = []
-    for doc_id in family_document_ids:
-        fixture_content = ParserOutput.model_validate_json(
-            (FIXTURE_DIR / "s3_files" / f"{doc_id}.json").read_text()
-        )
-        fixture_doc_ids.append(fixture_content.document_id)
-        fixture_text_blocks.extend(fixture_content.text_blocks)
-
-    generator = get_document_generator(
-        test_vespa, paths, S3Path(s3_mock.inference_results_path)
-    )
+    generator = get_document_generator(test_vespa, path)
 
     EXPECTED_DOCUMENTS = 3
-    EXPECTED_PASSAGES = 1978
-    assert EXPECTED_DOCUMENTS == len(paths)
-    assert EXPECTED_PASSAGES == len(fixture_text_blocks)
+    EXPECTED_PASSAGES = 152
 
     schemas = []
     ids = []
@@ -325,12 +311,11 @@ def test_get_document_generator(test_vespa, s3_mock, family_document_ids):
     assert len(set(ids)) == len(ids)
     assert "default_weights" in ids
 
-    # Documents belong to the specific families
-    # We expect this to be 2 families as only two fixture docs have passages
+    # Documents belong to the specific families - every fixture doc has passages
     assert len(family_document_refs) == EXPECTED_PASSAGES
-    assert len(set(family_document_refs)) == 2
+    assert len(set(family_document_refs)) == EXPECTED_DOCUMENTS
 
-    for doc_id in fixture_doc_ids:
+    for doc_id in family_document_ids:
         assert doc_id in ids
         assert doc_id not in document_passage_ids
 
@@ -365,26 +350,3 @@ def test_get_passage_id(text_block_id, passage_idx, expected_suffix):
     doc_id = DocumentID("CCLW.executive.1.0")
     result = get_passage_id(doc_id, text_block_id, passage_idx)
     assert result == PassageID(f"{doc_id}.{expected_suffix}")
-
-
-@pytest.mark.usefixtures("cleanup_test_vespa_before", "cleanup_test_vespa_after")
-def test_get_document_generator_persists_to_indexer_input(
-    test_vespa, s3_mock, family_document_ids
-):
-    """Documents read from embeddings_input are written to the indexer_input prefix."""
-    paths = [S3Path(s3_mock.path) / f"{doc_id}.json" for doc_id in family_document_ids]
-
-    list(
-        get_document_generator(
-            test_vespa,
-            paths,
-            S3Path(s3_mock.inference_results_path),
-        )
-    )
-
-    s3_client = boto3.client("s3", region_name=s3_mock.region)
-    for doc_id in family_document_ids:
-        response = s3_client.get_object(
-            Bucket=s3_mock.bucket, Key=f"indexer_input/{doc_id}.json"
-        )
-        ParserOutput.model_validate_json(response["Body"].read())

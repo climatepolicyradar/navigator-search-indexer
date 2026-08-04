@@ -1,18 +1,15 @@
 from unittest.mock import patch
-import json
 import traceback
 import time
 import uuid_utils as uuid
 
 from click.testing import CliRunner
-from cpr_sdk.parser_models import ParserOutput
 import pytest
 from vespa.application import Vespa
 from vespa.io import VespaQueryResponse
-from typing import Any
 
 from cli.index_data import run_as_cli
-from conftest import FIXTURE_DIR, VESPA_TEST_ENDPOINT
+from conftest import VESPA_TEST_ENDPOINT, get_pipeline_fixture_row
 from src import config
 from src.index.vespa_ import (
     SEARCH_WEIGHTS_SCHEMA,
@@ -43,12 +40,7 @@ def test_integration(test_vespa, s3_mock, family_document_ids):
 
     result = runner.invoke(
         run_as_cli,
-        args=[
-            s3_mock.path,
-            s3_mock.inference_results_path,
-            "--files-to-index",
-            json.dumps(family_document_ids),
-        ],
+        args=[s3_mock.path],
     )
     assert result.exit_code == 0, (
         f"Exception: {result.exception if result.exception else None}\n"
@@ -58,46 +50,19 @@ def test_integration(test_vespa, s3_mock, family_document_ids):
 
     for doc_id in family_document_ids:
         vespa_data = get_vespa_data(test_vespa, FAMILY_DOCUMENT_SCHEMA, doc_id)
-        fixture_path = FIXTURE_DIR / "s3_files" / f"{doc_id}.json"
-        s3_data = ParserOutput.model_validate_json(fixture_path.read_text())
+        expected = get_pipeline_fixture_row(doc_id)["vespa_family_document"]
 
         vf = vespa_data["fields"]
-        assert vf["family_name"] == s3_data.document_name
-        assert vf["family_name_index"] == s3_data.document_name
-        assert vf["family_description"] == s3_data.document_description
-        assert vf["family_description_index"] == s3_data.document_description
-        assert vf["family_import_id"] == s3_data.document_metadata.family_import_id
-        assert vf["family_slug"] == s3_data.document_metadata.family_slug
-        assert (
-            vf["family_publication_ts"]
-            == s3_data.document_metadata.publication_ts.isoformat()
-        )
-        assert (
-            vf["family_publication_year"]
-            == s3_data.document_metadata.publication_ts.year
-        )
-        assert vf["family_category"] == s3_data.document_metadata.category
-        assert vf["family_geography"] == s3_data.document_metadata.geography
-        assert vf["family_source"] == s3_data.document_metadata.source
-        assert vf["document_import_id"] == s3_data.document_id
-        assert vf["document_slug"] == s3_data.document_slug
-        assert vf["document_languages"] == s3_data.document_metadata.languages
-        assert vf["document_content_type"] == s3_data.document_content_type
-        assert vf["document_md5_sum"] == s3_data.document_md5_sum
-        assert vf["document_cdn_object"] == s3_data.document_cdn_object
-        assert vf["document_source_url"] == s3_data.document_metadata.source_url
-        assert vf["document_title"] == s3_data.document_metadata.document_title
-        assert vf["family_geographies"] == s3_data.document_metadata.geographies
-        assert vf["corpus_import_id"] == s3_data.document_metadata.corpus_import_id
-        assert vf["corpus_type_name"] == s3_data.document_metadata.corpus_type_name
-        assert vf["collection_title"] == s3_data.document_metadata.collection_title
-        assert vf["collection_summary"] == s3_data.document_metadata.collection_summary
+        for field, value in expected.items():
+            if field == "metadata":
+                continue
+            assert vf.get(field) == value, f"{field} mismatch for {doc_id}"
 
-        # We expect metadata but it won't be the same shape as it is in s3
-        assert isinstance(vespa_data["fields"]["metadata"], list)
-        assert len(vespa_data["fields"]["metadata"]) > 0
-        for metadata_item in vespa_data["fields"]["metadata"]:
-            assert sorted(list(metadata_item.keys())) == ["name", "value"]
+        # Metadata is checked for shape only, not exact equality/ordering
+        assert isinstance(vf["metadata"], list)
+        assert len(vf["metadata"]) > 0
+        for metadata_item in vf["metadata"]:
+            assert sorted(metadata_item.keys()) == ["name", "value"]
 
 
 @patch.object(config, "VESPA_INSTANCE_URL", new=VESPA_TEST_ENDPOINT)
@@ -112,20 +77,15 @@ def test_repeated_integration(test_vespa, s3_mock, family_document_ids):
     Third run: on the same fixture, shortened but less
     Fourth Run: on the same fixture but at its original state pre shortening
     """
-    NO_CHANGE_FAMILY = "CCLW.executive.10014.4470"
-    CHANGE_FAMILY = "CCLW.executive.10002.4495"
+    NO_CHANGE_FAMILY = "CCLW.legislative.8580.1568"
+    CHANGE_FAMILY = "CCLW.document.i00003331.n0000"
 
     runner = CliRunner()
 
     # From scratch
     result = runner.invoke(
         run_as_cli,
-        args=[
-            s3_mock.path,
-            s3_mock.inference_results_path,
-            "--files-to-index",
-            json.dumps(family_document_ids),
-        ],
+        args=[s3_mock.path],
     )
     assert result.exit_code == 0, (
         f"Exception: {result.exception if result.exception else None}\n"
@@ -147,12 +107,7 @@ def test_repeated_integration(test_vespa, s3_mock, family_document_ids):
     s3_mock.prepare(CHANGE_FAMILY, limit)
     result = runner.invoke(
         run_as_cli,
-        args=[
-            s3_mock.path,
-            s3_mock.inference_results_path,
-            "--files-to-index",
-            json.dumps([CHANGE_FAMILY]),
-        ],
+        args=[s3_mock.path],
     )
     assert result.exit_code == 0, (
         f"Exception: {result.exception if result.exception else None}\n"
@@ -181,12 +136,7 @@ def test_repeated_integration(test_vespa, s3_mock, family_document_ids):
     s3_mock.prepare(CHANGE_FAMILY, limit)
     result = runner.invoke(
         run_as_cli,
-        args=[
-            s3_mock.path,
-            s3_mock.inference_results_path,
-            "--files-to-index",
-            json.dumps([CHANGE_FAMILY]),
-        ],
+        args=[s3_mock.path],
     )
     assert result.exit_code == 0, (
         f"Exception: {result.exception if result.exception else None}\n"
@@ -214,12 +164,7 @@ def test_repeated_integration(test_vespa, s3_mock, family_document_ids):
     s3_mock.prepare(CHANGE_FAMILY, None)
     result = runner.invoke(
         run_as_cli,
-        args=[
-            s3_mock.path,
-            s3_mock.inference_results_path,
-            "--files-to-index",
-            json.dumps([CHANGE_FAMILY]),
-        ],
+        args=[s3_mock.path],
     )
     assert result.exit_code == 0, (
         f"Exception: {result.exception if result.exception else None}\n"
@@ -264,26 +209,14 @@ def test_repeated_integration(test_vespa, s3_mock, family_document_ids):
 def test_concept_enrichment_integration(test_vespa, s3_mock):
     """Test that we successfully index enriched concepts."""
 
-    DOCUMENT_ID: DocumentID = DocumentID("CCLW.executive.10014.4470")
-    json_path = FIXTURE_DIR / "inference_results" / f"{DOCUMENT_ID}.json"
-    inference_results: list[dict[str, Any]] = json.loads(json_path.read_text())
-    DOCUMENT_PASSAAGES_WITH_CONCEPTS = len(
-        [
-            passage_id
-            for passage_id in inference_results
-            if len(inference_results[passage_id]) > 0
-        ]
-    )
+    DOCUMENT_ID: DocumentID = DocumentID("CCLW.legislative.8580.1568")
+    passages = get_pipeline_fixture_row(DOCUMENT_ID)["vespa_document_passages"]
+    DOCUMENT_PASSAAGES_WITH_CONCEPTS = sum(1 for p in passages if p["concepts"])
 
     runner = CliRunner()
     result = runner.invoke(
         run_as_cli,
-        args=[
-            s3_mock.path,
-            s3_mock.inference_results_path,
-            "--files-to-index",
-            json.dumps([DOCUMENT_ID]),
-        ],
+        args=[s3_mock.path],
     )
     assert result.exit_code == 0, (
         f"Exception: {result.exception if result.exception else None}\n"
@@ -328,7 +261,7 @@ def test_cleanup_on_passage_id_format_change(test_vespa, s3_mock):
     passage IDs change format. The indexer must clean up old-format passages so they
     don't accumulate as stray documents in Vespa.
     """
-    DOCUMENT_ID = "CCLW.executive.10002.4495"
+    DOCUMENT_ID = "CCLW.document.i00003331.n0000"
     runner = CliRunner()
 
     # Run 1: Index with v1 `text_block_ids` (e.g. 'p_0_b_0').
@@ -336,12 +269,7 @@ def test_cleanup_on_passage_id_format_change(test_vespa, s3_mock):
     # `get_passage_id` falls back to loop index → passage IDs end with integers.
     result = runner.invoke(
         run_as_cli,
-        args=[
-            s3_mock.path,
-            s3_mock.inference_results_path,
-            "--files-to-index",
-            json.dumps([DOCUMENT_ID]),
-        ],
+        args=[s3_mock.path],
     )
     assert result.exit_code == 0, (
         f"Exception: {result.exception if result.exception else None}\n"
@@ -369,12 +297,7 @@ def test_cleanup_on_passage_id_format_change(test_vespa, s3_mock):
     # `get_passage_id` uses UUID → passage IDs end with UUIDs so old IDs become stray
     result = runner.invoke(
         run_as_cli,
-        args=[
-            s3_mock.path,
-            s3_mock.inference_results_path,
-            "--files-to-index",
-            json.dumps([DOCUMENT_ID]),
-        ],
+        args=[s3_mock.path],
     )
     assert result.exit_code == 0, (
         f"Exception: {result.exception if result.exception else None}\n"
