@@ -33,6 +33,7 @@ from vespa.io import VespaResponse
 
 
 from src import config
+from src.languages import doc_has_supported_language
 
 
 VespaConcept: TypeAlias = Passage.Concept
@@ -362,15 +363,26 @@ def get_document_generator(
             continue
         row = json.loads(line)
 
-        # TODO(ENRI-1496): language-support filtering (previously
-        # doc_has_supported_language, checked against a full ParserOutput) is not
-        # replicated here - it isn't reflected in pipeline_documents_for_indexing_v1
-        # and needs an explicit decision on whether/how it still applies.
-
         family_document_id = DocumentID(row["document_id"])
         family_document = VespaFamilyDocument.model_validate(
             row["vespa_family_document"]
         )
+
+        if not doc_has_supported_language(
+            family_document, row["vespa_document_passages"]
+        ):
+            _LOGGER.warning(
+                f"Document {family_document_id} skipped due to unsupported "
+                f"language(s): {list(family_document.document_languages)}",
+                extra={
+                    "props": {
+                        "document_id": family_document_id,
+                        "document_languages": list(family_document.document_languages),
+                    }
+                },
+            )
+            continue
+
         assert family_document.search_weights_ref == search_weights_ref, (
             f"search_weights_ref mismatch for {family_document_id}: "
             f"expected {search_weights_ref}, got {family_document.search_weights_ref}"

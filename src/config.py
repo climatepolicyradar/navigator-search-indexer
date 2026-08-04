@@ -13,8 +13,9 @@ class ConfigError(Exception):
 # General config
 # NOTE: Comparable list being maintained at https://github.com/climatepolicyradar/knowledge-graph/blob/83bda1919cea415b6fc0813bfb214a23662a060b/flows/inference.py#L29-L33
 BLOCKS_TO_FILTER = os.getenv("BLOCKS_TO_FILTER", "Table,Figure").split(",")
-TARGET_LANGUAGES: Set[str] = set(os.getenv("TARGET_LANGUAGES", "en").lower().split(","))
-ENCODER_SUPPORTED_LANGUAGES: Set[str] = {"en"}
+# Language names as the Snowflake export writes them, not ISO codes.
+TARGET_LANGUAGES: Set[str] = {"English"}
+ENCODER_SUPPORTED_LANGUAGES: Set[str] = {"English"}
 
 # Vespa config
 VESPA_CONNECTIONS: int = int(os.getenv("VESPA_CONNECTIONS", "100"))

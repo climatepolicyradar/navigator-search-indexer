@@ -1,3 +1,6 @@
+import json
+
+import boto3
 from cloudpathlib import S3Path
 from cpr_sdk.models.search import Passage
 from cpr_sdk.parser_models import BlockType, ParserOutput, PDFTextBlock
@@ -28,7 +31,7 @@ from src.index.vespa_ import (
     _SCHEMAS_TO_PROCESS,
 )
 
-from tests.conftest import FIXTURE_DIR, get_parser_output
+from tests.conftest import FIXTURE_DIR, get_parser_output, get_pipeline_fixture_row
 
 
 INFERENCE_RESULTS_FIXTURE = FIXTURE_DIR / "inference_results"
@@ -275,7 +278,7 @@ def test_get_document_generator(test_vespa, s3_mock, family_document_ids):
     generator = get_document_generator(test_vespa, path)
 
     EXPECTED_DOCUMENTS = 3
-    EXPECTED_PASSAGES = 152
+    EXPECTED_PASSAGES = 169
 
     schemas = []
     ids = []
@@ -330,6 +333,34 @@ def test_get_document_generator(test_vespa, s3_mock, family_document_ids):
         assert family_schema == FAMILY_DOCUMENT_SCHEMA
         assert family_id in ids
         assert len(family_id.split(".")) == 4
+
+
+def test_get_document_generator_skips_unsupported_language_documents(
+    test_vespa, s3_mock
+):
+    """Documents listing more than one distinct language are not indexed.
+
+    Their content reaches the export untranslated, so indexing it would feed
+    non-English text to schemas that index every passage as English.
+    """
+    doc_id = "CCLW.legislative.4777.1812"
+    row = get_pipeline_fixture_row(doc_id)
+    assert row["vespa_family_document"]["document_languages"] == [
+        "English",
+        "Portuguese",
+    ]
+
+    key = "pipeline_documents_for_indexing/unsupported_language.jsonl"
+    boto3.client("s3", region_name=s3_mock.region).put_object(
+        Bucket=s3_mock.bucket, Key=key, Body=(json.dumps(row) + "\n").encode()
+    )
+
+    generated = list(
+        get_document_generator(test_vespa, S3Path(f"s3://{s3_mock.bucket}/{key}"))
+    )
+
+    # Only the search weights are emitted - no family document, no passages.
+    assert [schema for schema, _, _ in generated] == [SEARCH_WEIGHTS_SCHEMA]
 
 
 @pytest.mark.parametrize(
