@@ -1,3 +1,4 @@
+import functools
 import json
 import os
 import uuid_utils as uuid
@@ -24,7 +25,26 @@ from src.config import VESPA_INSTANCE_URL
 
 FIXTURE_DIR = Path(__file__).parent / "fixtures"
 INFERENCE_RESULTS_DIR = FIXTURE_DIR / "inference_results"
+PIPELINE_DOCUMENTS_FOR_INDEXING_DIR = FIXTURE_DIR / "pipeline_documents_for_indexing_v1"
 VESPA_TEST_ENDPOINT = os.getenv("VESPA_INSTANCE_URL", "http://localhost:8080")
+
+# Unrelated to family_document_ids - only backs the legacy retrieve_inference_result tests.
+_INFERENCE_RESULTS_FIXTURE_DOC_ID = "CCLW.executive.10014.4470"
+
+
+@functools.lru_cache(maxsize=None)
+def _pipeline_fixture_line(doc_id: str) -> str:
+    """Find `doc_id`'s raw jsonl line among the pipeline_documents_for_indexing_v1 fixtures."""
+    for path in PIPELINE_DOCUMENTS_FOR_INDEXING_DIR.glob("*.jsonl"):
+        for line in path.read_text().splitlines():
+            if line.strip() and json.loads(line)["document_id"] == doc_id:
+                return line
+    raise KeyError(f"No fixture row for document_id={doc_id!r}")
+
+
+def get_pipeline_fixture_row(doc_id: str) -> dict:
+    """Return the fixture row for `doc_id`, freshly parsed each call (safe to mutate)."""
+    return json.loads(_pipeline_fixture_line(doc_id))
 
 
 def pytest_configure(config):
@@ -87,11 +107,11 @@ def get_parser_output(document_id: int, family_id: int) -> ParserOutput:
 
 @pytest.fixture
 def family_document_ids():
-    """Document IDs for integration test fixtures in s3_files."""
+    """Document IDs for fixtures in tests/fixtures/pipeline_documents_for_indexing_v1."""
     return [
-        "CCLW.executive.10014.4470",
-        "CCLW.executive.10002.4495",
-        "CCLW.document.i00000004.n0000",
+        "CCLW.legislative.8580.1568",  # small, has concepts, non-UUID text_block_ids
+        "CCLW.document.i00003331.n0000",  # 112 passages, non-UUID text_block_ids
+        "CCLW.document.i00001057.n0000",  # small, padding doc
     ]
 
 
@@ -141,45 +161,43 @@ def cleanup_test_vespa_before(test_vespa):
     yield
 
 
-def _upload_s3_doc(
+def _upload_export_file(
     s3_client,
     bucket: str,
-    prefix: str,
-    doc_id: str,
+    key: str,
+    family_document_ids: list[str],
+    override_doc_id: str | None = None,
     limit: int | None = None,
     uuid_ids: bool = False,
 ) -> None:
-    """Upload a fixture doc to moto-mocked S3.
+    """Upload family_document_ids' fixture rows to moto-mocked S3 as one combined `.jsonl` file.
 
-    :param limit: truncate text blocks to this many items.
-    :param uuid_ids: replace every text_block_id with a fresh UUID (v2 format).
+    Matches the real export's one-file-many-documents shape. `override_doc_id`
+    applies `limit`/`uuid_ids` to just that document's row, leaving the rest unchanged.
+
+    :param limit: truncate the override doc's vespa_document_passages to this
+        many items.
+    :param uuid_ids: replace the override doc's every passage text_block_id with
+        a fresh UUID (v2 format).
     """
-    json_path = FIXTURE_DIR / "s3_files" / f"{doc_id}.json"
-    family_document = ParserOutput.model_validate_json(json_path.read_text())
-
-    if limit is not None:
-        family_document.pdf_data.page_metadata = family_document.pdf_data.page_metadata[
-            :limit
-        ]
-        family_document.pdf_data.text_blocks = family_document.pdf_data.text_blocks[
-            :limit
-        ]
-
-    if uuid_ids:
-        for block in family_document.pdf_data.text_blocks:
-            block.text_block_id = str(uuid.uuid4())
-
-    s3_client.put_object(
-        Bucket=bucket,
-        Key=f"{prefix}/{doc_id}.json",
-        Body=family_document.model_dump_json().encode(),
-    )
+    lines = []
+    for doc_id in family_document_ids:
+        row = get_pipeline_fixture_row(doc_id)
+        if doc_id == override_doc_id:
+            if limit is not None:
+                row["vespa_document_passages"] = row["vespa_document_passages"][:limit]
+            if uuid_ids:
+                for passage in row["vespa_document_passages"]:
+                    passage["text_block_id"] = str(uuid.uuid4())
+        lines.append(json.dumps(row))
+    body = ("\n".join(lines) + "\n").encode()
+    s3_client.put_object(Bucket=bucket, Key=key, Body=body)
 
 
 @pytest.fixture
 def s3_mock(s3_bucket_and_region, family_document_ids):
     """
-    Mock S3 using moto. Creates bucket and populates with fixture docs.
+    Mock S3 using moto. Creates bucket and populates with a combined export file.
 
     Yields object with .path (S3 URI for CLI) and .prepare(doc_id, limit) for overwrites.
     """
@@ -195,17 +213,13 @@ def s3_mock(s3_bucket_and_region, family_document_ids):
                 "LocationConstraint": s3_bucket_and_region["region"],
             },
         )
-        prefix = "embeddings_input"
-        for doc_id in family_document_ids:
-            json_path = FIXTURE_DIR / "s3_files" / f"{doc_id}.json"
-            s3.put_object(
-                Bucket=bucket,
-                Key=f"{prefix}/{doc_id}.json",
-                Body=json_path.read_bytes(),
-            )
+        key = "pipeline_documents_for_indexing/export.jsonl"
+        _upload_export_file(s3, bucket, key, family_document_ids)
 
         inference_results_prefix = "inference_results"
-        inference_result_path = INFERENCE_RESULTS_DIR / f"{family_document_ids[0]}.json"
+        inference_result_path = (
+            INFERENCE_RESULTS_DIR / f"{_INFERENCE_RESULTS_FIXTURE_DOC_ID}.json"
+        )
         s3.put_object(
             Bucket=bucket,
             Key=f"{inference_results_prefix}/{family_document_ids[0]}.json",
@@ -214,15 +228,19 @@ def s3_mock(s3_bucket_and_region, family_document_ids):
 
         def prepare(doc_id: str, limit: int | None) -> None:
             s3_client = boto3.client("s3", region_name=s3_bucket_and_region["region"])
-            _upload_s3_doc(s3_client, bucket, prefix, doc_id, limit=limit)
+            _upload_export_file(
+                s3_client, bucket, key, family_document_ids, doc_id, limit=limit
+            )
 
         def prepare_with_uuid_ids(doc_id: str) -> None:
             s3_client = boto3.client("s3", region_name=s3_bucket_and_region["region"])
-            _upload_s3_doc(s3_client, bucket, prefix, doc_id, uuid_ids=True)
+            _upload_export_file(
+                s3_client, bucket, key, family_document_ids, doc_id, uuid_ids=True
+            )
 
         inference_results_path = f"s3://{bucket}/{inference_results_prefix}"
         yield SimpleNamespace(
-            path=f"s3://{bucket}/{prefix}",
+            path=f"s3://{bucket}/{key}",
             inference_results_path=inference_results_path,
             bucket=bucket,
             region=s3_bucket_and_region["region"],
