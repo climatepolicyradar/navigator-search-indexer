@@ -26,12 +26,7 @@ def validate_languages_decorator(func):
 
 
 def document_has_one_lang_that_is_supported(document) -> bool:
-    """Return true if the document has one language that is supported by the encoder.
-
-    `document` is a VespaFamilyDocument, left unannotated to avoid a circular import.
-    The Snowflake export writes language names ('English'), not ISO codes ('en'),
-    so the supported sets in `config` are expressed as names to match.
-    """
+    """Return true if the document has one language that is supported by the encoder."""
     return bool(
         document.document_languages
         and (len(set(document.document_languages)) == 1)
