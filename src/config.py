@@ -12,7 +12,7 @@ class ConfigError(Exception):
 
 # General config
 # Language names as the Snowflake export writes them, not ISO codes.
-TARGET_LANGUAGES: Set[str] = {"English"}
+TARGET_LANGUAGES: Set[str] = {"en"}
 ENCODER_SUPPORTED_LANGUAGES: Set[str] = {"English"}
 
 # Vespa config
