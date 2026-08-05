@@ -11,7 +11,7 @@ class ConfigError(Exception):
 
 
 # General config
-# Language names as the Snowflake export writes them, not ISO codes.
+# Language names as the Snowflake export writes them, 2 letter ISO codes.
 TARGET_LANGUAGES: Set[str] = {"en"}
 ENCODER_SUPPORTED_LANGUAGES: Set[str] = {"English"}
 
