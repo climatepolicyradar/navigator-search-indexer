@@ -4,7 +4,6 @@ from pathlib import Path
 import uuid_utils as uuid
 from typing import (
     Annotated,
-    Any,
     Generator,
     Mapping,
     NewType,
@@ -16,11 +15,6 @@ from typing import (
 
 from cloudpathlib import S3Path
 from cpr_sdk.models.search import Passage
-from cpr_sdk.parser_models import (
-    ParserOutput,
-    PDFTextBlock,
-    TextBlock,
-)
 import json
 from pydantic import BaseModel, Field
 from tenacity import (
@@ -44,7 +38,6 @@ DocumentID = NewType("DocumentID", str)
 PassageID = NewType("PassageID", str)
 Coord = tuple[float, float]
 TextCoords = Sequence[Coord]  # TODO: Could do better - look at data access change
-TextBlockId = NewType("TextBlockId", str)
 SEARCH_WEIGHTS_SCHEMA = SchemaName("search_weights")
 FAMILY_DOCUMENT_SCHEMA = SchemaName("family_document")
 DOCUMENT_PASSAGE_SCHEMA = SchemaName("document_passage")
@@ -128,78 +121,6 @@ class VespaFamilyDocument(BaseModel):
     metadata: Optional[list[MetadataItem]] = None
 
 
-def reshape_metadata(
-    metadata: Optional[dict[str, list[str]]],
-) -> Optional[list[VespaFamilyDocument.MetadataItem]]:
-    if metadata is None:
-        return None
-
-    metadata_items = []
-    for key, values in metadata.items():
-        metadata_items.extend(
-            [
-                VespaFamilyDocument.MetadataItem(
-                    name=key, value=str(value) if isinstance(value, int) else value
-                )
-                for value in values
-            ]
-        )
-    return metadata_items
-
-
-def build_vespa_family_document(
-    task: ParserOutput,
-    search_weights_ref,
-) -> VespaFamilyDocument:
-    return VespaFamilyDocument(
-        search_weights_ref=search_weights_ref,
-        family_name=task.document_name,
-        family_name_index=task.document_name,
-        family_description=task.document_description,
-        family_description_index=task.document_description,
-        family_import_id=task.document_metadata.family_import_id,
-        family_slug=task.document_metadata.family_slug,
-        family_publication_ts=task.document_metadata.publication_ts.isoformat(),
-        family_publication_year=task.document_metadata.publication_ts.year,
-        family_category=task.document_metadata.category,
-        family_geography=task.document_metadata.geography,
-        family_source=task.document_metadata.source,
-        document_import_id=task.document_id,
-        document_slug=task.document_slug,
-        document_languages=task.document_metadata.languages,
-        document_md5_sum=task.document_md5_sum,
-        document_content_type=task.document_content_type,
-        document_cdn_object=task.document_cdn_object,
-        document_source_url=task.document_metadata.source_url,
-        document_title=task.document_metadata.document_title,
-        family_geographies=task.document_metadata.geographies,
-        corpus_import_id=task.document_metadata.corpus_import_id,
-        corpus_type_name=task.document_metadata.corpus_type_name,
-        collection_title=task.document_metadata.collection_title,
-        collection_summary=task.document_metadata.collection_summary,
-        metadata=reshape_metadata(task.document_metadata.metadata),
-    )
-
-
-def build_vespa_document_passage(
-    family_document_id, search_weights_ref, text_block
-) -> VespaDocumentPassage:
-    fam_doc_ref = f"id:{_NAMESPACE}:family_document::{family_document_id}"
-    return VespaDocumentPassage(
-        family_document_ref=fam_doc_ref,
-        search_weights_ref=search_weights_ref,
-        text_block="\n".join(text_block.text),
-        text_block_id=text_block.text_block_id,
-        text_block_type=str(text_block.type),
-        text_block_page=(
-            text_block.page_number if isinstance(text_block, PDFTextBlock) else None
-        ),
-        text_block_coords=(
-            text_block.coords if isinstance(text_block, PDFTextBlock) else None
-        ),
-    )
-
-
 def get_existing_passage_ids(
     vespa: Vespa, family_doc_id: DocumentID, offset: int = 0
 ) -> list[str]:
@@ -248,66 +169,6 @@ def remove_ids(vespa: Vespa, stray_ids: list[str]):
         vespa.delete_data(
             schema=DOCUMENT_PASSAGE_SCHEMA, data_id=stray_id, namespace=_NAMESPACE
         )
-
-
-def retrieve_inference_result(
-    inference_results_s3_path: S3Path, document_id: str
-) -> dict[TextBlockId, list[VespaConcept]] | None:
-    """Retrieve an individual inference results file from S3 for a document."""
-
-    root_document_s3_path: S3Path = inference_results_s3_path / f"{document_id}.json"
-    translated_document_s3_path: S3Path = (
-        inference_results_s3_path / f"{document_id}_translated_en.json"
-    )
-
-    if root_document_s3_path.exists():
-        inference_result_s3_path: S3Path = root_document_s3_path
-    elif translated_document_s3_path.exists():
-        inference_result_s3_path: S3Path = translated_document_s3_path
-    else:
-        return None
-
-    inference_result_data: dict[str, Any] = json.loads(
-        inference_result_s3_path.read_text()
-    )
-    inference_result: dict[TextBlockId, list[VespaConcept]] = {
-        TextBlockId(id): [VespaConcept.model_validate(c) for c in concepts]
-        for id, concepts in inference_result_data.items()
-    }
-
-    return inference_result
-
-
-def join_concepts(
-    document_passage: VespaDocumentPassage,
-    inference_result: dict[
-        TextBlockId,
-        list[VespaConcept],
-    ],
-) -> VespaDocumentPassage:
-    """Join Concepts from inference results on VespaDocumentPassage using the ID."""
-
-    concepts: list[VespaConcept] = inference_result.get(
-        TextBlockId(document_passage.text_block_id), []
-    )
-
-    document_passage.concepts = concepts
-
-    return document_passage
-
-
-def passage_ids_match(
-    inference_result: dict[TextBlockId, list[VespaConcept]],
-    text_blocks: Sequence[TextBlock],
-) -> bool:
-    """Compare ids of passages in an inference result against text blocks for a match."""
-    inference_result_passage_ids: list[TextBlockId] = list(inference_result.keys())
-    text_block_passage_ids: list[TextBlockId] = [
-        TextBlockId(tb.text_block_id) for tb in text_blocks
-    ]
-    if set(inference_result_passage_ids) == set(text_block_passage_ids):
-        return True
-    return False
 
 
 def get_passage_id(

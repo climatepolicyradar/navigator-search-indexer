@@ -215,7 +215,7 @@ def test_concept_enrichment_integration(test_vespa, s3_mock):
 
     DOCUMENT_ID: DocumentID = DocumentID("CCLW.legislative.8580.1568")
     passages = get_pipeline_fixture_row(DOCUMENT_ID)["vespa_document_passages"]
-    DOCUMENT_PASSAAGES_WITH_CONCEPTS = sum(1 for p in passages if p["concepts"])
+    DOCUMENT_PASSAGES_WITH_CONCEPTS = sum(1 for p in passages if p["concepts"])
 
     runner = CliRunner()
     result = runner.invoke(
@@ -252,7 +252,7 @@ def test_concept_enrichment_integration(test_vespa, s3_mock):
             if hit_fields and len(hit["fields"]["concepts"]) > 0:
                 passage_hits_with_concepts.append(hit_id)
 
-    assert len(passage_hits_with_concepts) == DOCUMENT_PASSAAGES_WITH_CONCEPTS
+    assert len(passage_hits_with_concepts) == DOCUMENT_PASSAGES_WITH_CONCEPTS
 
 
 @patch.object(config, "VESPA_INSTANCE_URL", new=VESPA_TEST_ENDPOINT)
