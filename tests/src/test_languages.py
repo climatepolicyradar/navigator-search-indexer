@@ -1,134 +1,48 @@
-from datetime import datetime
-from pydantic import AnyHttpUrl
+import pytest
 
-from cpr_sdk.parser_models import (
-    BackendDocument,
-    BlockType,
-    HTMLData,
-    HTMLTextBlock,
-    ParserOutput,
-)
-
+from src.index.vespa_ import VespaFamilyDocument
 from src.languages import doc_has_supported_language
-
-# TODO test that the warning is logged if the document language is not supported by
-#  the encoder
+from tests.conftest import get_pipeline_fixture_row
 
 
-def test_doc_has_supported_language() -> None:
+@pytest.mark.parametrize(
+    ("document_id", "expected"),
+    [
+        # A single supported language.
+        ("CCLW.legislative.8580.1568", True),  # ['English']
+        # A single non-English *source* language. The content is translated to
+        # English upstream, but the export records the original language, so the
+        # supported-language check excludes it.
+        ("CCLW.document.i00001057.n0000", False),  # ['Portuguese']
+        # No language metadata at all, but a source url and passages - this
+        # document cannot be classified, so it is not indexed.
+        ("Sabin.document.133674.133677", False),  # []
+        # Mixed languages - upstream cannot cleanly translate these, so their
+        # original text reaches the indexer. Two entries naming the same language
+        # at different ISO granularities count as mixed.
+        ("CCLW.legislative.4777.1812", False),  # ['English', 'Portuguese']
+        ("CCLW.document.i00004914.n0000", False),  # ['Nepali (...)', 'Nepali (...)']
+    ],
+)
+def test_doc_has_supported_language(document_id, expected) -> None:
     """Tests that the function returns only docs of a supported language."""
-    metadata = BackendDocument(
-        publication_ts=datetime(2013, 1, 1),
-        name="Dummy Name",
-        description="description",
-        source_url="http://existing.com",
-        type="EU Decision",
-        source="CCLW",
-        import_id="TESTCCLW.executive.4.4",
-        family_import_id="TESTCCLW.family.4.0",
-        family_slug="slug_TESTCCLW.family.4.0",
-        category="Law",
-        geography="EUR",
-        languages=["English"],
-        metadata={
-            "hazards": [],
-            "frameworks": [],
-            "instruments": ["Capacity building|Governance"],
-            "keywords": ["Adaptation"],
-            "sectors": ["Economy-wide"],
-            "topics": ["Adaptation"],
-        },
-        slug="dummy_slug",
+    row = get_pipeline_fixture_row(document_id)
+    document = VespaFamilyDocument.model_validate(row["vespa_family_document"])
+
+    assert (
+        doc_has_supported_language(document, row["vespa_document_passages"]) is expected
     )
 
-    html_blocks = [
-        HTMLTextBlock(
-            text=["test_text"],
-            text_block_id="test_text_block_id",
-            language="test_language",
-            type=BlockType("Table"),
-            type_confidence=1.0,
-        ),
-        HTMLTextBlock(
-            text=["test_text"],
-            text_block_id="test_text_block_id",
-            language="test_language",
-            type=BlockType("Google Text Block"),
-            type_confidence=1.0,
-        ),
-    ]
 
-    no_source_url_no_lang_no_data = ParserOutput(
-        document_id="test_id",
-        document_metadata=metadata,
-        document_name="test_name",
-        document_description="test_description",
-        document_source_url=None,
-        document_cdn_object="test_cdn_object",
-        document_md5_sum="test_md5_sum",
-        languages=None,
-        translated=False,
-        document_slug="test_slug",
-        document_content_type=None,
-        html_data=None,
-        pdf_data=None,
-    )
+def test_doc_has_supported_language__root_document() -> None:
+    """A document with no source url, languages or passages is still indexable.
 
-    source_url_no_lang_no_data = ParserOutput(
-        document_id="test_id",
-        document_metadata=metadata,
-        document_name="test_name",
-        document_description="test_description",
-        document_source_url=AnyHttpUrl(
-            "https://www.example.com/files/climate-document.pdf"
-        ),
-        document_cdn_object="test_cdn_object",
-        document_md5_sum="test_md5_sum",
-        languages=None,
-        translated=False,
-        document_slug="test_slug",
-        document_content_type=None,
-        html_data=None,
-        pdf_data=None,
-    )
+    Every row in the export has a source url and at least one passage, so this
+    case is built from one rather than read straight out of the fixtures.
+    """
+    row = get_pipeline_fixture_row("CCLW.legislative.8580.1568")
+    document = VespaFamilyDocument.model_validate(
+        row["vespa_family_document"]
+    ).model_copy(update={"document_languages": [], "document_source_url": None})
 
-    source_url_supported_lang_data = ParserOutput(
-        document_id="test_id",
-        document_metadata=metadata,
-        document_name="test_name",
-        document_description="test_description",
-        document_source_url=AnyHttpUrl(
-            "https://www.example.com/files/climate-document.pdf"
-        ),
-        document_cdn_object="test_cdn_object",
-        document_md5_sum="test_md5_sum",
-        languages=["en"],
-        translated=False,
-        document_slug="test_slug",
-        document_content_type="text/html",
-        html_data=HTMLData(has_valid_text=True, text_blocks=html_blocks),
-        pdf_data=None,
-    )
-
-    source_url_unsupported_lang_data = ParserOutput(
-        document_id="test_id",
-        document_metadata=metadata,
-        document_name="test_name",
-        document_description="test_description",
-        document_source_url=AnyHttpUrl(
-            "https://www.example.com/files/climate-document.pdf"
-        ),
-        document_cdn_object="test_cdn_object",
-        document_md5_sum="test_md5_sum",
-        languages=["fr"],
-        translated=False,
-        document_slug="test_slug",
-        document_content_type="text/html",
-        html_data=HTMLData(has_valid_text=True, text_blocks=html_blocks),
-        pdf_data=None,
-    )
-
-    assert doc_has_supported_language(no_source_url_no_lang_no_data) is True
-    assert doc_has_supported_language(source_url_no_lang_no_data) is False
-    assert doc_has_supported_language(source_url_supported_lang_data) is True
-    assert doc_has_supported_language(source_url_unsupported_lang_data) is False
+    assert doc_has_supported_language(document, []) is True

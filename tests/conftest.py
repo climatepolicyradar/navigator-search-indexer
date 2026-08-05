@@ -6,30 +6,17 @@ import pytest as pytest
 from moto import mock_aws
 import boto3
 from pathlib import Path
-from datetime import datetime
 from types import SimpleNamespace
 from vespa.application import Vespa
 from tenacity import RetryError
 
-from cpr_sdk.parser_models import (
-    ParserOutput,
-    BackendDocument,
-    PDFData,
-    PDFTextBlock,
-    BlockType,
-    PDFPageMetadata,
-)
 from src.index.vespa_ import _SCHEMAS_TO_PROCESS, _NAMESPACE
 from src.config import VESPA_INSTANCE_URL
 
 
 FIXTURE_DIR = Path(__file__).parent / "fixtures"
-INFERENCE_RESULTS_DIR = FIXTURE_DIR / "inference_results"
 PIPELINE_DOCUMENTS_FOR_INDEXING_DIR = FIXTURE_DIR / "pipeline_documents_for_indexing_v1"
 VESPA_TEST_ENDPOINT = os.getenv("VESPA_INSTANCE_URL", "http://localhost:8080")
-
-# Unrelated to family_document_ids - only backs the legacy retrieve_inference_result tests.
-_INFERENCE_RESULTS_FIXTURE_DOC_ID = "CCLW.executive.10014.4470"
 
 
 @functools.lru_cache(maxsize=None)
@@ -58,51 +45,6 @@ def pytest_configure(config):
             f"{VESPA_INSTANCE_URL} | {VESPA_TEST_ENDPOINT} "
             "Has something been misconfigured?"
         )
-
-
-def get_parser_output(document_id: int, family_id: int) -> ParserOutput:
-    """Create a ParserOutput with specific family and document ids."""
-    return ParserOutput(
-        document_id=f"CCLW.executive.{document_id}.0",
-        document_name="Example name",
-        document_description="Example description.",
-        document_slug="",
-        document_content_type="application/pdf",
-        pdf_data=PDFData(
-            page_metadata=[PDFPageMetadata(page_number=1, dimensions=(612.0, 792.0))],
-            md5sum="123",
-            text_blocks=[
-                PDFTextBlock(
-                    text=[f"Example text for CCLW.executive.{document_id}.0"],
-                    text_block_id="p_1_b_0",
-                    type=BlockType.TEXT,
-                    type_confidence=1.0,
-                    coords=[
-                        (89.58967590332031, 243.0702667236328),
-                        (519.2817077636719, 243.0702667236328),
-                        (519.2817077636719, 303.5213928222656),
-                        (89.58967590332031, 303.5213928222656),
-                    ],
-                    page_number=1,
-                )
-            ],
-        ),
-        document_metadata=BackendDocument(
-            name="Example name",
-            description="Example description.",
-            import_id=f"CCLW.executive.{document_id}.0",
-            slug="",
-            family_import_id=f"CCLW.family.{family_id}.0",
-            family_slug="",
-            publication_ts=datetime.now(),
-            type="",
-            source="",
-            category="",
-            geography="",
-            languages=[],
-            metadata={},
-        ),
-    )
 
 
 @pytest.fixture
@@ -216,16 +158,6 @@ def s3_mock(s3_bucket_and_region, family_document_ids):
         key = "pipeline_documents_for_indexing/export.jsonl"
         _upload_export_file(s3, bucket, key, family_document_ids)
 
-        inference_results_prefix = "inference_results"
-        inference_result_path = (
-            INFERENCE_RESULTS_DIR / f"{_INFERENCE_RESULTS_FIXTURE_DOC_ID}.json"
-        )
-        s3.put_object(
-            Bucket=bucket,
-            Key=f"{inference_results_prefix}/{family_document_ids[0]}.json",
-            Body=inference_result_path.read_bytes(),
-        )
-
         def prepare(doc_id: str, limit: int | None) -> None:
             s3_client = boto3.client("s3", region_name=s3_bucket_and_region["region"])
             _upload_export_file(
@@ -238,10 +170,8 @@ def s3_mock(s3_bucket_and_region, family_document_ids):
                 s3_client, bucket, key, family_document_ids, doc_id, uuid_ids=True
             )
 
-        inference_results_path = f"s3://{bucket}/{inference_results_prefix}"
         yield SimpleNamespace(
             path=f"s3://{bucket}/{key}",
-            inference_results_path=inference_results_path,
             bucket=bucket,
             region=s3_bucket_and_region["region"],
             prepare=prepare,

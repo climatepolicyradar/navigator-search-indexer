@@ -49,6 +49,10 @@ def test_integration(test_vespa, s3_mock, family_document_ids):
     )
 
     for doc_id in family_document_ids:
+        # This fixture doc is Portuguese and is filtered out by the generator's
+        # language check, so it is never indexed into Vespa.
+        if doc_id == "CCLW.document.i00001057.n0000":
+            continue
         vespa_data = get_vespa_data(test_vespa, FAMILY_DOCUMENT_SCHEMA, doc_id)
         expected = get_pipeline_fixture_row(doc_id)["vespa_family_document"]
 
@@ -211,7 +215,7 @@ def test_concept_enrichment_integration(test_vespa, s3_mock):
 
     DOCUMENT_ID: DocumentID = DocumentID("CCLW.legislative.8580.1568")
     passages = get_pipeline_fixture_row(DOCUMENT_ID)["vespa_document_passages"]
-    DOCUMENT_PASSAAGES_WITH_CONCEPTS = sum(1 for p in passages if p["concepts"])
+    DOCUMENT_PASSAGES_WITH_CONCEPTS = sum(1 for p in passages if p["concepts"])
 
     runner = CliRunner()
     result = runner.invoke(
@@ -248,7 +252,7 @@ def test_concept_enrichment_integration(test_vespa, s3_mock):
             if hit_fields and len(hit["fields"]["concepts"]) > 0:
                 passage_hits_with_concepts.append(hit_id)
 
-    assert len(passage_hits_with_concepts) == DOCUMENT_PASSAAGES_WITH_CONCEPTS
+    assert len(passage_hits_with_concepts) == DOCUMENT_PASSAGES_WITH_CONCEPTS
 
 
 @patch.object(config, "VESPA_INSTANCE_URL", new=VESPA_TEST_ENDPOINT)
