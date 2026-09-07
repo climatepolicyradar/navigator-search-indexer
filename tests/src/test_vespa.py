@@ -166,8 +166,13 @@ def test_get_document_generator__real_export_with_line_separator(
         s3.put_object(Bucket=bucket, Key=key, Body=fixture_path.read_bytes())
 
         path = S3Path(f"s3://{bucket}/{key}")
-        ids = [doc_id for _, doc_id, _ in get_document_generator(test_vespa, path)]
+        results = list(get_document_generator(test_vespa, path))
 
+    # search_weights + 1 family_document + 1 passage. If the record had been
+    # shredded by an incorrect line split, this count would be wrong (or
+    # json.loads would have raised before we got here).
+    assert len(results) == 3
+    ids = [doc_id for _, doc_id, _ in results]
     assert "Sabin.document.131481.131485" in ids
 
 
