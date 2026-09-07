@@ -23,7 +23,7 @@ VESPA_TEST_ENDPOINT = os.getenv("VESPA_INSTANCE_URL", "http://localhost:8080")
 def _pipeline_fixture_line(doc_id: str) -> str:
     """Find `doc_id`'s raw jsonl line among the pipeline_documents_for_indexing_v1 fixtures."""
     for path in PIPELINE_DOCUMENTS_FOR_INDEXING_DIR.glob("*.jsonl"):
-        for line in path.read_text().splitlines():
+        for line in path.read_text().split("\n"):
             if line.strip() and json.loads(line)["document_id"] == doc_id:
                 return line
     raise KeyError(f"No fixture row for document_id={doc_id!r}")
