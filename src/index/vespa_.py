@@ -219,7 +219,7 @@ def get_document_generator(
 
     search_weights_ref = f"id:{_NAMESPACE}:search_weights::{search_weights_id}"
     physical_document_count = 0
-    for line in path.read_text().splitlines():
+    for line in path.read_text().split("\n"):
         if not line.strip():
             continue
         row = json.loads(line)
