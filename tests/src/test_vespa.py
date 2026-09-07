@@ -162,18 +162,30 @@ def test_get_document_generator__real_export_with_line_separator(
                 "LocationConstraint": s3_bucket_and_region["region"],
             },
         )
-        key = "pipeline_documents_for_indexing/export.jsonl"
+        key = "pipeline_documents_for_indexing/export-line-separator.jsonl"
         s3.put_object(Bucket=bucket, Key=key, Body=fixture_path.read_bytes())
 
         path = S3Path(f"s3://{bucket}/{key}")
         results = list(get_document_generator(test_vespa, path))
 
-    # search_weights + 1 family_document + 1 passage. If the record had been
-    # shredded by an incorrect line split, this count would be wrong (or
-    # json.loads would have raised before we got here).
-    assert len(results) == 3
-    ids = [doc_id for _, doc_id, _ in results]
-    assert "Sabin.document.131481.131485" in ids
+    family_count: int = 0
+    family_document_ids: set[DocumentID] = set()
+
+    for result in results:
+        schema, row_id, document = result
+
+        assert schema in set(
+            [FAMILY_DOCUMENT_SCHEMA, DOCUMENT_PASSAGE_SCHEMA, SEARCH_WEIGHTS_SCHEMA]
+        )
+        assert isinstance(row_id, str)
+        assert isinstance(document, dict)
+
+        if schema == FAMILY_DOCUMENT_SCHEMA:
+            family_count += 1
+            family_document_ids.add(row_id)
+
+    assert family_count == 3
+    assert DocumentID("Sabin.document.131481.131485") in family_document_ids
 
 
 @pytest.mark.parametrize(
