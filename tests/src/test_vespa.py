@@ -1,4 +1,8 @@
+from pathlib import Path
+
+import boto3
 from cloudpathlib import S3Path
+from moto import mock_aws
 import pytest
 
 from src.index.vespa_ import (
@@ -135,6 +139,36 @@ def test_get_document_generator(test_vespa, s3_mock, family_document_ids):
         assert family_schema == FAMILY_DOCUMENT_SCHEMA
         assert family_id in ids
         assert len(family_id.split(".")) == 4
+
+
+@pytest.mark.usefixtures("cleanup_test_vespa_before", "cleanup_test_vespa_after")
+def test_get_document_generator__real_export_with_line_separator(
+    test_vespa, s3_bucket_and_region
+):
+    """Validate the generator can handle unicode escape characters."""
+    fixture_path = (
+        Path(__file__).parent.parent
+        / "fixtures"
+        / "pipeline_documents_for_indexing_v1"
+        / "data_0_0_4.jsonl"
+    )
+
+    with mock_aws():
+        s3 = boto3.client("s3", region_name=s3_bucket_and_region["region"])
+        bucket = s3_bucket_and_region["bucket"]
+        s3.create_bucket(
+            Bucket=bucket,
+            CreateBucketConfiguration={
+                "LocationConstraint": s3_bucket_and_region["region"],
+            },
+        )
+        key = "pipeline_documents_for_indexing/export.jsonl"
+        s3.put_object(Bucket=bucket, Key=key, Body=fixture_path.read_bytes())
+
+        path = S3Path(f"s3://{bucket}/{key}")
+        ids = [doc_id for _, doc_id, _ in get_document_generator(test_vespa, path)]
+
+    assert "Sabin.document.131481.131485" in ids
 
 
 @pytest.mark.parametrize(
