@@ -1,4 +1,5 @@
-from collections import defaultdict
+from collections import Counter, defaultdict
+from dataclasses import dataclass
 import logging
 from pathlib import Path
 import uuid_utils as uuid
@@ -192,6 +193,32 @@ def get_passage_id(
         raise
 
 
+def get_concept_counts(
+    document_passages: list[tuple[int, VespaDocumentPassage]]
+) -> dict[str, int]:
+    @dataclass(frozen=True)
+    class SimpleConcept:
+        id: str
+        name: str
+        model: str
+
+    simple_concepts: list[SimpleConcept] = []
+    for _, passage in document_passages:
+        for concept in passage.concepts:
+            simple_concepts.append(
+                SimpleConcept(id=concept.id, name=concept.name, model=concept.model)
+            )
+
+    concepts_counts: Counter[SimpleConcept] = Counter(simple_concepts)
+
+    concepts_counts_with_names: dict[str, int] = {
+        f"{concept.id}:{concept.name}": count
+        for concept, count in concepts_counts.items()
+    }
+
+    return concepts_counts_with_names
+
+
 def get_document_generator(
     vespa: Vespa,
     path: S3Path,
@@ -225,9 +252,16 @@ def get_document_generator(
             continue
         row = json.loads(line)
 
+        document_passages: list[tuple[int, VespaDocumentPassage]] = [
+            (idx, VespaDocumentPassage.model_validate(passage_fields))
+            for idx, passage_fields in enumerate(row["vespa_document_passages"])
+        ]
         family_document_id = DocumentID(row["document_id"])
         family_document = VespaFamilyDocument.model_validate(
             row["vespa_family_document"]
+        )
+        family_document.concept_counts = get_concept_counts(
+            document_passages=document_passages
         )
 
         if not doc_has_supported_language(
@@ -261,10 +295,7 @@ def get_document_generator(
         existing_doc_passage_ids = get_existing_passage_ids(vespa, family_document_id)
         new_passage_ids = []
 
-        for document_passage_idx, passage_fields in enumerate(
-            row["vespa_document_passages"]
-        ):
-            document_passage = VespaDocumentPassage.model_validate(passage_fields)
+        for document_passage_idx, document_passage in document_passages:
             document_passage_id = get_passage_id(
                 family_document_id,
                 document_passage.text_block_id,
