@@ -35,6 +35,7 @@ def assert_expected_document_fields_are_present(doc):
         "collection_title",
         "collection_summary",
         "metadata",
+        "concept_counts",
     ]
     for field in expected_fields:
         assert field in doc, f"{field} not found in document"
