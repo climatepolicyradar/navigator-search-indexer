@@ -119,6 +119,7 @@ class VespaFamilyDocument(BaseModel):
     collection_title: Optional[str] = None
     collection_summary: Optional[str] = None
     metadata: Optional[list[MetadataItem]] = None
+    concept_counts: Optional[dict[str, int]] = None
 
 
 def get_existing_passage_ids(
