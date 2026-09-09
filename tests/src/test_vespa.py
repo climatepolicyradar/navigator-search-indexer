@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 from pathlib import Path
 
 import boto3
@@ -8,11 +9,13 @@ import pytest
 from src.index.vespa_ import (
     DocumentID,
     PassageID,
+    get_concept_counts,
     get_existing_passage_ids,
     get_passage_id,
     remove_ids,
     determine_stray_ids,
     get_document_generator,
+    VespaConcept,
     VespaDocumentPassage,
     VespaFamilyDocument,
     VespaSearchWeights,
@@ -21,6 +24,65 @@ from src.index.vespa_ import (
     DOCUMENT_PASSAGE_SCHEMA,
     _SCHEMAS_TO_PROCESS,
 )
+
+
+def test_get_concept_counts():
+    concept_a = VespaConcept(
+        id="Q1",
+        name="adaptation",
+        model="model_1",
+        start=0,
+        end=1,
+        timestamp=datetime.now(timezone.utc),
+    )
+    concept_b = VespaConcept(
+        id="Q2",
+        name="mitigation",
+        model="model_1",
+        start=0,
+        end=1,
+        timestamp=datetime.now(timezone.utc),
+    )
+
+    document_passages = [
+        (
+            0,
+            VespaDocumentPassage(
+                search_weights_ref="search_weights_ref",
+                family_document_ref="family_document_ref",
+                text_block="text",
+                text_block_id="text_block_id",
+                text_block_type="Text",
+                concepts=[concept_a, concept_b],
+            ),
+        ),
+        (
+            1,
+            VespaDocumentPassage(
+                search_weights_ref="search_weights_ref",
+                family_document_ref="family_document_ref",
+                text_block="text",
+                text_block_id="text_block_id",
+                text_block_type="Text",
+                concepts=[concept_a],
+            ),
+        ),
+        (
+            2,
+            VespaDocumentPassage(
+                search_weights_ref="search_weights_ref",
+                family_document_ref="family_document_ref",
+                text_block="text",
+                text_block_id="text_block_id",
+                text_block_type="Text",
+                concepts=[],
+            ),
+        ),
+    ]
+
+    counts = get_concept_counts(document_passages=document_passages)
+
+    assert counts == {"Q1:adaptation": 2, "Q2:mitigation": 1}
 
 
 @pytest.mark.usefixtures("cleanup_test_vespa_before", "cleanup_test_vespa_after")
